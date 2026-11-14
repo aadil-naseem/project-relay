@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { PlaceholderRoute } from './app/PlaceholderRoute'
+import ComponentKit from './pages/Kit/ComponentKit'
 
 const screens = [
   { path: '/', number: 'S0', title: 'Landing', route: '/' },
@@ -21,6 +22,10 @@ export const router = createBrowserRouter([
     path,
     element: <PlaceholderRoute {...props} />,
   })),
+  {
+    path: '/app/_kit',
+    element: <ComponentKit />,
+  },
   {
     path: '*',
     element: <PlaceholderRoute number="S10" title="Line not found" route="*" />,

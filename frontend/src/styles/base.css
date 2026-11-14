@@ -1,3 +1,6 @@
+@import url('../components/primitives/primitives.css');
+@import url('../components/domain/domain.css');
+
 :root {
   color: var(--text);
   background: var(--bg);

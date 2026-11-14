@@ -29,7 +29,7 @@ Phase tracker. Updated at the end of every phase (R11).
 Technical Phase 14 is intentionally deferred per user direction; do not mark it green or create `backend-v1` until its test gate passes. Frontend work is proceeding against the existing API contract. The backend gate and integration/failure testing remain required before final rehearsal.
 
 - [x] F0 Foundations
-- [ ] F1 Component library
+- [x] F1 Component library
 - [ ] F2 App shell, navigation, shutter
 - [ ] F3 Desk
 - [ ] F3 Exposure
@@ -210,6 +210,14 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Added `npm run lint:palette`; passed. `npm run lint` passed. `npm run build` passed. Initial JS bundle is 347.69 KB / 109.15 KB gzip (planner F0 target is to keep three/R3F lazy; F0 does not yet lazy-load routes, to revisit before screen bundles).
 - Browser console had no errors. Screenshot: `docs/screens/F0/desk-foundation.png`.
 - F0 is infrastructure/placeholders only: no functional screen has been designed yet. Next up is F1 shared primitives, then F2 shell; after that implement one screen at a time and wait for user confirmation between screens.
+
+### Frontend F1 - DONE (commit pending)
+- Added shared primitives under `src/components/primitives/`: Frame with registration ticks, Button variants/loading/disabled, Segmented, Chip, Nameplate, Stamp, Tooltip, Drawer, Dialog, Tabs, Toggle, Slider, Field/Input, striped Table, Skeleton, Toast, Kbd, and an inline glyph set.
+- Added domain components under `src/components/domain/`: Risk/Order/Fallback/Backup status pills (shape + text + semantic palette, including STALE and EXCLUDED reason hatch), ConfidenceBars, DataLabelBadge, WeatherSourceBadge, Money, Odometer, StackLight, ShiftClock, HorizonBar, ReadinessRing, AlertBanner, DimensionLine, CalcLog, PaperSheet, RelayCircuit, ShiftChart, DependencyGraph, CandidateCard, RouteCard, RedactionSheet.
+- Added centralized `src/lib/status.js` and `format.js`; all 4 risk levels / 3 order states / 3 fallback levels / 6 backup effective statuses / 5 confidence states are mapped.
+- Added hidden `/app/_kit` visual-regression gallery; no product screen design was started. Browser accessibility snapshot showed all gallery sections and no console errors.
+- Unit tests use Node's built-in runner: money and odometer formatting, distinct risk/status encodings, full backup statuses, and confidence bars: **6/6 pass**.
+- Done gates: `npm test` PASS; `npm run lint` PASS; `npm run lint:palette` PASS; `npm run build` PASS (initial app JS 363.59 KB / 113.88 KB gzip, includes the component kit and is above the planner's 350 KB initial budget; F2/F3 should lazy-load the kit or page chunks). Browser screenshot capture was unavailable during this phase; visual verification used the in-browser accessibility snapshot.
 
 ### Phase 12 - DONE (commit 0ef204b, pushed)
 - `scripts/make_sample_drawings.py`: 3 vector PDFs WITH text layers + 200-DPI PNGs (longest side <= 2000 px) + one deliberately messy variant (rotated 90 deg, contrast 0.45); title blocks with fictional customers; `expected.json` ground truth per drawing. Synthetic only - free-tier provider inputs may be stored by the provider (R9).
