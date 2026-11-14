@@ -272,7 +272,7 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - `npm test` 6/6; lint, palette lint, build pass. User screenshot at 1366×768 reviewed: relay circuit, readiness, review, action and history are legible. Moved the weighted score label below the ring to avoid overlapping the gauge. Screenshot attachment is in chat and could not be copied locally via browser tools.
 - No Passports work has started; wait for confirmation before F6.
 
-### Frontend F6-S4 Passports & RFQ - IMPLEMENTED (review pending)
+### Frontend F6-S4 Passports & RFQ - IMPLEMENTED (commit 76f3998, pushed; review pending)
 - Added the five-step Drawing → Review → Confirm → Redacted RFQ → Share flow. Sample tray has Pump shaft / Piston rod / Valve flange; sample PNGs + PDFs are served locally from `frontend/public/drawings/`. File picker and drop target accept PDF/PNG/JPG. No Gemini calls are needed for golden samples; repeated-provider 429s are not retried from the UI.
 - Extraction pending state uses a scan line only while the request is actually in flight. Provider/latency/degraded metadata is displayed. Rules-only mode has the explicit fallback banner. Manual draft remains available.
 - Passport editor shows confidence/source per field, low-confidence disagreements and candidate picking, editable dimensions, route/material fields, missing-confirm requirements, and planner-cycle-time caveat. Confirmation calls backend and links the created part; edit changes are saved as user-confirmed.
