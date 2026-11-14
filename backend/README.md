@@ -28,6 +28,16 @@ Settings are read from `backend/.env` when present; environment variables overri
 
 Replay is historical Cyclone Michaung rain shifted to the current demo clock. Exposure is a risk indicator, not a flood model; curated planning zones are not official flood maps.
 
+## Capture the frontend offline snapshot
+
+From `backend/`:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\capture_frontend_snapshot.py
+```
+
+This captures a replay pack to `frontend/src/data/snapshot.json` using a temporary isolated SQLite database and the committed golden drawing cache. It does not change the developer demo database or call Gemini/Open-Meteo. Run it when the replay data contract changes.
+
 ## Tests and contract
 
 From `backend/`:

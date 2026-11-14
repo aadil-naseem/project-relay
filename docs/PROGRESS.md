@@ -26,7 +26,7 @@ Phase tracker. Updated at the end of every phase (R11).
 
 ## Frontend planner subphases
 
-Phase 14 was initially deferred by user choice. The user later authorized it; suites A–K and M passed and `backend-v1` was tagged on 2026-11-15. F11 integration, snapshot capture, performance and final rehearsal remain pending.
+Phase 14 was initially deferred by user choice. The user later authorized it; suites A–K and M passed and `backend-v1` was tagged on 2026-11-15. Snapshot capture is complete; F11 integration, performance and final rehearsal remain pending.
 
 - [x] F0 Foundations
 - [x] F1 Component library
@@ -38,7 +38,7 @@ Phase 14 was initially deferred by user choice. The user later authorized it; su
 - [x] F5 Recovery
 - [x] F5 Partners & Readiness
 - [x] F6 Passports & RFQ
-- [ ] F7 Stage Controls, Presenter, Proof, System (S9/S8/S10 reviewed; snapshot pack/capture deferred to F11)
+- [x] F7 Stage Controls, Presenter, Proof, System (snapshot fallback captured and wired)
 - [ ] F8 Landing hero (visual review done; 50+ fps measurement deferred to F11)
 - [x] F9 Landing scroll story (visual review approved; smoother scroll verified)
 - [ ] F10 Persistent world backdrop (stretch)
@@ -48,7 +48,7 @@ Phase 14 was initially deferred by user choice. The user later authorized it; su
 
 1. **Phase 14 closeout — DONE:** suites A–K and M passed; `docs/TEST_REPORT.md` and `docs/openapi.snapshot.json` committed/pushed; `backend-v1` tagged. Optional suite L was not run.
 2. **F9 Landing scroll story — DONE:** visual review approved; smoothing, checks, commit and push complete.
-3. **Snapshot safety net:** in F11, capture the replay snapshot pack and wire read-only snapshot mode/System action.
+3. **Snapshot safety net — DONE:** captured the isolated replay pack and wired the offline System action, global saved-snapshot ribbon, and read-only API/UI mode.
 4. **Phase 17 integration:** run frontend/backend integration and failure-injection checks; record results.
 5. **Phase 18 freeze/submission:** performance and accessibility pass, rehearsal, final screenshots and submission freeze.
 
@@ -300,7 +300,7 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Browser smoke: weather replay/synthetic switching; reset confirmation cancel; `R` called `POST /demo/reset` (200) and returned to Desk/step 1; presenter advanced through What-if, Recovery and Partners; `H` hid/restored the strip; accessibility/scene toggles applied and were restored to defaults. Stage readouts were healthy, and the reloaded browser had no console errors.
 - User-reviewed screenshots show the Stage drawer hierarchy/readouts and Presenter strip; the drawer’s bottom controls were made scrollable after review. A reset-state mismatch found in the strip screenshot was corrected.
 - `npm test` 6/6; `npm run lint`, `npm run lint:palette`, and `npm run build` pass.
-- F7 screen implementations S9, S8 and S10 are reviewed. Snapshot data/capture remains pending for F11, so the F7 checkbox stays open. Phase 14 was subsequently completed and tagged.
+- F7 screen implementations S9, S8 and S10 are reviewed. Snapshot data/capture was subsequently completed in F11; see the snapshot safety-net log below. Phase 14 was completed and tagged.
 
 ### Frontend F7-S8 Proof & Method - DONE (screenshot reviewed)
 - Replaced the `/app/proof` placeholder with the Michaung exposure back-test table and score bars, four deterministic method summaries (exposure, weak points, matching, readiness), drawing-AI boundary, limits and data sources, and the six brief glossary terms. The Exposure CTA opens the screen with the live trace.
@@ -311,7 +311,7 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 
 ### Frontend F7-S10 System screens - DONE (user confirmed)
 - Replaced both nested and app-wide unknown-route placeholders with the “Line not found” relay-contact screen and Back to Desk action.
-- Added an AppShell health-error boundary for the full-page “Can’t reach the server” state with Retry. “Open saved snapshot” is present but disabled because no snapshot pack exists in this build; capture/read-only snapshot wiring remains scheduled for F11.
+- Added an AppShell health-error boundary for the full-page “Can’t reach the server” state with Retry and an enabled “Open saved snapshot” action. Snapshot-mode wiring and pack capture are now complete; see the snapshot safety-net log.
 - Offline map-tile badges and vector/site-marker fallbacks were already implemented in Desk and Exposure; they remain intact.
 - Browser smoke: nested and global 404 routes render and Back to Desk works; an isolated dev server pointed at an unreachable API showed the backend-unavailable page and the unavailable-snapshot explanation. User confirmed the System screens work as expected.
 - `npm test` 7/7; lint, palette lint and build pass. Phase 14 required test suites have passed.
@@ -356,3 +356,10 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Added a reversible five-chapter pinned story with GSAP ScrollTrigger + Lenis, a static/mobile fallback, story callouts, partner relay, readiness close, and post-story method/proof/limits/CTA sections.
 - Smoothed wheel response and camera transitions after user review. Honest replay labels are retained; sample values are not represented as live.
 - User approved the final visuals and scroll feel. `npm test` 11/11, lint, palette lint and production build pass. Desktop Lenis interaction was previously smoke-tested without console errors; the final smoothing was build/test verified.
+
+### Snapshot safety net — DONE
+- Added `frontend/src/data/snapshot.json`, a 20-endpoint, `SIMULATED SAMPLE` replay capture covering dashboard, SPOF, exposure/map, relationships, readiness, stress test, recovery request/tracking/handover, and confirmed passport/RFQ, plus supporting screen queries.
+- Added `backend/scripts/capture_frontend_snapshot.py`. It builds/captures in a temporary isolated SQLite database, uses replay and the committed golden drawing cache, makes no live provider calls, and leaves the developer demo database untouched.
+- “Open saved snapshot” now enters `/app` without health/API requests. The persistent ribbon says “SAVED SNAPSHOT · NOT LIVE”, shows capture time, and offers a return-to-live action. The client resolves captured GETs locally, permits only the read-only matching search POST, and rejects all writes; persistent write controls are disabled.
+- Recovery and passport navigation open their captured records automatically in snapshot mode. Read-only data views for Desk, Weak Points, Exposure, What-if, Recovery, Partners, Passports and Proof were browser-smoke-tested; the outage action was tested with backend requests blocked in the browser. No browser console errors or backend requests occurred after entering snapshot mode.
+- Frontend tests 15/15, lint, palette lint, production build, and Ruff on the capture script pass. The 50+ fps/accessibility/rehearsal parts of F11 remain pending.

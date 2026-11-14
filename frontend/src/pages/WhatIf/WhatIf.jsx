@@ -11,6 +11,7 @@ import { ShiftChart } from './ShiftChart'
 import { ZonePickerMap } from './ZonePickerMap'
 import geometry from '../../data/exposureGeometry.json'
 import scopes from '../../data/scenarioScopes.json'
+import { useUiStore } from '../../store/ui'
 
 const hazards = [
   { value: 'FLOOD', glyph: '≋', label: 'Flood' },
@@ -31,6 +32,7 @@ const scopeTypes = [
 
 export default function WhatIf() {
   const navigate = useRelayNavigate()
+  const snapshotMode = useUiStore((state) => state.snapshotMode)
   const { id } = useParams()
   const [searchParams] = useSearchParams()
   const autoTest = useStressTest(id)
@@ -188,7 +190,7 @@ export default function WhatIf() {
 
             <Slider label="Starts in (hours)" min={0} max={72} step={1} value={startHours} onChange={setStartHours} />
             <Slider label="Duration (hours)" min={6} max={120} step={6} value={durationHours} onChange={setDurationHours} />
-            <Button disabled={manualTest.isPending || (scopeType !== 'exposure_alert' && scopeIds.length === 0)} loading={manualTest.isPending} onClick={run}>Run test</Button>
+            <Button disabled={snapshotMode || manualTest.isPending || (scopeType !== 'exposure_alert' && scopeIds.length === 0)} loading={manualTest.isPending} onClick={run}>Run test</Button>
           </Frame>
 
           <section className="whatif-results">
@@ -198,13 +200,13 @@ export default function WhatIf() {
                 <h2>Scenario results appear here</h2>
                 <p>Choose a hazard, scope, start and duration, then run the test. The schedule compares baseline completion against the stressed schedule.</p>
               </Frame>
-            ) : <StressResults result={result} onOpenRecovery={openRecovery} onShowTrace={() => setTraceOpen(true)} />}
+            ) : <StressResults result={result} onOpenRecovery={openRecovery} onShowTrace={() => setTraceOpen(true)} readOnly={snapshotMode} />}
           </section>
         </section>
       )}
 
       {id && (result ? (
-        <StressResults result={result} onOpenRecovery={openRecovery} onShowTrace={() => setTraceOpen(true)} />
+        <StressResults result={result} onOpenRecovery={openRecovery} onShowTrace={() => setTraceOpen(true)} readOnly={snapshotMode} />
       ) : autoTest.isError ? (
         <Frame className="whatif-empty"><Nameplate>{autoTest.error.code || 'NOT_FOUND'}</Nameplate><p>{autoTest.error.message}</p><Button variant="secondary" onClick={() => autoTest.refetch()}>Retry</Button></Frame>
       ) : null)}
@@ -214,7 +216,7 @@ export default function WhatIf() {
   )
 }
 
-function StressResults({ result, onOpenRecovery, onShowTrace }) {
+function StressResults({ result, onOpenRecovery, onShowTrace, readOnly = false }) {
   const summary = result.summary
   return (
     <div className="whatif-result-stack">
@@ -235,7 +237,7 @@ function StressResults({ result, onOpenRecovery, onShowTrace }) {
           <div><span className="f0-kicker">T+00 ───────────────────────── T+168 h</span><h2>Shift chart</h2></div>
           <Button variant="ghost" size="small" onClick={onShowTrace}>Calc log</Button>
         </header>
-        <ShiftChart result={result} onOpenRecovery={(orderId) => onOpenRecovery(orderId, result.id)} />
+          <ShiftChart result={result} onOpenRecovery={(orderId) => onOpenRecovery(orderId, result.id)} readOnly={readOnly} />
       </Frame>
     </div>
   )

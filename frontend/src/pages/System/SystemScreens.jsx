@@ -24,7 +24,7 @@ export function SystemNotFound() {
   )
 }
 
-export function BackendUnavailable({ error, retrying = false, onRetry }) {
+export function BackendUnavailable({ error, retrying = false, onRetry, onOpenSnapshot, snapshotCapturedAt }) {
   return (
     <main className="system-page system-offline" role="alert">
       <div className="system-offline__layout">
@@ -43,12 +43,13 @@ export function BackendUnavailable({ error, retrying = false, onRetry }) {
         <Nameplate>{error?.code || 'BACKEND_UNREACHABLE'}</Nameplate>
         <div className="system-offline__actions">
           <Button loading={retrying} onClick={onRetry}>Retry connection</Button>
-          <Button variant="secondary" disabled title="No saved replay snapshot has been captured in this build yet.">
+          <Button variant="secondary" disabled={!onOpenSnapshot} onClick={onOpenSnapshot}>
             Open saved snapshot
           </Button>
         </div>
         <p className="system-offline__snapshot" role="status">
-          No saved replay snapshot has been captured in this build yet. Snapshot capture remains scheduled for the later integration phase.
+          Read-only replay captured {snapshotCapturedAt ? new Date(snapshotCapturedAt).toLocaleString() : 'from the seeded replay'}.
+          Live data and write actions are unavailable in snapshot mode.
         </p>
       </div>
     </main>

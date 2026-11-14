@@ -26,7 +26,7 @@ export function Button({
   )
 }
 
-export function Segmented({ value, options, onChange, label, className = '' }) {
+export function Segmented({ value, options, onChange, label, className = '', disabled = false }) {
   return (
     <div className={`relay-segmented ${className}`.trim()} role="group" aria-label={label}>
       {options.map((option) => {
@@ -39,6 +39,7 @@ export function Segmented({ value, options, onChange, label, className = '' }) {
             type="button"
             className={value === item.value ? 'is-selected' : ''}
             aria-pressed={value === item.value}
+            disabled={disabled}
             onClick={() => onChange?.(item.value)}
           >
             {item.label}

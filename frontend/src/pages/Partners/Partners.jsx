@@ -5,6 +5,7 @@ import { apiRequest } from '../../api/client'
 import { FACTORY_ID } from '../../api/hooks/useDeskData'
 import { BackupStatusPill, ReadinessRing } from '../../components/domain'
 import { Button, Frame, Nameplate, Segmented, Skeleton, Stamp, Toast } from '../../components/primitives'
+import { useUiStore } from '../../store/ui'
 
 const CHECKS = [
   'TECH_ASSESSMENT_DONE',
@@ -23,6 +24,7 @@ const CHECK_LABELS = {
 
 export default function Partners() {
   const queryClient = useQueryClient()
+  const snapshotMode = useUiStore((state) => state.snapshotMode)
   const [windowHours, setWindowHours] = useState(48)
   const [selectedPartnerId, setSelectedPartnerId] = useState(null)
   const [actionToRun, setActionToRun] = useState(null)
@@ -231,8 +233,9 @@ export default function Partners() {
             onClose={() => { setSelectedPartnerId(null); setDetailError(null) }}
             onComplete={(key) => completeCheck.mutate({ relationshipId: selected.relationship.id, key })}
             onReconfirm={() => reconfirm.mutate(selected.relationship.id)}
-            onSetStatus={(status) => setStatus.mutate({ relationshipId: selected.relationship.id, status })}
-            busy={completeCheck.isPending || reconfirm.isPending || setStatus.isPending}
+             onSetStatus={(status) => setStatus.mutate({ relationshipId: selected.relationship.id, status })}
+             busy={completeCheck.isPending || reconfirm.isPending || setStatus.isPending}
+             readOnly={snapshotMode}
           />}
         </Frame>
 
@@ -244,7 +247,7 @@ export default function Partners() {
             <div className="partners-action" key={action.relationship_id}>
               <div><strong>{action.label}</strong><small>{action.current_score} → {action.projected_score}</small></div>
               <b>+{action.uplift_points} pts</b>
-              <Button variant="secondary" size="small" onClick={() => setActionToRun(action)}>Do it</Button>
+              <Button variant="secondary" size="small" disabled={snapshotMode} onClick={() => setActionToRun(action)}>Do it</Button>
             </div>
           )) : <p>No positive-uplift actions at this window.</p>}
           <div className="partners-history">
@@ -255,7 +258,7 @@ export default function Partners() {
         </Frame>
       </section>
 
-      {actionToRun && <ConfirmAction action={actionToRun} onCancel={() => setActionToRun(null)} onConfirm={runAction} loading={completeCheck.isPending || reconfirm.isPending || setStatus.isPending} />}
+      {actionToRun && <ConfirmAction action={actionToRun} onCancel={() => setActionToRun(null)} onConfirm={runAction} loading={completeCheck.isPending || reconfirm.isPending || setStatus.isPending} readOnly={snapshotMode} />}
       <div className="partners-caveat">Matches are candidates, not approved backups. Risk is an indicator, not a prediction.</div>
     </main>
   )
@@ -286,7 +289,7 @@ function RelayCircuit({ partners, onSelect }) {
   )
 }
 
-function PartnerDrawer({ partner, error, onClose, onComplete, onReconfirm, onSetStatus, busy }) {
+function PartnerDrawer({ partner, error, onClose, onComplete, onReconfirm, onSetStatus, busy, readOnly = false }) {
   const relationship = partner.relationship
   if (!relationship) {
     return <aside className="partners-drawer"><Button variant="ghost" size="small" onClick={onClose}>Close</Button><p>No relationship record exists; candidate is POTENTIAL_MATCH.</p></aside>
@@ -307,7 +310,7 @@ function PartnerDrawer({ partner, error, onClose, onComplete, onReconfirm, onSet
             <li key={key}>
               <span className={check?.done ? 'is-done' : 'is-pending'}>{check?.done ? '✓' : '○'}</span>
               <span>{CHECK_LABELS[key]}</span>
-              {!check?.done && <Button variant="ghost" size="small" disabled={busy} onClick={() => onComplete(key)}>Complete</Button>}
+              {!check?.done && <Button variant="ghost" size="small" disabled={readOnly || busy} onClick={() => onComplete(key)}>{readOnly ? 'Read-only' : 'Complete'}</Button>}
             </li>
           )
         })}
@@ -316,23 +319,23 @@ function PartnerDrawer({ partner, error, onClose, onComplete, onReconfirm, onSet
         <div className="partners-guard-error"><Stamp tone="gold">CANNOT SET READY</Stamp><p>Missing: {error.details.missing_checks.join(', ')}</p></div>
       )}
       <div className="partners-drawer__actions">
-        <label>Set status<select value={partner.relationship.status} disabled={busy} onChange={(event) => onSetStatus(event.target.value)}>
+        <label>Set status<select value={partner.relationship.status} disabled={readOnly || busy} onChange={(event) => onSetStatus(event.target.value)}>
           {['POTENTIAL_MATCH', 'ASSESSMENT_IN_PROGRESS', 'APPROVAL_PENDING', 'READY', 'UNAVAILABLE_EXPIRED'].map((status) => <option key={status} value={status}>{status.replaceAll('_', ' ')}</option>)}
         </select></label>
-        <Button variant="secondary" disabled={busy || !partner.relationship.last_confirmed_at} onClick={onReconfirm}>Reconfirm</Button>
+        <Button variant="secondary" disabled={readOnly || busy || !partner.relationship.last_confirmed_at} onClick={onReconfirm}>Reconfirm</Button>
       </div>
     </aside>
   )
 }
 
-function ConfirmAction({ action, onCancel, onConfirm, loading }) {
+function ConfirmAction({ action, onCancel, onConfirm, loading, readOnly = false }) {
   return (
     <div className="partners-confirm-overlay" onMouseDown={(event) => event.target === event.currentTarget && onCancel()}>
       <section className="partners-confirm" role="dialog" aria-modal="true" aria-label="Confirm readiness action">
         <span className="f0-kicker">COUNTERFACTUAL ACTION · {action.uplift_points > 0 ? `+${action.uplift_points}` : ''} PTS</span>
         <h2>{action.label}</h2>
         <p>Current weighted score {action.current_score} · projected {action.projected_score}. The relationship and readiness history will be updated.</p>
-        <div><Button variant="ghost" disabled={loading} onClick={onCancel}>Cancel</Button><Button loading={loading} onClick={onConfirm}>Do it</Button></div>
+        <div><Button variant="ghost" disabled={loading} onClick={onCancel}>Cancel</Button><Button disabled={readOnly} loading={loading} onClick={onConfirm}>Do it</Button></div>
       </section>
     </div>
   )

@@ -19,6 +19,7 @@ export default function Landing() {
   const navigate = useNavigate()
   const tier = useSceneTier()
   const reduceMotion = useUiStore((state) => state.reduceMotion)
+  const snapshotMode = useUiStore((state) => state.snapshotMode)
   const [performanceLimitedTier, setPerformanceLimitedTier] = useState(null)
   const [nativePinFallback, setNativePinFallback] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -170,6 +171,7 @@ export default function Landing() {
   return (
     <main className="landing-page">
       <LandingNav
+        snapshotMode={snapshotMode}
         onStory={() => jumpToChapter(0)}
         onHow={() => scrollPageTo('how-it-works', reduceMotion)}
         onProof={() => scrollPageTo('landing-proof', reduceMotion)}
@@ -270,19 +272,27 @@ function scrollPageTo(id, reduceMotion) {
   })
 }
 
-function LandingNav({ onStory, onHow, onProof, onOpenDesk }) {
+function LandingNav({ snapshotMode, onStory, onHow, onProof, onOpenDesk }) {
   return (
-    <header className="landing-nav">
-      <button className="landing-nav__brand" type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-        RELAY <span>FACTORY CONTINUITY DESK</span>
-      </button>
-      <nav aria-label="Landing navigation">
-        <button type="button" onClick={onStory}>Story</button>
-        <button type="button" onClick={onHow}>How it works</button>
-        <button type="button" onClick={onProof}>Proof</button>
-      </nav>
-      <Button onClick={onOpenDesk}>Open the desk <span aria-hidden="true">↗</span></Button>
-    </header>
+    <>
+      <header className="landing-nav">
+        <button className="landing-nav__brand" type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          RELAY <span>FACTORY CONTINUITY DESK</span>
+        </button>
+        <nav aria-label="Landing navigation">
+          <button type="button" onClick={onStory}>Story</button>
+          <button type="button" onClick={onHow}>How it works</button>
+          <button type="button" onClick={onProof}>Proof</button>
+        </nav>
+        <Button onClick={onOpenDesk}>Open the desk <span aria-hidden="true">↗</span></Button>
+      </header>
+      {snapshotMode && (
+        <div className="landing-snapshot-ribbon" role="status">
+          <b>SAVED SNAPSHOT · NOT LIVE</b><span>Read-only replay</span>
+          <button type="button" onClick={onOpenDesk}>Open saved Desk ↗</button>
+        </div>
+      )}
+    </>
   )
 }
 

@@ -13,23 +13,24 @@ const weatherModes = [
 
 export function StageControls({ open, onClose, onReset }) {
   const queryClient = useQueryClient()
+  const snapshotMode = useUiStore((state) => state.snapshotMode)
   const modeQuery = useQuery({
     queryKey: ['demo-state'],
     queryFn: () => apiRequest('/demo/state'),
     staleTime: 15_000,
-    enabled: open,
+    enabled: open && !snapshotMode,
   })
   const weatherStatus = useQuery({
     queryKey: ['stage-weather'],
     queryFn: () => apiRequest('/factories/fac_owner/exposure'),
     staleTime: 15_000,
-    enabled: open,
+    enabled: open && !snapshotMode,
   })
   const health = useQuery({
     queryKey: ['health'],
     queryFn: () => apiRequest('/health'),
     staleTime: 15_000,
-    enabled: open,
+    enabled: open && !snapshotMode,
   })
   const [resetConfirm, setResetConfirm] = useState(false)
   const [modeError, setModeError] = useState(null)
@@ -61,9 +62,8 @@ export function StageControls({ open, onClose, onReset }) {
   const backdrop = useUiStore((state) => state.backdrop)
   const sound = useUiStore((state) => state.sound)
   const presenterMode = useUiStore((state) => state.presenterMode)
-  const snapshotMode = useUiStore((state) => state.snapshotMode)
   const setPreference = useUiStore((state) => state.setPreference)
-  const mode = modeQuery.data?.weather_mode || 'replay'
+  const mode = snapshotMode ? 'replay' : modeQuery.data?.weather_mode || 'replay'
 
   useEffect(() => {
     document.documentElement.dataset.contrast = highContrast ? 'high' : 'normal'
@@ -90,13 +90,16 @@ export function StageControls({ open, onClose, onReset }) {
               label="Weather mode"
               value={mode}
               options={weatherModes}
+              disabled={snapshotMode}
               onChange={(nextMode) => modeMutation.mutate(nextMode)}
             />
             <div className="stage-controls__readout">
-              <WeatherSourceBadge
-                source={weatherStatus.data?.weather?.source || modeQuery.data?.weather_mode || mode}
-                degraded={Boolean(weatherStatus.data?.weather?.degraded)}
-              />
+              {snapshotMode
+                ? <span>SAVED REPLAY · NOT LIVE</span>
+                : <WeatherSourceBadge
+                  source={weatherStatus.data?.weather?.source || modeQuery.data?.weather_mode || mode}
+                  degraded={Boolean(weatherStatus.data?.weather?.degraded)}
+                />}
               <span>{modeQuery.data?.replay_event || 'michaung_2023'}</span>
               <DataLabelBadge />
             </div>
@@ -106,12 +109,12 @@ export function StageControls({ open, onClose, onReset }) {
           <section>
             <span className="f0-kicker">DEMO DATA</span>
             <p>Rebuild the fictional sample world and clear generated demo state.</p>
-            <Button variant="secondary" onClick={() => setResetConfirm(true)}>Reset demo</Button>
+            <Button variant="secondary" disabled={snapshotMode} onClick={() => setResetConfirm(true)}>Reset demo</Button>
           </section>
 
           <section>
             <span className="f0-kicker">SYSTEM READOUT</span>
-            {!open || health.isLoading ? <p>Checking API health…</p> : health.isError || !health.data ? (
+            {snapshotMode ? <p>API · offline · snapshot data only</p> : !open || health.isLoading ? <p>Checking API health…</p> : health.isError || !health.data ? (
               <p className="stage-controls__error">Backend unavailable · {health.error.code}</p>
             ) : (
               <div className="stage-controls__health">
@@ -153,9 +156,12 @@ export function StageControls({ open, onClose, onReset }) {
 
           <section>
             <span className="f0-kicker">FAILURE FALLBACK</span>
-            <Toggle checked={snapshotMode} onChange={(checked) => setPreference('snapshotMode', checked)} label="Snapshot mode" />
+            <Toggle checked={snapshotMode} onChange={(checked) => {
+              queryClient.clear()
+              setPreference('snapshotMode', checked)
+            }} label="Snapshot mode" />
             <p className="stage-controls__hint">
-              {snapshotMode ? 'Saved snapshot mode selected · data pack is captured in F11.' : 'If the backend fails, the saved read-only snapshot will be available after F11.'}
+              {snapshotMode ? 'Saved replay is active · backend writes are blocked.' : 'If the backend fails, open the saved replay snapshot.'}
             </p>
           </section>
         </div>

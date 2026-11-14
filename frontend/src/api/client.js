@@ -1,3 +1,6 @@
+import { resolveSnapshotRequest, isSnapshotRequestAllowed } from './snapshot'
+import { useUiStore } from '../store/ui'
+
 const DEFAULT_API_URL = 'http://localhost:8000/api/v1'
 const REQUEST_TIMEOUT_MS = 8000
 
@@ -15,6 +18,26 @@ export class ApiError extends Error {
 export const API_URL = (import.meta.env.VITE_API_URL || DEFAULT_API_URL).replace(/\/$/, '')
 
 export async function apiRequest(path, options = {}) {
+  const method = (options.method || 'GET').toUpperCase()
+  if (useUiStore.getState().snapshotMode) {
+    if (!isSnapshotRequestAllowed(path, method)) {
+      throw new ApiError({
+        code: 'SNAPSHOT_READ_ONLY',
+        message: 'This saved replay is read-only. Reconnect to the backend to make changes.',
+        status: 0,
+      })
+    }
+    const payload = resolveSnapshotRequest(path, method)
+    if (payload === null) {
+      throw new ApiError({
+        code: 'SNAPSHOT_DATA_MISSING',
+        message: `The saved replay does not include ${path}.`,
+        status: 0,
+      })
+    }
+    return payload
+  }
+
   const controller = new AbortController()
   const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
 

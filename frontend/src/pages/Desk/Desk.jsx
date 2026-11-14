@@ -13,6 +13,7 @@ const windows = [24, 48, 72]
 
 export default function Desk() {
   const navigate = useRelayNavigate()
+  const snapshotMode = useUiStore((state) => state.snapshotMode)
   const queryClient = useQueryClient()
   const dashboard = useDashboard()
   const map = useExposureMap()
@@ -114,7 +115,7 @@ export default function Desk() {
           onset={data.alert.onset_in_hours}
           action={makeRecovery.isPending ? 'Starting…' : stress.isLoading ? 'Loading at-risk orders…' : 'Start recovery request'}
           onAction={openRecovery}
-          disabled={makeRecovery.isPending || stress.isLoading || !worstOrder}
+          disabled={snapshotMode || makeRecovery.isPending || stress.isLoading || !worstOrder}
         />
       ) : (
         <Frame className="desk-calm">

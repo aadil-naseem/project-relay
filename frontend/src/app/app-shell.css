@@ -145,6 +145,26 @@ body.relay-rail-hover .relay-kbd {
   transition: padding-left var(--t-panel) var(--ease-settle);
 }
 
+.relay-snapshot-ribbon {
+  position: sticky;
+  z-index: 5;
+  top: var(--strip);
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 5px 16px 5px 20px;
+  border-bottom: 1px solid var(--c-gold);
+  color: var(--c-cream);
+  background: var(--c-deep);
+}
+
+.relay-snapshot-ribbon > span { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; }
+.relay-snapshot-ribbon b { color: var(--c-sun); font: 10px var(--f-mono); }
+.relay-snapshot-ribbon small { color: var(--c-pale); font: 9px var(--f-mono); }
+.relay-health[data-state="snapshot"] i { background: var(--c-sun); }
+
 .relay-rail:hover ~ .relay-app__main,
 .relay-rail[data-pinned="true"] ~ .relay-app__main,
 body.relay-rail-hover .relay-app__main {
@@ -317,6 +337,8 @@ html[data-contrast="high"] { --hair: var(--c-cream-36); }
   .relay-mobile-nav button[aria-current="page"] { color: var(--c-sun); border-top: 2px solid var(--c-sun); }
   .relay-mobile-nav small { font: 9px var(--f-ui); }
   .relay-breadcrumb { padding-inline: 12px; }
+  .relay-snapshot-ribbon { padding-inline: 12px; }
+  .relay-snapshot-ribbon > span { display: grid; gap: 3px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

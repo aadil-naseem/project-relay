@@ -11,6 +11,7 @@ import { StageControls } from './StageControls'
 import { PresenterStrip } from './PresenterStrip'
 import { useUiStore } from '../store/ui'
 import { BackendUnavailable } from '../pages/System/SystemScreens'
+import { snapshotAvailable, snapshotCapturedAt } from '../api/snapshot'
 
 const navItems = [
   { path: '/app', label: 'Desk', glyph: '▦' },
@@ -44,7 +45,9 @@ function isEditable(target) {
 export function AppShell() {
   const navigate = useNavigate()
   const location = useLocation()
-  const health = useHealth()
+  const snapshotMode = useUiStore((state) => state.snapshotMode)
+  const setUiPreference = useUiStore((state) => state.setPreference)
+  const health = useHealth({ enabled: !snapshotMode })
   const demo = useQuery({
     queryKey: ['demo-state'],
     queryFn: () => apiRequest('/demo/state'),
@@ -54,7 +57,6 @@ export function AppShell() {
   const presenterMode = useUiStore((state) => state.presenterMode)
   const presenterStep = useUiStore((state) => state.presenterStep)
   const presenterRecoveryId = useUiStore((state) => state.presenterRecoveryId)
-  const setUiPreference = useUiStore((state) => state.setPreference)
   const setPresenterStep = useUiStore((state) => state.goToPresenterStep)
   const presenterDashboard = useQuery({
     queryKey: ['dashboard', 'fac_owner'],
@@ -87,6 +89,7 @@ export function AppShell() {
   }, [location.pathname, navigate])
 
   const resetDemo = useCallback(async () => {
+    if (snapshotMode) return
     await apiRequest('/demo/reset', { method: 'POST' })
     try {
       sessionStorage.removeItem('relay-desk-opened')
@@ -98,7 +101,7 @@ export function AppShell() {
     setPresenterStep(1)
     go('/app')
     await queryClient.invalidateQueries()
-  }, [go, setPresenterStep, setUiPreference])
+  }, [go, setPresenterStep, setUiPreference, snapshotMode])
 
   const presenterRoute = useCallback((step) => {
     if (step === 0) return '/'
@@ -173,25 +176,37 @@ export function AppShell() {
 
   const current = navItems.find((item) => item.path === location.pathname)
     || navItems.find((item) => location.pathname.startsWith(`${item.path}/`))
-  const healthState = health.data?.status === 'ok' ? 'ok' : health.isError ? 'error' : 'checking'
+  const healthState = snapshotMode ? 'snapshot' : health.data?.status === 'ok' ? 'ok' : health.isError ? 'error' : 'checking'
 
-  if (health.isError) {
+  if (health.isError && !snapshotMode) {
     const retryBackend = async () => {
       const result = await health.refetch()
       if (result.data?.status === 'ok') await queryClient.invalidateQueries()
+    }
+    const openSnapshot = () => {
+      queryClient.clear()
+      setUiPreference('snapshotMode', true)
+      navigate('/app', { replace: true })
     }
     return (
       <BackendUnavailable
         error={health.error}
         retrying={health.isFetching}
         onRetry={retryBackend}
+        onOpenSnapshot={snapshotAvailable ? openSnapshot : undefined}
+        snapshotCapturedAt={snapshotCapturedAt}
       />
     )
   }
 
+  const leaveSnapshot = () => {
+    queryClient.clear()
+    setUiPreference('snapshotMode', false)
+  }
+
   return (
     <RelayNavigationContext.Provider value={go}>
-    <div className={`relay-app ${railPinned ? 'rail-pinned' : ''}`}>
+    <div className={`relay-app ${railPinned ? 'rail-pinned' : ''}`} data-snapshot-mode={snapshotMode || undefined}>
       <header className="relay-status-strip">
         <button className="relay-wordmark" type="button" onClick={() => go('/')}>RELAY</button>
         <span className="relay-factory-name">Sample Precision Components · Ambattur</span>
@@ -203,7 +218,7 @@ export function AppShell() {
             degraded={Boolean(demo.isError || health.isError)}
           />
           <span className="relay-health" data-state={healthState} role="status">
-            <i aria-hidden="true" />{healthState === 'ok' ? 'API' : healthState === 'error' ? 'OFFLINE' : 'CHECK'}
+            <i aria-hidden="true" />{snapshotMode ? 'SNAPSHOT' : healthState === 'ok' ? 'API' : healthState === 'error' ? 'OFFLINE' : 'CHECK'}
           </span>
           <StackLight exposure="SEVERE" readiness={54} freshness={demo.data?.weather_mode || 'replay'} />
           <Button variant="ghost" size="small" onClick={() => setStageOpen(true)}>Stage <Kbd>`</Kbd></Button>
@@ -248,6 +263,12 @@ export function AppShell() {
       </div>
 
       <div className="relay-app__main">
+        {snapshotMode && (
+          <div className="relay-snapshot-ribbon" role="status">
+            <span><b>SAVED SNAPSHOT · NOT LIVE</b><small>Read-only replay · captured {new Date(snapshotCapturedAt).toLocaleString()}</small></span>
+            <Button variant="ghost" size="small" onClick={leaveSnapshot}>Try live server</Button>
+          </div>
+        )}
         {current && location.pathname !== current.path && (
           <div className="relay-breadcrumb" aria-label="Breadcrumb">
             <button type="button" onClick={() => go(current.path)}>{current.label}</button>

@@ -4,6 +4,8 @@ import { useParams } from 'react-router-dom'
 import { apiRequest } from '../../api/client'
 import { ConfidenceBars, PaperSheet } from '../../components/domain'
 import { Button, Field, Frame, Nameplate, Segmented, Stamp, Toast } from '../../components/primitives'
+import { useUiStore } from '../../store/ui'
+import { snapshotPassportId } from '../../api/snapshot'
 
 const samples = [
   { id: 'pump_shaft', label: 'Pump shaft', filename: 'pump_shaft.png', pdf: 'pump_shaft.pdf' },
@@ -36,10 +38,12 @@ const fieldSpecs = [
 
 export default function Passports() {
   const { id } = useParams()
+  const snapshotMode = useUiStore((state) => state.snapshotMode)
+  const passportId = id || (snapshotMode ? snapshotPassportId : null)
   const [activeStep, setActiveStep] = useState(0)
   const [passportOverride, setPassportOverride] = useState(null)
-  const [selectedSample, setSelectedSample] = useState(null)
-  const [previewUrl, setPreviewUrl] = useState(null)
+  const [selectedSample, setSelectedSample] = useState(() => snapshotMode ? samples[0] : null)
+  const [previewUrl, setPreviewUrl] = useState(() => snapshotMode ? '/drawings/pump_shaft.png' : null)
   const [previewType, setPreviewType] = useState('image')
   const [selectedPartner, setSelectedPartner] = useState('fac_oragadam')
   const [shareLevel, setShareLevel] = useState('RFQ')
@@ -48,9 +52,9 @@ export default function Passports() {
   const [dragging, setDragging] = useState(false)
 
   const passportQuery = useQuery({
-    queryKey: ['passport', id],
-    queryFn: () => apiRequest(`/passports/${id}`),
-    enabled: Boolean(id),
+    queryKey: ['passport', passportId],
+    queryFn: () => apiRequest(`/passports/${passportId}`),
+    enabled: Boolean(passportId),
     staleTime: 30_000,
   })
 
@@ -145,6 +149,7 @@ export default function Passports() {
   const fieldState = (key) => passport?.data?.[key] || { value: null, confidence: 'MISSING', source: null }
 
   const selectSample = async (sample) => {
+    if (snapshotMode) return
     setSelectedSample(sample)
     setPreviewType('image')
     const file = await fetch(`/drawings/${sample.filename}`).then((response) => {
@@ -156,7 +161,7 @@ export default function Passports() {
   }
 
   const openFile = (file) => {
-    if (!file) return
+    if (!file || snapshotMode) return
     setSelectedSample(null)
     setPreviewUrl(URL.createObjectURL(file))
     setPreviewType(file.type === 'application/pdf' ? 'pdf' : 'image')
@@ -164,6 +169,7 @@ export default function Passports() {
   }
 
   const setField = (field, value) => {
+    if (snapshotMode) return
     setPassportOverride((current) => {
       const base = current || passportQuery.data
       if (!base) return base
@@ -178,7 +184,7 @@ export default function Passports() {
   }
 
   const saveField = (field, value) => {
-    if (passport?.id && value !== undefined) patch.mutate({ field, value })
+    if (!snapshotMode && passport?.id && value !== undefined) patch.mutate({ field, value })
   }
 
   const changeMaterial = (material) => setField('material', material)
@@ -231,6 +237,7 @@ export default function Passports() {
       <ol className="passport-stepper" aria-label="Passport workflow">
         {steps.map((step, index) => <li key={step} className={currentStep === index ? 'is-current' : currentStep > index ? 'is-done' : ''}><span>{String(index + 1).padStart(2, '0')}</span>{step}</li>)}
       </ol>
+      {snapshotMode && <Nameplate>READ-ONLY SAVED PASSPORT</Nameplate>}
 
       {notice && <Toast tone={notice.tone} onDismiss={() => setNotice(null)}>{notice.text}</Toast>}
       {extract.isError && <Toast tone="warning">{extract.error.message}</Toast>}
@@ -256,9 +263,9 @@ export default function Passports() {
             <div className={`passport-drop ${dragging ? 'is-dragging' : ''}`} onDragOver={(event) => { event.preventDefault(); setDragging(true) }} onDragLeave={() => setDragging(false)} onDrop={handleDrop}>
               <span className="f0-kicker">{extract.isPending ? 'READING YOUR DRAWING…' : 'DRAWING INPUT'}</span>
               <p>Choose a sample or drop a PDF / PNG / JPG here.</p>
-              <label className="relay-button relay-button--secondary relay-button--small">
+              <label className={`relay-button relay-button--secondary relay-button--small ${snapshotMode ? 'is-disabled' : ''}`}>
                 Browse files
-                <input type="file" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" onChange={(event) => openFile(event.target.files?.[0])} hidden />
+                <input type="file" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" onChange={(event) => openFile(event.target.files?.[0])} disabled={snapshotMode} hidden />
               </label>
             </div>
           )}
@@ -266,14 +273,14 @@ export default function Passports() {
             <span className="f0-kicker">SAMPLE DRAWINGS</span>
             <div>
               {samples.map((sample) => (
-                <button type="button" className={selectedSample?.id === sample.id ? 'is-selected' : ''} key={sample.id} onClick={() => selectSample(sample)}>
+                <button type="button" disabled={snapshotMode} className={selectedSample?.id === sample.id ? 'is-selected' : ''} key={sample.id} onClick={() => selectSample(sample)}>
                   <img src={`/drawings/${sample.filename}`} alt="" />
                   <span>{sample.label}</span>
                 </button>
               ))}
             </div>
           </div>
-          <Button variant="ghost" size="small" disabled={manual.isPending} onClick={() => manual.mutate()}>Create manually</Button>
+          <Button variant="ghost" size="small" disabled={snapshotMode || manual.isPending} onClick={() => manual.mutate()}>Create manually</Button>
           {extractMeta && <div className="passport-provider">
             <span className={`passport-provider__dot passport-provider__dot--${extractMeta.provider || 'rules'}`} />
             <span>{providerLabel}</span>{extractMeta.latency_ms != null && <small>{extractMeta.latency_ms} ms</small>}
@@ -294,7 +301,7 @@ export default function Passports() {
               {(passport.needs_review || []).length > 0 && (
                 <div className="passport-review-warning"><span className="f0-kicker">NEEDS REVIEW</span><span>{passport.needs_review.join(', ')}</span></div>
               )}
-              <FieldGroup label="Part name" state={fieldState('part_name')} value={values.part_name || ''} onChange={(value) => setField('part_name', value)} onBlur={() => saveField('part_name', values.part_name)} />
+              <FieldGroup label="Part name" state={fieldState('part_name')} value={values.part_name || ''} onChange={(value) => setField('part_name', value)} onBlur={() => saveField('part_name', values.part_name)} readOnly={snapshotMode} />
               <div className="passport-field-grid">
                 {fieldSpecs.filter((field) => field.key !== 'part_name').map((field) => (
                   <PassportFieldEditor
@@ -304,6 +311,7 @@ export default function Passports() {
                     value={values[field.key]}
                     onChange={(value) => setField(field.key, value)}
                     onBlur={() => saveField(field.key, values[field.key])}
+                    readOnly={snapshotMode}
                   />
                 ))}
                 <label className="passport-field passport-field--route">
@@ -311,19 +319,20 @@ export default function Passports() {
                   <input
                     value={(values.process_route || []).map((item) => typeof item === 'string' ? item : item.process).join(' → ')}
                     placeholder="TURN → MILL"
+                    readOnly={snapshotMode}
                     onChange={(event) => setField('process_route', event.target.value.split(/[→,]/).map((process) => ({ process: process.trim().toUpperCase() })).filter((item) => item.process))}
                     onBlur={() => changeProcessRoute((values.process_route || []).map((item) => item.process).join(' → '))}
                   />
                   <small>Planner estimates are editable; the drawing does not contain cycle times.</small>
                 </label>
               </div>
-              <MaterialEditor state={fieldState('material')} value={values.material} onChange={changeMaterial} onBlur={() => saveField('material', values.material)} />
-              <DimensionEditor state={fieldState('dimensions')} rows={values.dimensions || []} onChange={changeDimensions} onBlur={() => saveField('dimensions', values.dimensions)} />
+              <MaterialEditor state={fieldState('material')} value={values.material} onChange={changeMaterial} onBlur={() => saveField('material', values.material)} readOnly={snapshotMode} />
+              <DimensionEditor state={fieldState('dimensions')} rows={values.dimensions || []} onChange={changeDimensions} onBlur={() => saveField('dimensions', values.dimensions)} readOnly={snapshotMode} />
               {(fieldState('tightest_tolerance_mm').candidates || []).length > 1 && (
                 <div className="passport-candidates">
                   <span className="f0-kicker">CANDIDATES · RULES VALUE IS DEFAULT</span>
-                  {fieldState('tightest_tolerance_mm').candidates.map((candidate, index) => (
-                    <button key={`${candidate}-${index}`} type="button" onClick={() => { setField('tightest_tolerance_mm', candidate); saveField('tightest_tolerance_mm', candidate) }}>
+                    {fieldState('tightest_tolerance_mm').candidates.map((candidate, index) => (
+                      <button key={`${candidate}-${index}`} type="button" disabled={snapshotMode} onClick={() => { setField('tightest_tolerance_mm', candidate); saveField('tightest_tolerance_mm', candidate) }}>
                       {candidate} mm · {index === 0 ? 'printed-text rules' : 'vision reading'}
                     </button>
                   ))}
@@ -336,7 +345,7 @@ export default function Passports() {
                 </div>
               )}
               <div className="passport-confirm-row">
-                <Button disabled={!canConfirm || confirm.isPending} loading={confirm.isPending} onClick={() => confirm.mutate()}>Confirm passport</Button>
+                <Button disabled={snapshotMode || !canConfirm || confirm.isPending} loading={confirm.isPending} onClick={() => confirm.mutate()}>Confirm passport</Button>
                 <small>Cycle times are planner estimates from defaults. A drawing does not contain them.</small>
               </div>
             </>
@@ -378,18 +387,18 @@ export default function Passports() {
           <div className="passport-share">
             <div><span className="f0-kicker">STEP 5 · EXPLICIT CONSENT</span><p>Share redacted RFQ by default. Full passport sharing requires customer permission.</p></div>
             <label className="passport-share__partner">Partner
-              <select value={selectedPartner} onChange={(event) => setSelectedPartner(event.target.value)}>
+                <select value={selectedPartner} disabled={snapshotMode} onChange={(event) => setSelectedPartner(event.target.value)}>
                 <option value="fac_oragadam">Sample Components (Oragadam)</option>
                 <option value="fac_hosur">Sample Engineering (Hosur)</option>
                 <option value="fac_peenya">Sample Works (Peenya)</option>
                 <option value="fac_cbe">Sample Tools (Coimbatore)</option>
               </select>
             </label>
-            <Segmented label="Share level" value={shareLevel} onChange={(level) => { setShareLevel(level); setActiveStep(4) }} options={[
+            <Segmented label="Share level" disabled={snapshotMode} value={shareLevel} onChange={(level) => { setShareLevel(level); setActiveStep(4) }} options={[
               { value: 'RFQ', label: 'Redacted RFQ' },
               { value: 'FULL', label: 'Full passport' },
             ]} />
-            <Button variant="secondary" disabled={share.isPending || !rfq.data} onClick={() => shareLevel === 'FULL' ? setShareConsentOpen(true) : share.mutate({ level: 'RFQ' })}>
+            <Button variant="secondary" disabled={snapshotMode || share.isPending || !rfq.data} onClick={() => shareLevel === 'FULL' ? setShareConsentOpen(true) : share.mutate({ level: 'RFQ' })}>
               {shareLevel === 'FULL' ? 'Review full-share consent' : 'Share redacted RFQ'}
             </Button>
           </div>
@@ -404,7 +413,7 @@ export default function Passports() {
             <span className="f0-kicker">FULL-PASSPORT SHARE</span>
             <h2>Share full drawing details?</h2>
             <p>The partner will see the full drawing details. Only do this with the customer's permission.</p>
-            <div><Button variant="ghost" onClick={() => setShareConsentOpen(false)}>Cancel</Button><Button onClick={() => share.mutate({ level: 'FULL' })}>I have permission · Share full</Button></div>
+            <div><Button variant="ghost" onClick={() => setShareConsentOpen(false)}>Cancel</Button><Button disabled={snapshotMode} onClick={() => share.mutate({ level: 'FULL' })}>I have permission · Share full</Button></div>
           </section>
         </div>
       )}
@@ -412,16 +421,16 @@ export default function Passports() {
   )
 }
 
-function FieldGroup({ label, state, value, onChange, onBlur }) {
+function FieldGroup({ label, state, value, onChange, onBlur, readOnly = false }) {
   return (
     <label className="passport-field passport-field--wide">
       <span>{label}<ConfidenceBars value={state.confidence} /><small>{state.source || 'not found'}</small></span>
-      <input value={value} onChange={(event) => onChange(event.target.value)} onBlur={onBlur} />
+      <input value={value} readOnly={readOnly} onChange={(event) => onChange(event.target.value)} onBlur={onBlur} />
     </label>
   )
 }
 
-function PassportFieldEditor({ spec, state, value, onChange, onBlur }) {
+function PassportFieldEditor({ spec, state, value, onChange, onBlur, readOnly = false }) {
   const normalized = value == null ? '' : value
   return (
     <label className="passport-field">
@@ -430,6 +439,7 @@ function PassportFieldEditor({ spec, state, value, onChange, onBlur }) {
         type={spec.type}
         step={spec.type === 'number' ? 'any' : undefined}
         value={normalized}
+        readOnly={readOnly}
         onChange={(event) => onChange(spec.type === 'number' ? event.target.value === '' ? null : Number(event.target.value) : event.target.value)}
         onBlur={onBlur}
       />
@@ -437,21 +447,21 @@ function PassportFieldEditor({ spec, state, value, onChange, onBlur }) {
   )
 }
 
-function MaterialEditor({ state, value, onChange, onBlur }) {
+function MaterialEditor({ state, value, onChange, onBlur, readOnly = false }) {
   const material = value || {}
   return (
     <div className="passport-field passport-field--material">
       <span>Material <ConfidenceBars value={state.confidence} /><small>{state.source || 'not found'}</small></span>
       <div>
-        <Field label="Grade" value={material.grade || ''} onChange={(event) => onChange({ ...material, grade: event.target.value })} onBlur={onBlur} />
-        <Field label="Standard" value={material.standard || ''} onChange={(event) => onChange({ ...material, standard: event.target.value || null })} onBlur={onBlur} />
-        <Field label="Form" value={material.form || ''} onChange={(event) => onChange({ ...material, form: event.target.value || null })} onBlur={onBlur} />
+        <Field label="Grade" value={material.grade || ''} disabled={readOnly} onChange={(event) => onChange({ ...material, grade: event.target.value })} onBlur={onBlur} />
+        <Field label="Standard" value={material.standard || ''} disabled={readOnly} onChange={(event) => onChange({ ...material, standard: event.target.value || null })} onBlur={onBlur} />
+        <Field label="Form" value={material.form || ''} disabled={readOnly} onChange={(event) => onChange({ ...material, form: event.target.value || null })} onBlur={onBlur} />
       </div>
     </div>
   )
 }
 
-function DimensionEditor({ state, rows, onChange, onBlur }) {
+function DimensionEditor({ state, rows, onChange, onBlur, readOnly = false }) {
   return (
     <section className="passport-dimensions">
       <header><span className="f0-kicker">DIMENSIONS · MILLIMETRES</span><ConfidenceBars value={state.confidence} /></header>
@@ -460,11 +470,11 @@ function DimensionEditor({ state, rows, onChange, onBlur }) {
           <div className="passport-dimensions__row is-header"><span>Feature</span><span>Nominal</span><span>+ tol</span><span>− tol</span><span>Critical</span></div>
           {rows.map((row, index) => (
             <div className="passport-dimensions__row" key={`${row.label}-${index}`}>
-              <input aria-label={`${row.label} label`} value={row.label || ''} onChange={(event) => onChange(index, 'label', event.target.value)} onBlur={onBlur} />
+              <input aria-label={`${row.label} label`} value={row.label || ''} disabled={readOnly} onChange={(event) => onChange(index, 'label', event.target.value)} onBlur={onBlur} />
               {['nominal_mm', 'tol_plus_mm', 'tol_minus_mm'].map((field) => (
-                <input key={field} type="number" step="any" aria-label={`${row.label} ${field}`} value={row[field] ?? ''} onChange={(event) => onChange(index, field, event.target.value)} onBlur={onBlur} />
+                <input key={field} type="number" step="any" aria-label={`${row.label} ${field}`} value={row[field] ?? ''} disabled={readOnly} onChange={(event) => onChange(index, field, event.target.value)} onBlur={onBlur} />
               ))}
-              <input type="checkbox" aria-label={`${row.label} critical`} checked={Boolean(row.critical)} onChange={(event) => onChange(index, 'critical', event.target.checked)} onBlur={onBlur} />
+              <input type="checkbox" aria-label={`${row.label} critical`} checked={Boolean(row.critical)} disabled={readOnly} onChange={(event) => onChange(index, 'critical', event.target.checked)} onBlur={onBlur} />
             </div>
           ))}
         </div>

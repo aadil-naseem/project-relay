@@ -6,6 +6,7 @@ import { BackupStatusPill, CalcLog } from '../../components/domain'
 import { PaperSheet } from '../../components/domain'
 import { Button, Frame, Nameplate, Skeleton, Stamp, Toast } from '../../components/primitives'
 import { useRelayNavigate } from '../../app/navigation'
+import { useUiStore } from '../../store/ui'
 
 const STEP_LABELS = {
   REQUEST_SENT: 'Request sent',
@@ -29,6 +30,7 @@ const NO_CANDIDATES = []
 
 export default function Recovery() {
   const navigate = useRelayNavigate()
+  const snapshotMode = useUiStore((state) => state.snapshotMode)
   const { id } = useParams()
   const queryClient = useQueryClient()
   const [candidateToSelect, setCandidateToSelect] = useState(null)
@@ -169,10 +171,10 @@ export default function Recovery() {
         </header>
         {matching.isLoading ? <Skeleton lines={4} /> : (
           <div className="recovery-candidate-columns">
-            <CandidateColumn title="READY" tone="sky" items={grouped.ready} selectedId={request.data.selected_partner_id} onSelect={setCandidateToSelect} />
-            <CandidateColumn title="APPROVAL PENDING" tone="pale" items={grouped.pending} selectedId={request.data.selected_partner_id} onSelect={setCandidateToSelect} />
-            <CandidateColumn title="EXCLUDED" tone="sun" items={grouped.excluded} selectedId={request.data.selected_partner_id} onSelect={setCandidateToSelect} />
-            {grouped.other.length > 0 && <CandidateColumn title="OTHER CANDIDATES" tone="hair" items={grouped.other} selectedId={request.data.selected_partner_id} onSelect={setCandidateToSelect} />}
+            <CandidateColumn title="READY" tone="sky" items={grouped.ready} selectedId={request.data.selected_partner_id} onSelect={snapshotMode ? undefined : setCandidateToSelect} readOnly={snapshotMode} />
+            <CandidateColumn title="APPROVAL PENDING" tone="pale" items={grouped.pending} selectedId={request.data.selected_partner_id} onSelect={snapshotMode ? undefined : setCandidateToSelect} readOnly={snapshotMode} />
+            <CandidateColumn title="EXCLUDED" tone="sun" items={grouped.excluded} selectedId={request.data.selected_partner_id} onSelect={snapshotMode ? undefined : setCandidateToSelect} readOnly={snapshotMode} />
+            {grouped.other.length > 0 && <CandidateColumn title="OTHER CANDIDATES" tone="hair" items={grouped.other} selectedId={request.data.selected_partner_id} onSelect={snapshotMode ? undefined : setCandidateToSelect} readOnly={snapshotMode} />}
           </div>
         )}
       </section>
@@ -223,11 +225,11 @@ export default function Recovery() {
                 </ol>
                 <Button
                   variant="secondary"
-                  disabled={!pendingStep || advance.isPending}
+                  disabled={snapshotMode || !pendingStep || advance.isPending}
                   loading={advance.isPending}
                   onClick={() => advance.mutate()}
                 >
-                  {pendingStep ? `Advance · ${STEP_LABELS[pendingStep.step_key]}` : 'Simulated route complete'}
+                  {snapshotMode ? 'Saved snapshot · read only' : pendingStep ? `Advance · ${STEP_LABELS[pendingStep.step_key]}` : 'Simulated route complete'}
                 </Button>
               </>
             )}
@@ -240,6 +242,7 @@ export default function Recovery() {
           candidate={candidateToSelect}
           note={activationNote}
           loading={selectPartner.isPending}
+          readOnly={snapshotMode}
           onCancel={() => setCandidateToSelect(null)}
           onConfirm={() => selectPartner.mutate(candidateToSelect.partner_id)}
         />
@@ -250,7 +253,7 @@ export default function Recovery() {
   )
 }
 
-function CandidateColumn({ title, tone, items, selectedId, onSelect }) {
+function CandidateColumn({ title, tone, items, selectedId, onSelect, readOnly = false }) {
   return (
     <section className={`recovery-candidate-column recovery-candidate-column--${tone}`}>
       <h3>{title}<span>{items.length}</span></h3>
@@ -261,13 +264,14 @@ function CandidateColumn({ title, tone, items, selectedId, onSelect }) {
           candidate={candidate}
           selected={selectedId === candidate.partner_id}
           onSelect={!candidate.excluded ? onSelect : undefined}
+          readOnly={readOnly}
         />
       ))}
     </section>
   )
 }
 
-function CandidateCard({ candidate, selected, onSelect }) {
+function CandidateCard({ candidate, selected, onSelect, readOnly = false }) {
   const failed = (candidate.filters || []).filter((filter) => filter.result === 'FAIL')
   const passed = (candidate.filters || []).filter((filter) => filter.result === 'PASS')
   const unknown = (candidate.filters || []).filter((filter) => filter.result === 'UNKNOWN')
@@ -305,15 +309,15 @@ function CandidateCard({ candidate, selected, onSelect }) {
       {candidate.excluded ? (
         <Button variant="ghost" size="small" disabled title={`Excluded: ${candidate.exclusion_reason}`}>Cannot select</Button>
       ) : (
-        <Button variant={selected ? 'ghost' : 'secondary'} size="small" disabled={!canSelect || selected} onClick={() => onSelect(candidate)}>
-          {selected ? 'Selected' : canSelect ? 'Select partner' : 'Hard filters failed'}
+        <Button variant={selected ? 'ghost' : 'secondary'} size="small" disabled={readOnly || !canSelect || selected} onClick={() => onSelect(candidate)}>
+          {readOnly ? 'Read-only snapshot' : selected ? 'Selected' : canSelect ? 'Select partner' : 'Hard filters failed'}
         </Button>
       )}
     </Frame>
   )
 }
 
-function ConfirmSelection({ candidate, note, loading, onCancel, onConfirm }) {
+function ConfirmSelection({ candidate, note, loading, onCancel, onConfirm, readOnly = false }) {
   return (
     <div className="recovery-confirm-overlay" onMouseDown={(event) => event.target === event.currentTarget && onCancel()}>
       <section className="recovery-confirm" role="dialog" aria-modal="true" aria-label="Confirm partner selection">
@@ -322,7 +326,7 @@ function ConfirmSelection({ candidate, note, loading, onCancel, onConfirm }) {
         <p>{note}</p>
         <div className="recovery-confirm__actions">
           <Button variant="ghost" disabled={loading} onClick={onCancel}>Cancel</Button>
-          <Button loading={loading} onClick={onConfirm}>Send recovery request</Button>
+          <Button disabled={readOnly} loading={loading} onClick={onConfirm}>Send recovery request</Button>
         </div>
       </section>
     </div>

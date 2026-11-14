@@ -13,7 +13,7 @@ function elapsedHours(timestamp, start) {
   return Number.isFinite(difference) ? Math.max(0, difference / 3_600_000) : 0
 }
 
-export function ShiftChart({ result, onOpenRecovery }) {
+export function ShiftChart({ result, onOpenRecovery, readOnly = false }) {
   const rows = result?.orders || []
   const createdAt = result?.created_at || '1970-01-01T00:00:00Z'
   const chartHeight = Math.max(150, 74 + rows.length * ROW_H)
@@ -81,7 +81,7 @@ export function ShiftChart({ result, onOpenRecovery }) {
             <span>{formatMoney(order.value_inr)}</span>
             <FallbackShield value={order.fallback_level} />
             <span className="whatif-order-list__backup">{order.best_backup || 'No backup'}</span>
-            <button type="button" onClick={() => onOpenRecovery(order.order_id)}>Open recovery →</button>
+            <button type="button" disabled={readOnly} onClick={() => onOpenRecovery(order.order_id)}>Open recovery →</button>
           </article>
         ))}
       </div>
