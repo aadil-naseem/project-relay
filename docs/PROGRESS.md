@@ -257,7 +257,7 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - User screenshot review: layout and chart are clear. Follow-up adds an explicit `+Nh` overflow marker when stressed completion extends beyond T+168 h (e.g. 172 h no longer visually clips at the chart edge). Browser screenshot tool cannot save the uploaded chat image locally.
 - F5 Recovery is now in progress separately from Partners & Readiness; the user confirmed this screen as the next step.
 
-### Frontend F5-S6 Recovery - IMPLEMENTED (commit pending; screenshot review pending)
+### Frontend F5-S6 Recovery - IMPLEMENTED (commit 787e067, pushed; screenshot review pending)
 - Replaced `/app/recovery/:id` with the alert-prefilled request: disruption/order/deadline, scenario-aware matching options, Ready / Approval Pending / Excluded / Other groups.
 - Candidate cards show machine-checkable PASS/FAIL/UNKNOWN filters with basis/detail, unverified approval checks, capacity summaries, relationship status and ranking. Excluded or hard-filter-failing partners cannot be selected; selection goes through the approval disclaimer confirmation sheet.
 - After selection, loads the consent-aware Jinja handover API and renders the Cream paper pack with authorised documents, job requirements, quantity/deadline, inspection checklist, required approvals, responsibilities, simulated milestones and explicit note that contacts aren’t in the API contract.
