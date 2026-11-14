@@ -33,7 +33,7 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 | D1 | Root at `E:\Projects\factory-continuity-desk\` | Root at `E:\VihaanX-Build\` | User decision at kickoff. `.env.example` `DATABASE_URL` rewritten to match. No other path assumptions in code (all paths resolved via `pathlib`) |
 | D2 | Python 3.12 installed to `E:\Python312` | Kept existing `C:\Users\Aadil\AppData\Local\Programs\Python\Python312` (3.12.10) | Reinstalling the interpreter mid-event adds risk with no real gain: the bulk (venv + site-packages) is on E:, which is what the C: rule is protecting |
 | D3 | Ollama optional, models on `E:\dev-cache\ollama` | Ollama dropped | E: has 13.3 GB free; a vision model would consume most of the remaining headroom. Provider chain runs cache -> Gemini -> text rules -> manual |
-| D4 | GitHub repo created in Phase 0 | Local repo only; no `origin` yet | `gh` CLI is not installed. Add the remote when the repo is created on github.com |
+| D4 | GitHub repo `factory-continuity-desk` created in Phase 0 | Remote is `https://github.com/aadil-naseem/project-relay` (user pre-created it empty, per the organisers' submission rule) | Repo name on GitHub is `project-relay`, matching the renamed project. `origin/main` now tracks `main` |
 | D5 | `npm_config_cache` / `npm_config_prefix` user env vars | Also written to `C:\Users\Aadil\.npmrc` | npm reads `.npmrc`, not the inherited env block, so the env vars alone left npm pointed at `C:\Users\Aadil\AppData\Local\npm-cache` |
 | D6 | Install `requirements-data.txt` (OSMnx) in Phase 0 | Deferred to Phase 4 | Connection is running ~80 kB/s; OSMnx pulls geopandas/pyproj/fiona/scikit-learn (hundreds of MB). It is only needed for the one-time prefetch. If it still fails, the cut order allows site-only exposure |
 | D7 | - | `check_c_drive_leaks.ps1` rewritten to resolve process -> user -> machine | Windows does not push updated user env into an already-running shell, so a naive `$env:` check reports false leaks. Script now distinguishes STALE-PROCESS from LEAK |
@@ -61,7 +61,7 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - **Gemini verified live**: `gemini-3.5-flash-lite` is the only responsive model on this key. Text 1.5 s, vision 5.6-13.1 s (variable). Larger flash models are 404/503/timeout. Golden cache is therefore load-bearing, not optional.
 - Outstanding, deliberately deferred: `requirements-data.txt` (OSMnx, D6) and the GitHub remote (D4).
 
-**Phase 0 done-when checklist:** python + node work from E: (PATH) - **PASS**; installs produced no C: leak - **PASS**; repo pushed to GitHub - **NOT DONE** (no `gh`, D4); `.env` has Gemini key - **PASS**; smoke results recorded - **PASS**; folder tree matches section 5 - **PASS**.
+**Phase 0 done-when checklist:** python + node work from E: (PATH) - **PASS**; installs produced no C: leak - **PASS**; repo pushed to GitHub - **PASS** (remote `project-relay` added retroactively at kickoff of Phase 2; empty repo was pre-created by the user per organisers' rule); `.env` has Gemini key - **PASS**; smoke results recorded - **PASS**; folder tree matches section 5 - **PASS**.
 
 ### Phase 1 - DONE (commit 2615245)
 - `settings.py`: pydantic-settings reading `backend/.env` resolved from the file location, not CWD; env vars beat .env (pytest depends on this).
