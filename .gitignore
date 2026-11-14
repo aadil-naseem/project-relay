@@ -1,0 +1,31 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Runtime / generated
+backend/data/fcd.sqlite
+backend/data/fcd.sqlite-shm
+backend/data/fcd.sqlite-wal
+backend/data/raw/
+
+# Frontend
+node_modules/
+dist/
+.vite/
+
+# Secrets
+.env
+.env.local
+backend/.env
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
