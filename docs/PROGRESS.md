@@ -143,7 +143,7 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 
 **Lessons recorded for later phases:** Oragadam scores 58 (HIGH) in the replay because the archive really did drop ~180 mm/24 h there - it is *less* exposed than Ambattur, not unexposed. Phase 9 must not use "risk >= alert_threshold" alone as the correlated-risk test or the hero backup would be excluded; use a relative test and document it. The TTL cache keys on (mode, site set) and must be cleared by `reset_weather_ttl()` after a demo reset, otherwise a stale live result can survive.
 
-### Phase 8 - DONE
+### Phase 8 - DONE (commit 090c030)
 - `core/hazards.py` (pure): `resolve_affected_sites` (zone, cluster, grid, sites, exposure_alert, resource) and `build_downtime_windows` implementing the section 7.3 hazard-to-effects table (`FLOOD`, `POWER_OUTAGE`, `WATER_OUTAGE`, `ACCESS_BLOCKED`, `RESOURCE_DOWN`).
 - `core/scheduler.py` (pure): deterministic list scheduler with EDD priority, pre-emptive resume `finish_time`, machine capability matching (process, tolerance, envelope), outsourced vendor handoff + 4h transport legs, supplier lead times, access-blocking delays, and baseline vs. stressed comparisons.
 - `services/stress.py`: loads factory shop floor, linked vendors and suppliers, orders and parts; builds downtime windows; executes simulation; formats plain-language headlines; persists `stress_tests` rows; implements idempotent `run_auto_for_alert`.
