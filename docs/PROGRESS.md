@@ -9,7 +9,7 @@ Phase tracker. Updated at the end of every phase (R11).
 - [x] Phase 2  Data model & catalogues
 - [x] Phase 3  Demo world & seeding
 - [x] Phase 4  Real-data prefetch
-- [ ] Phase 5  M1 API
+- [x] Phase 5  M1 API
 - [ ] Phase 6  M3 SPOF
 - [ ] Phase 7  M4 Exposure
 - [ ] Phase 8  M5 Stress test
@@ -110,3 +110,13 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Tests: 16 new (74 total), all offline. Done-when: cache committed (152 KB JSON total), reset in 0.32 s with everything loaded; no network in tests.
 
 **Lessons recorded for later phases:** Overpass-api.de 502s under load - retry with backoff (water lookups are the flaky part; routes + elevations are stable). OSMnx drops its HTTP cache into `./cache` relative to CWD (now git-ignored as `backend/cache/`). osmnx `nearest_nodes` on an unprojected graph needs scikit-learn - hand-rolled haversine argmin avoids it. OSMnx keeps `tunnel` but not `layer` by default - append `layer` to `useful_tags_way` before downloading.
+
+### Phase 5 - DONE (commit 95212bc, pushed)
+- `core/status_rules.py` (pure): `required_checks_for` per the 7.5 table (APPROVAL_PENDING needs TECH only; READY needs TECH+SAMPLE+TERMS+CAPACITY + CUSTOMER when required; UNAVAILABLE_EXPIRED from any state), `missing_checks_for`, `effective_status` (READY past staleness reads STALE, never stored), `is_expiring_soon` for the Phase 10 review.
+- `services/factories.py`: CRUD with UUID4 runtime ids; `create_machines` honours `count=N` -> N rows (section 7.1); order creation validates part existence (404) and factory ownership (409 PART_NOT_IN_FACTORY).
+- `services/relationships.py`: effective status computed at read time from readiness.yaml `staleness_days`; `patch_status` guard raises 409 MISSING_CHECKS with `details.missing_checks`; `complete_check` (CAPACITY_RECONFIRMED refreshes last_confirmed_at) and `reconfirm`.
+- Routers `api/factories.py` + `api/relationships.py` wired into main: GET/POST /factories, GET/PUT /factories/{id}, POST /factories/{id}/machines (list response), PUT/DELETE /machines/{id}, GET /factories/{id}/parts, GET/POST /factories/{id}/orders (part_id filter), GET /factories/{id}/relationships, PATCH /relationships/{id}/status, POST /relationships/{id}/checks/{key}/complete, POST /relationships/{id}/reconfirm.
+- Tests: 15 new API tests (89 total) in tests/api/test_m1_api.py: CRUD round trips, count=N, error envelope shapes (422/404/409), guarded transitions (Hosur blocked with exactly the two missing checks; Cbe -> APPROVAL_PENDING legal; UNAVAILABLE_EXPIRED from any state), complete-checks-then-READY, reconfirm cures staleness (Peenya STALE -> READY), orders part filter.
+- Done-when verified live: server boot with seeded DB, /health ok, peenya status READY effective STALE, hosur APPROVAL_PENDING; ruff clean.
+
+**Lessons recorded for later phases:** a required Pydantic field that is computed (effective_status) needs a schema default so the ORM row validates, then the service overwrites it at read time. PUT endpoints need a separate all-optional Update schema (MachineCreate with required fields 422s on partial updates). The conftest `client` fixture now freezes the clock too, so API tests are deterministic end to end.
