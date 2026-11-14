@@ -50,6 +50,7 @@ class RecoveryOut(_Out):
     options: list[OptionOut] = []
     outstanding_approvals: list[str] = []
     data_label: str = DATA_LABEL
+    activation_note: str = ""
     created_at: datetime
 
 
@@ -68,6 +69,7 @@ class HandoverOut(_Out):
     responsibilities: list[dict]
     required_approvals: list[str]
     milestones: list[dict]
+    text: str = ""  # the same pack rendered as markdown (Jinja2)
 
 
 class StepOut(_Out):

@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 
 from sqlalchemy import ForeignKey, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.clock import now
 from app.db import Base, UTCDateTime
@@ -23,6 +23,10 @@ class RecoveryRequest(Base):
     selected_partner_id: Mapped[str | None] = mapped_column(String(64), default=None)
     created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=lambda: now())
 
+    steps: Mapped[list["RecoveryStep"]] = relationship(
+        back_populates="request", cascade="all, delete-orphan"
+    )
+
 
 class RecoveryStep(Base):
     """Simulated stepper: REQUEST_SENT -> ... -> DISPATCH_AND_DELIVERY (M10, mocked)."""
@@ -34,3 +38,5 @@ class RecoveryStep(Base):
     step_key: Mapped[str] = mapped_column(String(64))
     state: Mapped[str] = mapped_column(String(16), default="PENDING")  # PENDING | DONE
     at: Mapped[datetime | None] = mapped_column(UTCDateTime(), default=None)
+
+    request: Mapped[RecoveryRequest] = relationship(back_populates="steps")
