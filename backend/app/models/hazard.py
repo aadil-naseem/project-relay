@@ -37,7 +37,7 @@ class SiteTerrain(Base):
     elevation_m: Mapped[float]
     ring_mean_m: Mapped[float]  # mean elevation of the surrounding ring
     relative_m: Mapped[float]  # elevation_m - ring_mean_m (negative = in a depression)
-    nearest_water_m: Mapped[float]
+    nearest_water_m: Mapped[float | None] = mapped_column(default=None)  # null when OSM water lookup found nothing
     zone_ids: Mapped[list] = mapped_column(JSON, default=list)  # membership derived at prefetch time
     source: Mapped[str] = mapped_column(String(64), default="open-meteo-elevation")
     fetched_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=lambda: now())

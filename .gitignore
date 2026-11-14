@@ -12,6 +12,7 @@ backend/data/*.sqlite
 backend/data/*.sqlite-shm
 backend/data/*.sqlite-wal
 backend/data/raw/
+backend/cache/
 
 # Frontend
 node_modules/

@@ -58,6 +58,8 @@ Peak hours: 2023-12-04 14:00 (19.6 mm), 13:00 (19.4 mm), 04:00 (18.7 mm).
 
 Params used: `latitude` and `longitude` as **comma-separated lists** (batched). Two points returned `[14.0, 16.0]` metres — plausible for Ambattur. Batch limit: to confirm at Phase 4 when asking for 100+ coordinates.
 
+> **Phase 4 update (2026-11-14): batch limit VERIFIED live = 100 coordinates per call** (HTTP 200 with exactly 100 `latitude`/`longitude` values; 100-element `elevation[]` returned). All prefetch batches are sized <= 100.
+
 - Attribution "Weather data by Open-Meteo.com" required in UI.
 - Rate limits: not hit during Phase 0; blueprint's ~10k/day fair use is unverified but far above demo needs.
 
@@ -98,5 +100,18 @@ Vision accuracy on the probe image: returned `shape=shaft`, `material=EN24`, `di
 
 | Claim | Status | Source |
 |---|---|---|
-| Ambattur north phase (~1,500 units) flooded during Cyclone Michaung, Dec 2023 | ASSUMED | blueprint §9, source not yet recorded |
-| Oragadam / SIPCOT estates resumed within days | ASSUMED | blueprint §9, source not yet recorded |
+| Ambattur north phase (~1,500 units) flooded during Cyclone Michaung, Dec 2023 | **VERIFIED** | KNN India (2023-12-07): "The North phase [of Ambattur Industrial Estate] has three sectors. Water is slowly receding in sector one while the other two sectors are still [flooded]"; The Hindu (2023-12-04): "The Ambattur Industrial Estate was the most affected. Water seeped into many units"; estate loss ~Rs 2,000 crore (The Week, 2023-12-06) |
+| Thirumudivakkam / Perungudi / Thirumazhisai / Kakkalur estates submerged | **VERIFIED** | The Week (2023-12-06): estates "still submerged in four to six feet of water"; The Hindu Businessline (2023-12-08): flooding "crippled" MSME units in Ambattur, Thirumudivakkam, Perungudi, Thirumazhisai |
+| Villivakkam industrial estate flooded | **VERIFIED** | Deccan Herald (2023-12): Ambattur and Villivakkam estates flooded days after the storm, water on shop floors damaging machines/stock, MSME damages > Rs 3,000 crore |
+| Oragadam / SIPCOT estates resumed within days | **VERIFIED** | Deccan Herald (2023-12, TN govt statement): "situation in Oragadam ... was better" with industrial parks resuming operations; Indian Express: >90% of large-scale units resumed while MSMEs stayed hit |
+| All zones in `data/cache/zones.json` are illustrative, not official flood maps | BY DESIGN | radii are planning heuristics around reported estates; every zone note cites the source above |
+
+## Phase 4 prefetch (verified 2026-11-14)
+
+| Item | Status | Notes |
+|---|---|---|
+| OSMnx install on Windows + Python 3.12 | **VERIFIED** | osmnx 2.1.1 (with geopandas 1.2.0, pyproj 3.8.0, networkx 3.7) installed from requirements-data.txt |
+| Terrain: 16 sites (9 demo + 7 back-test) | **VERIFIED** | `data/cache/terrain.json`; owner is -4.7 m below its ring mean; Oragadam 53 m (plateau) |
+| Replay: 16 sites x 72 h from 2023-12-03T00:00Z | **VERIFIED** | `data/cache/replay_michaung.json`; owner Dec-4 total **238.7 mm — matches the Phase 0 reference exactly**; flooded back-test sites 225-315 mm; Hosur 0.4 mm, Peenya 2.5 mm, Coimbatore 1.7 mm (dry inland - supports the matching story) |
+| Synthetic fallback | VERIFIED | `data/cache/synthetic_storm.json`, labelled "SYNTHETIC SAMPLE", deterministic ramp (peak 20 mm/h at t+36h) |
+| Routes (OSM drive graph, Chennai metro) | VERIFIED | `data/cache/routes.json` + `data/raw/graph_chennai.graphml` (git-ignored); scope decision: routes only for storm-footprint sites (Ambattur cluster + Guindy); far partners keep null route facts per the cut order |

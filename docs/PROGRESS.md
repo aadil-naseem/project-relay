@@ -8,7 +8,7 @@ Phase tracker. Updated at the end of every phase (R11).
 - [x] Phase 1  Backend skeleton
 - [x] Phase 2  Data model & catalogues
 - [x] Phase 3  Demo world & seeding
-- [ ] Phase 4  Real-data prefetch
+- [x] Phase 4  Real-data prefetch
 - [ ] Phase 5  M1 API
 - [ ] Phase 6  M3 SPOF
 - [ ] Phase 7  M4 Exposure
@@ -99,3 +99,14 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Done-when: `reset_demo.py` runs in **0.09 s** (< 3 s budget) and produces all section 9 entities; ruff clean; server boots.
 
 **Lessons recorded for later phases:** cluster.yaml `sites` includes the vendor and supplier, so "seed factories == config sites" is wrong - the union of factories.json and vendors.json must equal the site list. seed() wiping its own tables (not drop_all) keeps prefetch data safe once Phase 4 lands; `POST /demo/reset` (Phase 13) should call `reset_demo()` which drops everything.
+
+### Phase 4 - DONE (commit pending, pushed)
+- **OSMnx installed after all (D6 risk cleared):** osmnx 2.1.1 + geopandas 1.2.0 + pyproj 3.8.0 installed cleanly; scipy-free nearest-node lookup written by hand (vectorised numpy haversine over the 77k-node graph) to avoid the scikit-learn optional dependency.
+- `prefetch_terrain.py` -> `data/cache/terrain.json`: 16 sites (9 demo + 7 back-test), centre + 3 rings (500/1000/2000 m) x 8 bearings via the Open-Meteo elevation API (batch 100 VERIFIED live); owner -4.7 m below ring mean (depression), Oragadam 53 m plateau; 15x15 cluster grid -> `low_threshold_m` 13.0 m.
+- `prefetch_routes.py` -> `data/cache/routes.json`: Chennai drive graph downloaded once (77,285 nodes, cached in git-ignored `data/raw/graph_chennai.graphml`); 14 routes (4 Ambattur sites x 3 exits + Guindy x 2), 3.6-13.1 km, sampled every 250 m, 488 sample elevations batched, low_share + underpass counts (tunnel/layer<0). Scope decision: routes only for storm-footprint sites; far partners keep null route facts (schema supports; M4 degrades to site-only). Nearest-water distances filled for all 9 demo sites (Overpass 502 retries needed; fac_owner 169.4 m - Ambattur lake vicinity).
+- `prefetch_replay.py` -> `replay_michaung.json` (16 sites x 72 h from 2023-12-03T00:00Z; owner 2023-12-04 total **238.7 mm, matches the Phase 0 reference exactly**; flooded back-test sites 225-315 mm; Hosur 0.4 / Peenya 2.5 / Coimbatore 1.7 mm - dry inland, supports the matching story) + `synthetic_storm.json` (labelled SYNTHETIC SAMPLE, deterministic ramp, last-resort mode).
+- `data/cache/zones.json`: 5 curated circles with real citations (KNN India, The Hindu, The Week, Deccan Herald, Businessline) recorded in VERIFIED_FACTS.md; labelled "illustrative planning zones... NOT official flood maps".
+- Seeder: `load_exposure_cache()` in `app/demo_seed.py` loads zones/terrain/routes into the DB during `reset_demo()` (zone membership derived with the circle test into `site_terrain.zone_ids`; factory membership stays on `factories.hazard_zone_id`). `nearest_water_m` made nullable in the model.
+- Tests: 16 new (74 total), all offline. Done-when: cache committed (152 KB JSON total), reset in 0.32 s with everything loaded; no network in tests.
+
+**Lessons recorded for later phases:** Overpass-api.de 502s under load - retry with backoff (water lookups are the flaky part; routes + elevations are stable). OSMnx drops its HTTP cache into `./cache` relative to CWD (now git-ignored as `backend/cache/`). osmnx `nearest_nodes` on an unprojected graph needs scikit-learn - hand-rolled haversine argmin avoids it. OSMnx keeps `tunnel` but not `layer` by default - append `layer` to `useful_tags_way` before downloading.

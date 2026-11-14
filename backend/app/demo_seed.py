@@ -35,6 +35,7 @@ from app.models import (
     AppState,
     BackupRelationship,
     Factory,
+    HazardZone,
     Machine,
     Order,
     Part,
@@ -44,6 +45,8 @@ from app.models import (
     ReadinessSnapshot,
     RelationshipCheck,
     Rfq,
+    Route,
+    SiteTerrain,
     Vendor,
     VendorLink,
 )
@@ -51,6 +54,7 @@ from app.models import (
 logger = logging.getLogger(__name__)
 
 SEED_DIR = Path(__file__).resolve().parents[1] / "data" / "seed"
+CACHE_DIR = Path(__file__).resolve().parents[1] / "data" / "cache"
 SEED_VERSION = 1
 INITIAL_SNAPSHOT_ID = "rdy_initial"
 
@@ -260,21 +264,98 @@ def _seed(session: Session) -> dict[str, int]:
     return counts
 
 
+def load_exposure_cache(session: Session) -> dict[str, int]:
+    """Load committed prefetch JSON (Phase 4) into hazard_zones, site_terrain, routes.
+
+    Reads data/cache/zones.json, terrain.json and routes.json if present and
+    returns the row counts. Missing files are fine (fresh clone mid-build);
+    the Phase 4 done-when is that the cache is committed so a fresh clone has
+    them. Zone membership in site_terrain.zone_ids is derived here with the
+    circle test; factory zone membership itself stays on factories.hazard_zone_id
+    (pinned in Phase 2).
+    """
+    from app.core.geo import point_in_circle
+
+    counts = {"hazard_zones": 0, "site_terrain": 0, "routes": 0}
+
+    zones_path = CACHE_DIR / "zones.json"
+    if zones_path.exists():
+        zones_payload = json.loads(zones_path.read_text(encoding="utf-8"))
+        for row in zones_payload["zones"]:
+            session.add(
+                HazardZone(
+                    id=row["id"],
+                    name=row["name"],
+                    center_lat=row["center_lat"],
+                    center_lon=row["center_lon"],
+                    radius_m=row["radius_m"],
+                    note=row["note"],
+                )
+            )
+            counts["hazard_zones"] += 1
+
+    terrain_path = CACHE_DIR / "terrain.json"
+    if terrain_path.exists():
+        terrain_payload = json.loads(terrain_path.read_text(encoding="utf-8"))
+        all_zones = session.scalars(select(HazardZone)).all()
+        for site_id, site in terrain_payload["sites"].items():
+            zone_ids = [
+                zone.id
+                for zone in all_zones
+                if point_in_circle(site["lat"], site["lon"], zone.center_lat, zone.center_lon, zone.radius_m)
+            ]
+            session.add(
+                SiteTerrain(
+                    site_id=site_id,
+                    elevation_m=site["elevation_m"],
+                    ring_mean_m=site["ring_mean_m"],
+                    relative_m=site["relative_m"],
+                    nearest_water_m=site.get("nearest_water_m"),
+                    zone_ids=zone_ids,
+                    source=terrain_payload.get("source", "open-meteo-elevation"),
+                )
+            )
+            counts["site_terrain"] += 1
+
+    routes_path = CACHE_DIR / "routes.json"
+    if routes_path.exists():
+        routes_payload = json.loads(routes_path.read_text(encoding="utf-8"))
+        for row in routes_payload["routes"]:
+            session.add(
+                Route(
+                    id=row["route_id"],
+                    site_id=row["site_id"],
+                    exit_id=row["exit_id"],
+                    length_km=row["length_km"],
+                    samples=row["samples"],
+                    low_share=row.get("low_share"),
+                    underpass_count=row.get("underpass_count", 0),
+                )
+            )
+            counts["routes"] += 1
+
+    session.flush()
+    return counts
+
+
 def seed(session: Session) -> dict[str, int]:
     """Seed into the existing (empty or wipeable) schema."""
     return _seed(session)
 
 
 def reset_demo() -> dict[str, int]:
-    """Drop and recreate the schema, seed, and write the initial readiness snapshot.
+    """Drop and recreate the schema, seed, write the initial readiness snapshot,
+    and load the committed prefetch cache (zones, terrain, routes).
 
     Used by `scripts/reset_demo.py` and later by `POST /demo/reset` (Phase 13).
     """
-    logger.info("resetting demo world (drop + create + seed)")
+    logger.info("resetting demo world (drop + create + seed + exposure cache)")
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     with Session(engine) as session:
         counts = _seed(session)
+        exposure = load_exposure_cache(session)
+        counts.update(exposure)
         session.add(
             ReadinessSnapshot(
                 id=INITIAL_SNAPSHOT_ID,
@@ -290,9 +371,9 @@ def reset_demo() -> dict[str, int]:
     return counts
 
 
-def verify_counts(session: Session) -> dict[str, int]:
+def verify_counts(session: Session, include_exposure: bool = False) -> dict[str, int]:
     """Row counts straight from the database, for tests and the done-when check."""
-    return {
+    counts = {
         "factories": len(session.scalars(select(Factory)).all()),
         "vendors": len(session.scalars(select(Vendor)).all()),
         "vendor_links": len(session.scalars(select(VendorLink)).all()),
@@ -303,6 +384,15 @@ def verify_counts(session: Session) -> dict[str, int]:
         "relationships": len(session.scalars(select(BackupRelationship)).all()),
         "relationship_checks": len(session.scalars(select(RelationshipCheck)).all()),
     }
+    if include_exposure:
+        counts.update(
+            {
+                "hazard_zones": len(session.scalars(select(HazardZone)).all()),
+                "site_terrain": len(session.scalars(select(SiteTerrain)).all()),
+                "routes": len(session.scalars(select(Route)).all()),
+            }
+        )
+    return counts
 
 
 __all__ = [
@@ -310,6 +400,7 @@ __all__ = [
     "INITIAL_SNAPSHOT_ID",
     "SEED_DIR",
     "SEED_VERSION",
+    "load_exposure_cache",
     "load_seed_data",
     "reset_demo",
     "seed",

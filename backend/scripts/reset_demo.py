@@ -24,7 +24,7 @@ def main() -> int:
     counts = reset_demo()
     elapsed = time.perf_counter() - started
     with Session(engine) as session:
-        actual = verify_counts(session)
+        actual = verify_counts(session, include_exposure=True)
     ok = actual == counts
     print(f"reset in {elapsed:.2f}s -> {counts}")
     if not ok:

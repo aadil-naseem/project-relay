@@ -28,6 +28,19 @@ sites:
   - {id: fac_peenya, role: PARTNER, name: "Sample Works (Peenya, Bengaluru)", lat: 13.028, lon: 77.520, cluster_id: cl_peenya, hazard_zone_id: null, grid_id: grid_blr, note: "READY but STALE (~120 days) - does not count"}
   - {id: fac_cbe, role: PARTNER, name: Sample Tools (Coimbatore), lat: 10.950, lon: 76.970, cluster_id: cl_cbe, hazard_zone_id: null, grid_id: grid_cbe, note: POTENTIAL_MATCH - lacks grinding at the needed tolerance}
 
+# Exit junctions for access-route exposure (Phase 4 prefetch, M4). Real road
+# junctions, one per main direction out of the estate. Routes are only computed
+# for sites inside the Michaung storm footprint (Chennai metro): far partners
+# (Oragadam, Hosur, Peenya, Coimbatore) are never exposed in this story.
+exits:
+  cl_ambattur:
+    - {id: exit_padi, name: Padi Junction, lat: 13.1076, lon: 80.1965}
+    - {id: exit_madhavaram, name: Madhavaram Junction, lat: 13.1392, lon: 80.2317}
+    - {id: exit_villivakkam, name: Villivakkam Junction, lat: 13.1080, lon: 80.2237}
+  cl_guindy:
+    - {id: exit_kathipara, name: Kathipara Junction, lat: 12.9926, lon: 80.1999}
+    - {id: exit_taramani, name: Taramani (OMR) Junction, lat: 12.9907, lon: 80.2477}
+
 # Back-test sites for the exposure engine (Phase 7): flooded during Michaung vs not.
 backtest_flooded:
   - {id: bt_ambattur_north, name: Ambattur north phase, lat: 13.102, lon: 80.152}

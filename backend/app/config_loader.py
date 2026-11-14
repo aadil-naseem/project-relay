@@ -150,6 +150,13 @@ class BacktestSite(_Strict):
     lon: float
 
 
+class ExitJunction(_Strict):
+    id: str
+    name: str
+    lat: float
+    lon: float
+
+
 class ReplayConfig(_Strict):
     event: str
     series_start_utc: datetime
@@ -164,6 +171,7 @@ class ClusterConfig(_Strict):
     sites: list[ClusterSite] = Field(default_factory=list)
     backtest_flooded: list[BacktestSite] = Field(default_factory=list)
     backtest_not_flooded: list[BacktestSite] = Field(default_factory=list)
+    exits: dict[str, list[ExitJunction]] = Field(default_factory=dict)
 
 
 # ---------------------------------------------------------------- bundle
