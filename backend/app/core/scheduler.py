@@ -28,10 +28,13 @@ No database or FastAPI imports.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 
 from app.core.hazards import DowntimeWindows
 from app.enums import FallbackLevel, OrderState, ProcessCode
+
+FallbackResolver = Callable[["OrderScheduleInput"], tuple[FallbackLevel, str | None]]
 
 
 @dataclass(frozen=True)
@@ -338,6 +341,7 @@ def run_stress_simulation(
     downtime: DowntimeWindows,
     due_buffer_hours: float = 24.0,
     transport_hours: float = 4.0,
+    fallback_resolver: FallbackResolver | None = None,
 ) -> StressSimulationResult:
     """Run baseline and stressed schedules, compare against due dates, and summarize."""
     # 1. Baseline run (no downtime windows)
@@ -393,7 +397,11 @@ def run_stress_simulation(
             orders_at_risk += 1
             revenue_exposed_inr += order.value_inr
 
-        # Phase 8 stub: fallback_level = NONE until Phase 9 M6 matcher connects
+        fallback_level = FallbackLevel.NONE
+        best_backup = None
+        if fallback_resolver is not None:
+            fallback_level, best_backup = fallback_resolver(order)
+
         evaluations.append(
             OrderStressEvaluation(
                 order_id=order.order_id,
@@ -404,14 +412,21 @@ def run_stress_simulation(
                 stressed_finish_hours=str_finish,
                 days_late=days_late,
                 value_inr=order.value_inr,
-                fallback_level=FallbackLevel.NONE,
-                best_backup=None,
+                fallback_level=fallback_level,
+                best_backup=best_backup,
             )
         )
 
-    # In Phase 8, with stub fallback_level = NONE, all at-risk orders have no fallback
-    orders_no_fallback = orders_at_risk
-    orders_no_ready_fallback = orders_at_risk
+    orders_no_fallback = sum(
+        1
+        for o in evaluations
+        if o.state in (OrderState.LATE, OrderState.AT_RISK) and o.fallback_level == FallbackLevel.NONE
+    )
+    orders_no_ready_fallback = sum(
+        1
+        for o in evaluations
+        if o.state in (OrderState.LATE, OrderState.AT_RISK) and o.fallback_level != FallbackLevel.READY
+    )
 
     return StressSimulationResult(
         orders=tuple(evaluations),

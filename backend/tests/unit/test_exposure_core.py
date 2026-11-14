@@ -78,8 +78,9 @@ def test_dry_series_scores_zero(cfg):
 def test_depression_clamps_at_full_depth(cfg):
     shallow = engine.vulnerability(elevation_m=17.0, ring_mean_m=18.0, nearest_water_m=None, zone_ids=[], cfg=cfg)
     deep = engine.vulnerability(elevation_m=10.0, ring_mean_m=18.0, nearest_water_m=None, zone_ids=[], cfg=cfg)
-    assert shallow.depression == pytest.approx(1 / 3, abs=1e-4)
-    assert deep.depression == 1.0  # 8 m below a 3 m full-depth threshold
+    # calibration: depression_full_m = 5.0 (a 1 m dip is mild; >= 5 m saturates)
+    assert shallow.depression == pytest.approx(0.2)
+    assert deep.depression == 1.0  # 8 m below a 5 m full-depth threshold
 
 
 def test_water_proximity_is_inverse_distance(cfg):

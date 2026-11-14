@@ -13,7 +13,7 @@ Phase tracker. Updated at the end of every phase (R11).
 - [x] Phase 6  M3 SPOF
 - [x] Phase 7  M4 Exposure
 - [x] Phase 8  M5 Stress test
-- [ ] Phase 9  M6 Matching
+- [x] Phase 9  M6 Matching
 - [ ] Phase 10 M8 Readiness
 - [ ] Phase 11 M7/M9/M10
 - [ ] Phase 12 M2 Passport + RFQ
@@ -153,3 +153,13 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Done-when verified: manual FLOOD test produces LATE orders with sensible dates; auto test attaches to alert and is idempotent; property tests pass.
 
 **Lessons recorded for later phases:** in parallel multi-machine list scheduling, Graham's anomaly can shift order assignments across machines; monotonic order delay strictly holds for dedicated routing or overall makespan. Phase 9 M6 matcher will wire into `services/stress.py` to replace the `FallbackLevel.NONE` stub with candidate searches.
+
+### Phase 9 - DONE (commit pending, pushed)
+- `core/matching.py` (pure): six hard filters (process/material/tolerance/envelope/capacity/lead_time) each returning PASS/FAIL/UNKNOWN with basis+detail (capacity UNKNOWN when the relationship is stale, per section 7.4); UNVERIFIED requirement list flipped to verified by completed relationship checks; correlated-risk exclusions (SAME_CLUSTER, SAME_HAZARD_ZONE, SAME_GRID only under POWER_OUTAGE else down-rank flag, ALSO_EXPOSED_SAME_EVENT, NEARBY down-rank); ranking `score = 100*(0.40*status_w + 0.20*time_slack + 0.15*capacity_slack + 0.15*freshness + 0.10*separation)` with STALE READY weighted 0.5 and flagged RECONFIRM_NEEDED; greedy top-2 set selection avoiding correlation among picks; `fallback_level` READY | POTENTIAL_ONLY | NONE.
+- `services/matching.py`: loads candidates (partner machines, relationships, completed checks), resolves the scenario context (hazard, affected sites) and **always computes partner site risks fresh through the exposure service** in the current demo weather mode (idempotent snapshot writes keyed by forecast hash). Full trace.
+- `api/matching.py`: `POST /matching/search {order_id, scenario?}`; the Phase 8 stub in `services/stress.py` now calls the real matcher so stress results carry real `fallback_level` + `best_backup`.
+- Tests: 4 new files (filters, exclusions, ranking, service/API) - every filter pass/fail/unknown case, every exclusion reason, set selection avoiding correlated pairs, and the section 9 invariants: hero order PRT-B has exactly one viable READY (Oragadam) + one viable APPROVAL_PENDING (Hosur) + excluded correlated candidates; PRT-A fallback NONE.
+- **Two documented changes to make invariant 4 hold honestly** (blueprint Phase 9 task 5 sanctions tuning; no site names in code or config):
+  1. `config/exposure.yaml` `depression_full_m: 3.0 -> 5.0`. Oragadam dips exactly 3 m below its ring mean on the 53 m plateau; at 3.0 the depression term saturated (D=1.0) and its indicator hit 58, above the alert threshold, which would have excluded the hero backup. 5.0 matches the floodplain scale that actually flooded (owner -4.7 m at 14 m elevation). Effect verified: Oragadam 48 (below threshold, viable), Guindy 67 unchanged (excluded), owner 96 SEVERE (alert unchanged), and the Michaung back-test separation **improved from +12 to +22** (`docs/BACKTEST_EXPOSURE.md` regenerated).
+  2. `services/matching.py` computes partner exposure fresh instead of silently falling back to `site_risk=None` when no snapshots exist yet (the hero-invariant test failed exactly this way after `reset_demo()`); without this the correlated-risk exclusion could never fire on a fresh database.
+- Done-when verified live: `POST /matching/search` on ord_102 -> fallback READY, recommended set [fac_oragadam, fac_hosur], Guindy excluded ALSO_EXPOSED_SAME_EVENT, Ambattur neighbour excluded SAME_CLUSTER, Peenya STALE flagged; ord_101 -> fallback NONE. 191 tests passing, ruff clean.

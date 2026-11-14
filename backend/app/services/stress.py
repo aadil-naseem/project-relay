@@ -22,7 +22,7 @@ from app.config_loader import load_configs
 from app.core import hazards, scheduler
 from app.core.clock import now
 from app.core.trace import TraceBuilder
-from app.enums import HazardType, Trigger
+from app.enums import FallbackLevel, HazardType, Trigger
 from app.errors import AppError
 from app.models import (
     ExposureSnapshot,
@@ -379,6 +379,16 @@ def run_manual_stress_test(session: Session, payload: StressCreate) -> StressOut
         },
     )
 
+    from app.services import matching as matching_service
+
+    def _resolve_manual_fallback(o: scheduler.OrderScheduleInput) -> tuple[FallbackLevel, str | None]:
+        match_out = matching_service.find_matches_for_order(
+            session,
+            o.order_id,
+            scenario={"hazard": payload.hazard.value, "affected_sites": list(downtime.affected_sites)},
+        )
+        return match_out.fallback_level, match_out.best_backup
+
     # 2. Run simulation
     sim_result = scheduler.run_stress_simulation(
         orders=orders,
@@ -390,6 +400,7 @@ def run_manual_stress_test(session: Session, payload: StressCreate) -> StressOut
         downtime=downtime,
         due_buffer_hours=due_buffer_hours,
         transport_hours=transport_hours,
+        fallback_resolver=_resolve_manual_fallback,
     )
 
     trace.add(
@@ -521,6 +532,16 @@ def run_auto_for_alert(
         resources=res_refs,
     )
 
+    from app.services import matching as matching_service
+
+    def _resolve_auto_fallback(o: scheduler.OrderScheduleInput) -> tuple[FallbackLevel, str | None]:
+        match_out = matching_service.find_matches_for_order(
+            session,
+            o.order_id,
+            scenario={"hazard": HazardType.FLOOD.value, "affected_sites": list(downtime.affected_sites)},
+        )
+        return match_out.fallback_level, match_out.best_backup
+
     sim_result = scheduler.run_stress_simulation(
         orders=orders,
         factory_id=factory.id,
@@ -531,6 +552,7 @@ def run_auto_for_alert(
         downtime=downtime,
         due_buffer_hours=due_buffer_hours,
         transport_hours=transport_hours,
+        fallback_resolver=_resolve_auto_fallback,
     )
 
     summary_stub = StressSummary(

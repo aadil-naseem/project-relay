@@ -19,7 +19,10 @@ rain_3h_breakpoints_mm:    # [rolling 3 h total mm, hazard] - cloudburst intensi
 
 # Site vulnerability: depression below surroundings, water proximity, curated flood history.
 vulnerability_weights: {depression: 0.35, water_proximity: 0.25, flood_history: 0.40}
-depression_full_m: 3.0          # >= 3 m below local ring mean -> 1.0
+depression_full_m: 5.0          # >= 5 m below local ring mean -> 1.0. Calibrated on real terrain: the
+                                # flooded estates sit in shallow floodplain basins (owner -4.7 m at 14 m
+                                # elevation), while SIPCOT plateau sites dip ~3 m at 50+ m elevation
+                                # without flooding. 3.0 saturated the plateau dips and mis-scored them.
 water_full_distance_m: 1500     # at/inside 0 m -> 1.0, >= 1500 m -> 0
 vulnerability_floor: 0.25       # risk = 100 * H * (floor + (1-floor) * V)
 

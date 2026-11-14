@@ -5,19 +5,19 @@ Weather: Open-Meteo archive, real hourly precipitation. Terrain: Open-Meteo elev
 Zones: curated planning circles from public reporting, **not** official flood maps.
 Risk is a **risk indicator, not a flood model**.
 
-Generated (UTC): 2026-11-14T12:11:50+00:00
+Generated (UTC): 2026-11-14T13:14:56+00:00
 
 | Site | Truth | Risk | H (rain) | 24 h mm | V | Depression | Water | Zone |
 |---|---|---|---|---|---|---|---|---|
-| Thirumudivakkam | FLOODED | **82** | 0.97 | 190.7 | 0.80 | 0.42 | 1.00 | 1 |
+| Thirumudivakkam | FLOODED | **78** | 0.97 | 190.7 | 0.74 | 0.25 | 1.00 | 1 |
 | Ambattur north phase | FLOODED | **73** | 1.00 | 242.3 | 0.64 | 0.00 | 0.95 | 1 |
 | Villivakkam | FLOODED | **70** | 1.00 | 259.4 | 0.60 | 0.00 | 0.78 | 1 |
 | Perungudi | FLOODED | **70** | 0.97 | 193.4 | 0.62 | 0.00 | 0.87 | 1 |
-| Oragadam | not flooded | **58** | 0.95 | 180.7 | 0.49 | 1.00 | 0.54 | 0 |
-| Pillaipakkam | not flooded | **31** | 0.92 | 168.2 | 0.12 | 0.33 | 0.00 | 0 |
+| Oragadam | not flooded | **48** | 0.95 | 180.7 | 0.35 | 0.60 | 0.54 | 0 |
 | Irungattukottai | not flooded | **29** | 0.95 | 180.7 | 0.08 | 0.00 | 0.31 | 0 |
+| Pillaipakkam | not flooded | **28** | 0.92 | 168.2 | 0.07 | 0.20 | 0.00 | 0 |
 
-Separation (lowest flooded - highest not-flooded): **+12 points**.
+Separation (lowest flooded - highest not-flooded): **+22 points**.
 
 Result: **PASS** - every flooded site ranks above every not-flooded site.
 

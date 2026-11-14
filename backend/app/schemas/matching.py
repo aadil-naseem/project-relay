@@ -56,4 +56,5 @@ class MatchingOut(_Out):
     candidates: list[CandidateOut]
     recommended_set: RecommendedSet | None = None
     fallback_level: FallbackLevel
+    best_backup: str | None = None
     trace: list[TraceEntry] = []
