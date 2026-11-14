@@ -12,7 +12,7 @@ Phase tracker. Updated at the end of every phase (R11).
 - [x] Phase 5  M1 API
 - [x] Phase 6  M3 SPOF
 - [x] Phase 7  M4 Exposure
-- [ ] Phase 8  M5 Stress test
+- [x] Phase 8  M5 Stress test
 - [ ] Phase 9  M6 Matching
 - [ ] Phase 10 M8 Readiness
 - [ ] Phase 11 M7/M9/M10
@@ -142,3 +142,14 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Done-when verified live: owner **98 SEVERE** with readable drivers (242 mm/24 h, 56 mm/3 h, 4.7 m depression, 169 m from water, in a planning zone), alert active (owner + heat vendor + supplier), onset 23 h, Oragadam 58 < Ambattur 96.
 
 **Lessons recorded for later phases:** Oragadam scores 58 (HIGH) in the replay because the archive really did drop ~180 mm/24 h there - it is *less* exposed than Ambattur, not unexposed. Phase 9 must not use "risk >= alert_threshold" alone as the correlated-risk test or the hero backup would be excluded; use a relative test and document it. The TTL cache keys on (mode, site set) and must be cleared by `reset_weather_ttl()` after a demo reset, otherwise a stale live result can survive.
+
+### Phase 8 - DONE
+- `core/hazards.py` (pure): `resolve_affected_sites` (zone, cluster, grid, sites, exposure_alert, resource) and `build_downtime_windows` implementing the section 7.3 hazard-to-effects table (`FLOOD`, `POWER_OUTAGE`, `WATER_OUTAGE`, `ACCESS_BLOCKED`, `RESOURCE_DOWN`).
+- `core/scheduler.py` (pure): deterministic list scheduler with EDD priority, pre-emptive resume `finish_time`, machine capability matching (process, tolerance, envelope), outsourced vendor handoff + 4h transport legs, supplier lead times, access-blocking delays, and baseline vs. stressed comparisons.
+- `services/stress.py`: loads factory shop floor, linked vendors and suppliers, orders and parts; builds downtime windows; executes simulation; formats plain-language headlines; persists `stress_tests` rows; implements idempotent `run_auto_for_alert`.
+- `api/stress.py` & `main.py`: `POST /api/v1/stress-tests` and `GET /api/v1/stress-tests/{id}` wired into `/api/v1`.
+- Tests: 27 new tests across `test_finish_time.py`, `test_hazards.py`, `test_scheduler_core.py`, `test_stress_service.py`, and `test_scheduler_properties.py` (Hypothesis property tests for machine non-overlap, step sequence integrity, and monotonic delays).
+- Section 9 story invariant 2 verified: auto stress test yields `orders_at_risk >= 2` (3 orders), `revenue_exposed_inr >= 1,000,000` (₹24.7 L), and `orders_no_fallback >= 1`.
+- Done-when verified: manual FLOOD test produces LATE orders with sensible dates; auto test attaches to alert and is idempotent; property tests pass.
+
+**Lessons recorded for later phases:** in parallel multi-machine list scheduling, Graham's anomaly can shift order assignments across machines; monotonic order delay strictly holds for dedicated routing or overall makespan. Phase 9 M6 matcher will wire into `services/stress.py` to replace the `FallbackLevel.NONE` stub with candidate searches.
