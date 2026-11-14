@@ -64,7 +64,7 @@ EXPECTED_COUNTS = {
     "factories": 7,  # 1 owner + 6 partners
     "vendors": 2,  # 1 vendor + 1 supplier
     "vendor_links": 2,
-    "machines": 32,
+    "machines": 33,
     "parts": 6,
     "part_steps": 12,
     "orders": 8,
@@ -364,7 +364,7 @@ def reset_demo() -> dict[str, int]:
                 score=0.0,
                 weighted_score=0.0,
                 breakdown={},
-                reason="INITIAL - not yet computed (M8 fills this on first run)",
+                reason="INITIAL (not yet computed)",
             )
         )
         session.commit()

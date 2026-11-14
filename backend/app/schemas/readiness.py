@@ -27,6 +27,7 @@ class PartCoverage(_Out):
     covered_by: str | None = None
     backup_status: str | None = None
     reason: str | None = None  # NO_PARTNER_ELIGIBLE | NOT_READY | STALE | CORRELATED | TOO_SLOW | NO_CAPACITY
+    detail: str | None = None  # plain-word explanation for the UI
 
 
 class ReviewItem(_Out):
@@ -66,6 +67,7 @@ class ActionsOut(_Out):
     factory_id: str
     window_hours: int
     actions: list[ActionOut]
+    trace: list[TraceEntry] = []
 
 
 class HistoryPoint(_Out):

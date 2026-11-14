@@ -94,7 +94,7 @@ def test_machine_count_creates_n_rows(client):
 
     listed = client.get("/api/v1/factories/fac_oragadam/machines")
     assert listed.status_code == 200
-    assert len(listed.json()["items"]) == 5 + 3  # 5 seeded + 3 new
+    assert len(listed.json()["items"]) == 6 + 3  # 6 seeded + 3 new
 
 
 def test_machine_update_and_delete(client):

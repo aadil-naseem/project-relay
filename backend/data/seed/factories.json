@@ -30,7 +30,7 @@
       "materials_handled": ["EN8", "EN24", "SS304"],
       "typical_lead_time_hours": 48.0,
       "mobilisation_hours": 6.0,
-      "spare_hours_per_week": {"TURN": 40.0, "MILL": 30.0, "GRIND_CYL": 16.0},
+      "spare_hours_per_week": {"TURN": 80.0, "MILL": 60.0, "GRIND_CYL": 32.0},
       "contacts": ["production", "quality"]
     },
     {
@@ -46,7 +46,7 @@
       "materials_handled": ["EN8", "SS304", "Al6061"],
       "typical_lead_time_hours": 48.0,
       "mobilisation_hours": 8.0,
-      "spare_hours_per_week": {"TURN": 30.0, "MILL": 40.0},
+      "spare_hours_per_week": {"TURN": 60.0, "MILL": 80.0},
       "contacts": ["production"]
     },
     {
@@ -62,7 +62,7 @@
       "materials_handled": ["EN8", "EN24", "SS304"],
       "typical_lead_time_hours": 72.0,
       "mobilisation_hours": 10.0,
-      "spare_hours_per_week": {"TURN": 60.0, "MILL": 40.0},
+      "spare_hours_per_week": {"TURN": 120.0, "MILL": 100.0, "DRILL_TAP": 30.0},
       "contacts": ["production", "quality", "purchase"]
     },
     {
@@ -78,7 +78,7 @@
       "materials_handled": ["EN8", "EN19", "SS304"],
       "typical_lead_time_hours": 72.0,
       "mobilisation_hours": 12.0,
-      "spare_hours_per_week": {"TURN": 50.0, "MILL": 40.0, "HEAT_TREAT": 20.0},
+      "spare_hours_per_week": {"TURN": 100.0, "MILL": 80.0, "HEAT_TREAT": 40.0},
       "contacts": ["production", "quality"]
     },
     {
@@ -94,7 +94,7 @@
       "materials_handled": ["EN8", "Mild Steel"],
       "typical_lead_time_hours": 72.0,
       "mobilisation_hours": 10.0,
-      "spare_hours_per_week": {"TURN": 40.0, "MILL": 30.0},
+      "spare_hours_per_week": {"TURN": 80.0, "MILL": 60.0},
       "contacts": ["production"]
     },
     {
@@ -110,7 +110,7 @@
       "materials_handled": ["EN8", "EN19"],
       "typical_lead_time_hours": 96.0,
       "mobilisation_hours": 16.0,
-      "spare_hours_per_week": {"MILL": 30.0, "GRIND_CYL": 20.0},
+      "spare_hours_per_week": {"MILL": 60.0, "GRIND_CYL": 40.0},
       "contacts": ["production"]
     }
   ]

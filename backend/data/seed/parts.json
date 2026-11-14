@@ -1,5 +1,5 @@
 {
-  "_note": "Blueprint section 9: six parts with routes. PRT-A is the no-fallback order (grinder + heat vendor + EN24 supplier SPOFs); PRT-B is the hero recovery order; PRT-C covered by Oragadam; PRT-F Hosur-dependent (in-house heat treat).",
+  "_note": "Blueprint section 9: six parts with routes. PRT-A is the no-fallback order (grinder + heat vendor + EN24 supplier SPOFs); PRT-B is the hero recovery order; PRT-C covered by Oragadam (which carries a drill/tap centre for that route); PRT-F Hosur-dependent (in-house heat treat).",
   "parts": [
     {
       "id": "prt_a",

@@ -67,6 +67,9 @@ def patch_status(session: Session, relationship_id: str, target: BackupStatus) -
         )
     relationship.status = target
     session.commit()
+    from app.services import readiness as readiness_service
+
+    readiness_service.record_snapshot(session, relationship.owner_id)
     return relationship
 
 
@@ -83,6 +86,10 @@ def complete_check(session: Session, relationship_id: str, key: CheckKey) -> Bac
         check.done_at = now()
         if key == CheckKey.CAPACITY_RECONFIRMED:
             relationship.last_confirmed_at = now()
+            session.commit()
+            from app.services import readiness as readiness_service
+
+            readiness_service.record_snapshot(session, relationship.owner_id)
         session.commit()
     return relationship
 
@@ -92,4 +99,7 @@ def reconfirm(session: Session, relationship_id: str) -> BackupRelationship:
     relationship = get_relationship(session, relationship_id)
     relationship.last_confirmed_at = now()
     session.commit()
+    from app.services import readiness as readiness_service
+
+    readiness_service.record_snapshot(session, relationship.owner_id)
     return relationship

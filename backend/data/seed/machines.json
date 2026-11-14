@@ -25,6 +25,7 @@
     {"id": "mch_ora_turn_3", "factory_id": "fac_oragadam", "process": "TURN", "name": "CNC lathe 3", "achievable_tolerance_mm": 0.01, "envelope_mm": 800.0},
     {"id": "mch_ora_mill_1", "factory_id": "fac_oragadam", "process": "MILL", "name": "VMC 1", "achievable_tolerance_mm": 0.01, "envelope_mm": 700.0},
     {"id": "mch_ora_mill_2", "factory_id": "fac_oragadam", "process": "MILL", "name": "VMC 2", "achievable_tolerance_mm": 0.01, "envelope_mm": 700.0},
+    {"id": "mch_ora_drill_1", "factory_id": "fac_oragadam", "process": "DRILL_TAP", "name": "Drill/Tap centre 1", "achievable_tolerance_mm": 0.05, "envelope_mm": 400.0},
 
     {"id": "mch_hos_turn_1", "factory_id": "fac_hosur", "process": "TURN", "name": "CNC lathe 1", "achievable_tolerance_mm": 0.015, "envelope_mm": 600.0},
     {"id": "mch_hos_turn_2", "factory_id": "fac_hosur", "process": "TURN", "name": "CNC lathe 2", "achievable_tolerance_mm": 0.015, "envelope_mm": 600.0},
