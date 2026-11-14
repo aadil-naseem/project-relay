@@ -14,7 +14,7 @@ class _Out(BaseModel):
 
 class SpofNode(_Out):
     id: str
-    kind: str  # machine | vendor | supplier
+    kind: str  # part | step | machine | vendor | supplier
     name: str
     process: ProcessCode | None = None
     exposed: bool = False
@@ -42,4 +42,7 @@ class SpofOut(_Out):
     items: list[SpofItem]
     nodes: list[SpofNode]
     edges: list[SpofEdge]
+    # requirements no approved resource can serve at all (honest gap reporting)
+    uncovered_requirements: list[str] = []
+    total_orders: int = 0
     trace: list[TraceEntry] = []
