@@ -10,7 +10,7 @@ Phase tracker. Updated at the end of every phase (R11).
 - [x] Phase 3  Demo world & seeding
 - [x] Phase 4  Real-data prefetch
 - [x] Phase 5  M1 API
-- [ ] Phase 6  M3 SPOF
+- [x] Phase 6  M3 SPOF
 - [ ] Phase 7  M4 Exposure
 - [ ] Phase 8  M5 Stress test
 - [ ] Phase 9  M6 Matching
@@ -120,3 +120,13 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Done-when verified live: server boot with seeded DB, /health ok, peenya status READY effective STALE, hosur APPROVAL_PENDING; ruff clean.
 
 **Lessons recorded for later phases:** a required Pydantic field that is computed (effective_status) needs a schema default so the ORM row validates, then the service overwrites it at read time. PUT endpoints need a separate all-optional Update schema (MachineCreate with required fields 422s on partial updates). The conftest `client` fixture now freezes the clock too, so API tests are deterministic end to end.
+
+### Phase 6 - DONE (commit 5588e83, pushed)
+- `core/spof.py` (pure, no DB/FastAPI): `Resource` (machine/vendor/supplier view), `StepRequirement`, `OrderRequirement`, `find_spofs()` implementing the section 7.1 coverage algorithm exactly - requirements = every step + the material, `servers(req)` with the machine process/tolerance/envelope filters, remove-one-resource-and-recheck, rank by revenue desc then order count then id. Returns ranked items, part/step/resource graph nodes+edges, `uncovered_requirements`, `excluded_resources`.
+- Two modelling decisions **recorded**: (1) requirements with zero servers at baseline are reported in `uncovered_requirements` and are not blamed on any resource - otherwise every resource would "break" a part with no approved supplier; (2) `outsourced` routes a step to approved vendors, in-house steps to own machines (documented in the module docstring).
+- `services/spof.py`: builds the world from the DB (own machines, linked vendors/suppliers, orders + part routes, passport envelope when present), computes the static exposed flag (hazard zone on the site row or `site_terrain.zone_ids`; live exposure joins in Phase 13), and emits a trace (load_world, coverage, remove_resource per SPOF, rank).
+- `api/spof.py`: `GET /factories/{id}/spof` (409 NOT_AN_OWNER for a partner, 404 NOT_FOUND for unknown); schema extended with `uncovered_requirements` + `total_orders`; node kinds widened to part/step/machine/vendor/supplier.
+- Tests: 21 new (110 total). Unit: three lathes never a SPOF, lone grinder is, ranking tie-breaks, tolerance filter, envelope filter, unavailable machine excluded, outsourced routing, supplier material match, exposed flag, graph shape, empty world. **Hypothesis property test (200 examples)** cross-checks the algorithm against an independent brute-force remove-and-recheck implementation.
+- Done-when verified against the seeded world: top SPOF is `ven_heat` (₹19 L, ord_101+ord_106), then `mch_own_grind_1` (₹12 L) and `sup_steel` (₹12 L), all `exposed=true`; the three lathes and both VMCs never appear. Section 9 invariant 3 holds.
+
+**Lessons recorded for later phases:** a single supplier is itself a SPOF - test fixtures that want "material is not the point" need two suppliers of the same grade. Uncovered requirements are a normal state in the demo world (only EN24 has an approved supplier), so later modules must not assume full material coverage. The hypothesis strategy must collapse duplicate ids, since generated ids can repeat.
