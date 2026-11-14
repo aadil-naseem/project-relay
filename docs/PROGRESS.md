@@ -36,7 +36,7 @@ Technical Phase 14 is intentionally deferred per user direction; do not mark it 
 - [x] F4 Weak Points
 - [x] F4 What-if
 - [x] F5 Recovery
-- [ ] F5 Partners & Readiness
+- [x] F5 Partners & Readiness
 - [ ] F6 Passports & RFQ
 - [ ] F7 Stage Controls, Presenter, Proof, System
 - [ ] F8 Landing hero
@@ -265,12 +265,12 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Browser smoke against live `rr_20261114173203_ord_102`: six candidates (Oragadam READY, Hosur APPROVAL_PENDING, Ambattur/Guindy excluded, Peenya STALE, Coimbatore potential); selected Oragadam, request ACTIVE, handover redacted and labelled, responsibilities/milestones visible, route card at REQUEST_SENT. No browser console errors.
 - `npm test` 6/6; lint, palette lint, build pass. User-reviewed screenshot at 1366×768 shows request summary, Ready / Approval Pending / Excluded columns and unverified checks with no visual blocker. Screenshot attachment remains in chat; the browser tool could not copy it to `docs/screens/`.
 
-### Frontend F5-S7 Partners & Readiness - IMPLEMENTED (commit a4cf09c, pushed; review pending)
+### Frontend F5-S7 Partners & Readiness - DONE (commit a4cf09c, pushed; polish a7a14c4; user screenshot reviewed)
 - Replaced the Partners placeholder with the relay circuit and partner drawer, 24/48/72 readiness ring/breakdown, stale/expiring preparedness review, score history chart, and next-best-action counterfactuals.
 - Circuit uses live relationships and M6 exclusions/reasons, with solid/dashed/hatched paths. Drawer exposes all five checks, reconfirm, and guarded status changes; backend `409 details.missing_checks` is rendered as CANNOT SET READY.
 - “Do it” confirms the counterfactual delta, then completes pending checks + READY or reconfirms. Verified with Hosur: 53.9 → 70.9 weighted (+17); score/history updated. Demo DB reset after smoke run.
-- `npm test` 6/6; lint, palette lint, build pass. User screenshot review pending; no Passports work has started.
-- After the first Partners screenshot review, moved the weighted score label below the ring to prevent overlap with the gauge. The screenshot predates this polish; request an updated capture before marking S7 complete.
+- `npm test` 6/6; lint, palette lint, build pass. User screenshot at 1366×768 reviewed: relay circuit, readiness, review, action and history are legible. Moved the weighted score label below the ring to avoid overlapping the gauge. Screenshot attachment is in chat and could not be copied locally via browser tools.
+- No Passports work has started; wait for confirmation before F6.
 
 ### Phase 12 - DONE (commit 0ef204b, pushed)
 - `scripts/make_sample_drawings.py`: 3 vector PDFs WITH text layers + 200-DPI PNGs (longest side <= 2000 px) + one deliberately messy variant (rotated 90 deg, contrast 0.45); title blocks with fictional customers; `expected.json` ground truth per drawing. Synthetic only - free-tier provider inputs may be stored by the provider (R9).
