@@ -19,6 +19,7 @@ import './pages/Exposure/exposure.css'
 import './pages/WeakPoints/weak-points.css'
 import './pages/WhatIf/what-if.css'
 import './pages/Recovery/recovery.css'
+import './pages/Partners/partners.css'
 import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(

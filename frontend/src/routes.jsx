@@ -7,6 +7,7 @@ import ExposureRoute from './pages/Exposure/ExposureRoute'
 import WeakPointsRoute from './pages/WeakPoints/WeakPointsRoute'
 import WhatIfRoute from './pages/WhatIf/WhatIfRoute'
 import RecoveryRoute from './pages/Recovery/RecoveryRoute'
+import PartnersRoute from './pages/Partners/PartnersRoute'
 
 // Route configuration is intentionally a non-component export in this module.
 // oxlint-disable-next-line react/only-export-components
@@ -17,7 +18,6 @@ const appScreens = [
   { path: 'passports', number: 'S4', title: 'Passports', route: '/app/passports' },
   { path: 'passports/:id', number: 'S4', title: 'Passport Detail', route: '/app/passports/:id' },
   { path: 'recovery', number: 'S6', title: 'Recovery', route: '/app/recovery' },
-  { path: 'partners', number: 'S7', title: 'Partners & Readiness', route: '/app/partners' },
   { path: 'proof', number: 'S8', title: 'Proof & Method', route: '/app/proof' },
 ]
 
@@ -41,6 +41,7 @@ export const router = createBrowserRouter([
       { path: 'what-if', element: <WhatIfRoute /> },
       { path: 'what-if/:id', element: <WhatIfRoute /> },
       { path: 'recovery/:id', element: <RecoveryRoute /> },
+      { path: 'partners', element: <PartnersRoute /> },
       { path: '_kit', element: <Suspense fallback={<div className="f0-content">Loading component kit…</div>}><ComponentKit /></Suspense> },
       { path: '*', element: <PlaceholderRoute number="S10" title="Line not found" route="*" /> },
     ],

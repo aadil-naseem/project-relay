@@ -255,7 +255,7 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Browser smoke: `RESOURCE_DOWN` deep link populated the selected grinder and returned a 1-order/₹12 L/no-fallback result; manual FLOOD zone run returned 4 at-risk orders/₹30.7 L and rendered due/fallback rows; auto test opened read-only; Open Recovery created a prefilled recovery request. Demo reset performed afterwards. No console errors.
 - Gates: `npm test` 6/6; lint, palette lint, build pass. Map/scope zones are explicitly labelled illustrative. Rain samples/hourly scrubber unavailable by API contract; what-if visualization is based on actual baseline/stressed finish timestamps.
 - User screenshot review: layout and chart are clear. Follow-up adds an explicit `+Nh` overflow marker when stressed completion extends beyond T+168 h (e.g. 172 h no longer visually clips at the chart edge). Browser screenshot tool cannot save the uploaded chat image locally.
-- F5 Recovery is now in progress separately from Partners & Readiness; the user confirmed this screen as the next step.
+- F5 Recovery is implemented and reviewed; Partners & Readiness is the current screen, with no further screen started.
 
 ### Frontend F5-S6 Recovery - DONE (commit 787e067, pushed; user screenshot reviewed)
 - Replaced `/app/recovery/:id` with the alert-prefilled request: disruption/order/deadline, scenario-aware matching options, Ready / Approval Pending / Excluded / Other groups.
@@ -264,7 +264,12 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Added M10 tracking rail with seven backend steps and one-step advance; every simulated value is labelled. Errors from selection/step advancement are surfaced.
 - Browser smoke against live `rr_20261114173203_ord_102`: six candidates (Oragadam READY, Hosur APPROVAL_PENDING, Ambattur/Guindy excluded, Peenya STALE, Coimbatore potential); selected Oragadam, request ACTIVE, handover redacted and labelled, responsibilities/milestones visible, route card at REQUEST_SENT. No browser console errors.
 - `npm test` 6/6; lint, palette lint, build pass. User-reviewed screenshot at 1366×768 shows request summary, Ready / Approval Pending / Excluded columns and unverified checks with no visual blocker. Screenshot attachment remains in chat; the browser tool could not copy it to `docs/screens/`.
-- Do not start Partners until user confirmation.
+
+### Frontend F5-S7 Partners & Readiness - IMPLEMENTED (review pending)
+- Replaced the Partners placeholder with the relay circuit and partner drawer, 24/48/72 readiness ring/breakdown, stale/expiring preparedness review, score history chart, and next-best-action counterfactuals.
+- Circuit uses live relationships and M6 exclusions/reasons, with solid/dashed/hatched paths. Drawer exposes all five checks, reconfirm, and guarded status changes; backend `409 details.missing_checks` is rendered as CANNOT SET READY.
+- “Do it” confirms the counterfactual delta, then completes pending checks + READY or reconfirms. Verified with Hosur: 53.9 → 70.9 weighted (+17); score/history updated. Demo DB reset after smoke run.
+- `npm test` 6/6; lint, palette lint, build pass. User screenshot review pending; no Passports work has started.
 
 ### Phase 12 - DONE (commit 0ef204b, pushed)
 - `scripts/make_sample_drawings.py`: 3 vector PDFs WITH text layers + 200-DPI PNGs (longest side <= 2000 px) + one deliberately messy variant (rotated 90 deg, contrast 0.45); title blocks with fictional customers; `expected.json` ground truth per drawing. Synthetic only - free-tier provider inputs may be stored by the provider (R9).
