@@ -1,1 +1,5 @@
-﻿"""deps.py - stub created in Phase 0. Implementation lands in its build phase."""
+﻿"""Shared FastAPI dependencies."""
+
+from app.db import get_db
+
+__all__ = ["get_db"]

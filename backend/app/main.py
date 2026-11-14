@@ -1,1 +1,40 @@
-﻿"""main.py - stub created in Phase 0. Implementation lands in its build phase."""
+﻿"""FastAPI application: CORS, /api/v1 router, error handlers, health."""
+
+from __future__ import annotations
+
+from fastapi import APIRouter, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from app.api import health
+from app.errors import register_error_handlers
+from app.settings import get_settings
+
+API_PREFIX = "/api/v1"
+
+
+def create_app() -> FastAPI:
+    settings = get_settings()
+    app = FastAPI(
+        title="Factory Continuity Desk (Relay) API",
+        version="0.1.0",
+        description=(
+            "Finds where a factory would break before a disruption, and shows who could cover the work. "
+            "Demo data is sample / simulated; weather, terrain and road data are real."
+        ),
+    )
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origin_list,
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    register_error_handlers(app)
+
+    api = APIRouter(prefix=API_PREFIX)
+    api.include_router(health.router)
+    app.include_router(api)
+    return app
+
+
+app = create_app()

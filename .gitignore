@@ -8,9 +8,9 @@ __pycache__/
 htmlcov/
 
 # Runtime / generated
-backend/data/fcd.sqlite
-backend/data/fcd.sqlite-shm
-backend/data/fcd.sqlite-wal
+backend/data/*.sqlite
+backend/data/*.sqlite-shm
+backend/data/*.sqlite-wal
 backend/data/raw/
 
 # Frontend

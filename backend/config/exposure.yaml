@@ -1,1 +1,34 @@
-﻿# exposure.yaml - populated in Phase 2
+﻿# M4 exposure engine constants (blueprint section 7.2). Loaded once; never hard-coded in logic.
+# Honest labelling: this produces a risk indicator from forecast rain and site
+# conditions, NOT a flood model. Zones are curated planning zones, not official maps.
+horizon_hours: 72
+
+# Piecewise-linear rain -> hazard 0..1, IMD-style heavy / very heavy / extremely heavy bands.
+rain_24h_breakpoints_mm:   # [rolling 24 h total mm, hazard]
+  - [0, 0.0]
+  - [15, 0.1]
+  - [64.5, 0.5]
+  - [115.6, 0.8]
+  - [204.5, 1.0]
+rain_3h_breakpoints_mm:    # [rolling 3 h total mm, hazard] - cloudburst intensity
+  - [0, 0.0]
+  - [10, 0.1]
+  - [30, 0.5]
+  - [60, 0.85]
+  - [100, 1.0]
+
+# Site vulnerability: depression below surroundings, water proximity, curated flood history.
+vulnerability_weights: {depression: 0.35, water_proximity: 0.25, flood_history: 0.40}
+depression_full_m: 3.0          # >= 3 m below local ring mean -> 1.0
+water_full_distance_m: 1500     # at/inside 0 m -> 1.0, >= 1500 m -> 0
+vulnerability_floor: 0.25       # risk = 100 * H * (floor + (1-floor) * V)
+
+# Access-route exposure: share of samples below the 25th-percentile elevation, underpasses.
+route_weights: {low_share: 0.6, underpass: 0.4}
+underpass_cap: 2
+
+alert_threshold: 50             # HIGH and above raises the banner
+heavy_onset_mm_3h: 5            # defines wet-spell start/end
+recession_hours: {HIGH: 24, SEVERE: 72}   # flood water outlasts the rain
+wet_spell_cap_hours: 72
+cache_ttl_minutes: 10
