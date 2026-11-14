@@ -257,13 +257,14 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - User screenshot review: layout and chart are clear. Follow-up adds an explicit `+Nh` overflow marker when stressed completion extends beyond T+168 h (e.g. 172 h no longer visually clips at the chart edge). Browser screenshot tool cannot save the uploaded chat image locally.
 - F5 Recovery is now in progress separately from Partners & Readiness; the user confirmed this screen as the next step.
 
-### Frontend F5-S6 Recovery - IMPLEMENTED (commit 787e067, pushed; screenshot review pending)
+### Frontend F5-S6 Recovery - DONE (commit 787e067, pushed; user screenshot reviewed)
 - Replaced `/app/recovery/:id` with the alert-prefilled request: disruption/order/deadline, scenario-aware matching options, Ready / Approval Pending / Excluded / Other groups.
 - Candidate cards show machine-checkable PASS/FAIL/UNKNOWN filters with basis/detail, unverified approval checks, capacity summaries, relationship status and ranking. Excluded or hard-filter-failing partners cannot be selected; selection goes through the approval disclaimer confirmation sheet.
 - After selection, loads the consent-aware Jinja handover API and renders the Cream paper pack with authorised documents, job requirements, quantity/deadline, inspection checklist, required approvals, responsibilities, simulated milestones and explicit note that contacts aren’t in the API contract.
 - Added M10 tracking rail with seven backend steps and one-step advance; every simulated value is labelled. Errors from selection/step advancement are surfaced.
 - Browser smoke against live `rr_20261114173203_ord_102`: six candidates (Oragadam READY, Hosur APPROVAL_PENDING, Ambattur/Guindy excluded, Peenya STALE, Coimbatore potential); selected Oragadam, request ACTIVE, handover redacted and labelled, responsibilities/milestones visible, route card at REQUEST_SENT. No browser console errors.
-- `npm test` 6/6; lint, palette lint, build pass. User screenshot review pending; do not start Partners until user confirmation.
+- `npm test` 6/6; lint, palette lint, build pass. User-reviewed screenshot at 1366×768 shows request summary, Ready / Approval Pending / Excluded columns and unverified checks with no visual blocker. Screenshot attachment remains in chat; the browser tool could not copy it to `docs/screens/`.
+- Do not start Partners until user confirmation.
 
 ### Phase 12 - DONE (commit 0ef204b, pushed)
 - `scripts/make_sample_drawings.py`: 3 vector PDFs WITH text layers + 200-DPI PNGs (longest side <= 2000 px) + one deliberately messy variant (rotated 90 deg, contrast 0.45); title blocks with fictional customers; `expected.json` ground truth per drawing. Synthetic only - free-tier provider inputs may be stored by the provider (R9).
