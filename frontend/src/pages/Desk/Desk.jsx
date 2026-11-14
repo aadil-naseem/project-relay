@@ -5,6 +5,7 @@ import { useDashboard, useExposureMap, useOwnerExposure, useReadiness, useReadin
 import { AlertBanner, CalcLog, DimensionLine, Money, Odometer, ReadinessRing, RiskPill } from '../../components/domain'
 import { Button, Frame, Nameplate, Segmented, Skeleton, Toast } from '../../components/primitives'
 import { useRelayNavigate } from '../../app/navigation'
+import { useUiStore } from '../../store/ui'
 
 const ExposureMiniMap = lazy(() => import('./ExposureMiniMap').then((module) => ({ default: module.ExposureMiniMap })))
 
@@ -43,6 +44,7 @@ export default function Desk() {
       body: JSON.stringify({ from_stress_test_id: stress_test_id, order_id }),
     }),
     onSuccess: async (request) => {
+      useUiStore.getState().setPreference('presenterRecoveryId', request.id)
       await queryClient.invalidateQueries({ queryKey: ['recovery-request', request.id] })
       navigate(`/app/recovery/${request.id}`)
     },

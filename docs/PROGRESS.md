@@ -38,7 +38,7 @@ Technical Phase 14 is intentionally deferred per user direction; do not mark it 
 - [x] F5 Recovery
 - [x] F5 Partners & Readiness
 - [x] F6 Passports & RFQ
-- [ ] F7 Stage Controls, Presenter, Proof, System
+- [ ] F7 Stage Controls, Presenter, Proof, System (S9 Stage Controls/Presenter done; S8/S10 pending)
 - [ ] F8 Landing hero
 - [ ] F9 Landing scroll story
 - [ ] F10 Persistent world backdrop (stretch)
@@ -280,7 +280,16 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Browser smoke using the local golden Pump shaft PNG: extraction returned in 1 ms, confirm created a part, RFQ redaction hid customer/drawing/part identifiers, structured and printable RFQ refs now render consistently in the UI, share consent dialog is present. No live Gemini call was made.
 - **Backend mismatch discovered for Phase 14:** current API can generate different random RFQ refs for `RfqOut.rfq_ref` and the rendered `RfqOut.text`. The frontend normalizes the displayed printable copy to the structured ref; log and fix at the deferred backend gate, not via a provider retry.
 - `npm test` 6/6; lint, palette lint, build pass. User-reviewed 1366×768 screenshot shows sample tray, drawing sheet, confidence/source fields, review state, and consent workflow; no visual blocker. Screenshot is available in chat, not in the repo's docs/screens folder.
-- Passports & RFQ is the last functional screen in the current sequence; wait for user confirmation before Stage Controls/Proof/System.
+- Passports & RFQ was the last functional screen before the user authorized F7 Stage Controls & Presenter. Proof & System remain unstarted and require separate confirmation.
+
+### Frontend F7-S9 Stage Controls & Presenter - DONE (screenshots reviewed)
+- Replaced the Stage placeholder with the weather mode selector, current weather source/degraded badge, confirmed demo reset, API/DB/weather/vision readout, presenter toggle, projector/reduced-motion controls, scene quality, backdrop/sound, and snapshot preference. UI preferences persist locally; Stage drawer content scrolls independently on shorter screens.
+- Added the 8-step presenter script (Appendix D, steps 0–7), elapsed timer, click navigation, `←`/`→`, `H` hide/show, and `R` reset. Reset returns to Desk with the Desk step selected and clears session/recovery demo state.
+- Presenter Recovery steps route to the Recovery entry and, when available, the latest request handover. Recovery creation records that request ID for the presenter flow.
+- Browser smoke: weather replay/synthetic switching; reset confirmation cancel; `R` called `POST /demo/reset` (200) and returned to Desk/step 1; presenter advanced through What-if, Recovery and Partners; `H` hid/restored the strip; accessibility/scene toggles applied and were restored to defaults. Stage readouts were healthy, and the reloaded browser had no console errors.
+- User-reviewed screenshots show the Stage drawer hierarchy/readouts and Presenter strip; the drawer’s bottom controls were made scrollable after review. A reset-state mismatch found in the strip screenshot was corrected.
+- `npm test` 6/6; `npm run lint`, `npm run lint:palette`, and `npm run build` pass.
+- F7 is not complete as a whole: Proof (S8) and System (S10) have not started. Wait for user confirmation before beginning them. Phase 14 remains deferred.
 
 ### Phase 12 - DONE (commit 0ef204b, pushed)
 - `scripts/make_sample_drawings.py`: 3 vector PDFs WITH text layers + 200-DPI PNGs (longest side <= 2000 px) + one deliberately messy variant (rotated 90 deg, contrast 0.45); title blocks with fictional customers; `expected.json` ground truth per drawing. Synthetic only - free-tier provider inputs may be stored by the provider (R9).

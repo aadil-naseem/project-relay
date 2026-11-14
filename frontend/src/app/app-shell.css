@@ -252,6 +252,33 @@ body.relay-rail-hover .relay-app__main {
 
 .relay-mobile-nav { display: none; }
 
+.stage-controls { display: grid; gap: 22px; padding-bottom: 36px; }
+.stage-controls-drawer { display: flex; height: 100dvh; min-height: 0; flex-direction: column; overflow: hidden; }
+.stage-controls-drawer .relay-drawer__body { min-height: 0; flex: 1; overflow-y: auto; overscroll-behavior: contain; padding-right: 8px; }
+.stage-controls > section { display: grid; justify-items: start; gap: 10px; padding-bottom: 14px; border-bottom: 1px solid var(--c-cream-12); }
+.stage-controls > section > .f0-kicker { color: var(--c-pale); font: 10px var(--f-mono); letter-spacing: 0.09em; }
+.stage-controls > section > p { margin: 0; color: var(--c-cream); font-size: 12px; line-height: 1.4; }
+.stage-controls__readout { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--c-pale); font: 10px var(--f-mono); }
+.stage-controls__health { display: flex; flex-wrap: wrap; gap: 6px; }
+.stage-controls__health span { padding: 4px 6px; border: 1px solid var(--hair); color: var(--c-cream); font: 9px var(--f-mono); }
+.stage-controls__select { display: grid; width: 100%; gap: 5px; color: var(--c-pale); font: 10px var(--f-mono); }
+.stage-controls__select select { min-height: 36px; padding: 6px 8px; border: 1px solid var(--hair); border-radius: 0; color: var(--c-cream); background: var(--c-deep); }
+.stage-controls__hint { color: var(--c-pale) !important; font: 10px/1.4 var(--f-mono) !important; }
+.stage-controls__error { color: var(--c-sun) !important; }
+
+.relay-presenter { position: fixed; z-index: 10; inset: auto 12px 10px max(86px, calc(var(--rail) + 16px)); display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 5px 8px; border: 1px solid var(--c-gold); background: var(--c-deep-80); }
+.relay-presenter__timer { color: var(--c-sun); font: 14px var(--f-mono); }
+.relay-presenter__steps { display: flex; flex: 1; justify-content: space-around; gap: 4px; }
+.relay-presenter__steps button { display: flex; min-height: 32px; align-items: center; gap: 5px; padding: 4px 7px; border: 0; color: var(--c-cream); background: transparent; cursor: pointer; font-size: 10px; white-space: nowrap; }
+.relay-presenter__steps button span { color: var(--c-pale); font: 9px var(--f-mono); }
+.relay-presenter__steps button.is-active { color: var(--c-deep); background: var(--c-sun); }
+.relay-presenter__steps button.is-active span { color: var(--c-deep); }
+
+html[data-reduce-motion="true"] *,
+html[data-reduce-motion="true"] *::before,
+html[data-reduce-motion="true"] *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+html[data-contrast="high"] { --hair: var(--c-cream-36); }
+
 @media (max-width: 760px) {
   .relay-status-strip { gap: 10px; padding-inline: 12px; }
   .relay-factory-name,
@@ -274,6 +301,9 @@ body.relay-rail-hover .relay-app__main {
     border-top: 1px solid var(--hair);
     background: var(--panel);
   }
+  .relay-presenter { inset-inline: 6px; bottom: 64px; overflow-x: auto; }
+  .relay-presenter__steps { justify-content: start; }
+  .relay-presenter__steps button { min-width: max-content; }
   .relay-mobile-nav button {
     display: grid;
     place-content: center;

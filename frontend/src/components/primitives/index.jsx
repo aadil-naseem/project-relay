@@ -65,11 +65,11 @@ export function Tooltip({ label, children }) {
   return <span className="relay-tooltip" title={label}>{children}</span>
 }
 
-export function Drawer({ open, title, onClose, children, side = 'right' }) {
+export function Drawer({ open, title, onClose, children, side = 'right', className = '' }) {
   if (!open) return null
   return (
     <div className="relay-overlay" onMouseDown={(event) => event.target === event.currentTarget && onClose?.()}>
-      <section className={`relay-drawer relay-drawer--${side}`} role="dialog" aria-modal="true" aria-label={title}>
+      <section className={`relay-drawer relay-drawer--${side} ${className}`.trim()} role="dialog" aria-modal="true" aria-label={title}>
         <header className="relay-drawer__header">
           <h2>{title}</h2>
           <Button variant="ghost" size="small" aria-label="Close drawer" onClick={onClose}>×</Button>

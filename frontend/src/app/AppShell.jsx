@@ -5,8 +5,11 @@ import { apiRequest } from '../api/client'
 import { queryClient } from '../api/queryClient'
 import { useHealth } from '../api/hooks/useHealth'
 import { DataLabelBadge, ShiftClock, StackLight, WeatherSourceBadge } from '../components/domain'
-import { Button, Drawer, Kbd } from '../components/primitives'
+import { Button, Kbd } from '../components/primitives'
 import { RelayNavigationContext } from './navigation'
+import { StageControls } from './StageControls'
+import { PresenterStrip } from './PresenterStrip'
+import { useUiStore } from '../store/ui'
 
 const navItems = [
   { path: '/app', label: 'Desk', glyph: '▦' },
@@ -42,6 +45,17 @@ export function AppShell() {
   const location = useLocation()
   const health = useHealth()
   const demo = useQuery({ queryKey: ['demo-state'], queryFn: () => apiRequest('/demo/state'), staleTime: 30_000 })
+  const presenterMode = useUiStore((state) => state.presenterMode)
+  const presenterStep = useUiStore((state) => state.presenterStep)
+  const presenterRecoveryId = useUiStore((state) => state.presenterRecoveryId)
+  const setUiPreference = useUiStore((state) => state.setPreference)
+  const setPresenterStep = useUiStore((state) => state.goToPresenterStep)
+  const presenterDashboard = useQuery({
+    queryKey: ['dashboard', 'fac_owner'],
+    queryFn: () => apiRequest('/dashboard/fac_owner'),
+    enabled: presenterMode,
+    staleTime: 30_000,
+  })
   const [railPinned, setRailPinned] = useState(false)
   const [paletteOpen, setPaletteOpen] = useState(false)
   const [paletteQuery, setPaletteQuery] = useState('')
@@ -54,7 +68,8 @@ export function AppShell() {
 
   const go = useCallback((path) => {
     if (path === location.pathname) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (useUiStore.getState().reduceMotion || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setShutter(false)
       navigate(path)
       return
     }
@@ -64,6 +79,27 @@ export function AppShell() {
       timers.current.push(window.setTimeout(() => setShutter(false), 320))
     }, 240))
   }, [location.pathname, navigate])
+
+  const resetDemo = useCallback(async () => {
+    await apiRequest('/demo/reset', { method: 'POST' })
+    try {
+      sessionStorage.removeItem('relay-desk-opened')
+      sessionStorage.removeItem('relay-presenter-started')
+    } catch {
+      // Storage is optional; demo reset still succeeds.
+    }
+    setUiPreference('presenterRecoveryId', null)
+    setPresenterStep(1)
+    go('/app')
+    await queryClient.invalidateQueries()
+  }, [go, setPresenterStep, setUiPreference])
+
+  const presenterRoute = useCallback((step) => {
+    if (step === 0) return '/'
+    if (step === 2 && presenterDashboard.data?.alert?.stress_test_id) return `/app/what-if/${presenterDashboard.data.alert.stress_test_id}`
+    if (step === 6 && presenterRecoveryId) return `/app/recovery/${presenterRecoveryId}`
+    return ['/app', '/app', '/app/what-if', '/app/weak-points', '/app/passports', '/app/recovery', '/app/recovery', '/app/partners'][step] || '/app'
+  }, [presenterDashboard.data, presenterRecoveryId])
 
   useEffect(() => {
     const onKeyDown = (event) => {
@@ -83,24 +119,41 @@ export function AppShell() {
         setStageOpen(false)
         return
       }
+      if (presenterMode && event.key === 'ArrowRight') {
+        event.preventDefault()
+        const next = Math.min(7, presenterStep + 1)
+        setPresenterStep(next)
+        go(presenterRoute(next))
+        return
+      }
+      if (presenterMode && event.key === 'ArrowLeft') {
+        event.preventDefault()
+        const next = Math.max(0, presenterStep - 1)
+        setPresenterStep(next)
+        go(presenterRoute(next))
+        return
+      }
+      if (presenterMode && event.key.toLowerCase() === 'r') {
+        event.preventDefault()
+        resetDemo()
+        return
+      }
+      if (presenterMode && event.key.toLowerCase() === 'h') {
+        event.preventDefault()
+        setUiPreference('presenterHidden', !useUiStore.getState().presenterHidden)
+        return
+      }
       const number = Number(event.key)
       if (number >= 1 && number <= 8) go(navItems[number - 1].path)
     }
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
-  }, [go])
+  }, [go, presenterMode, presenterRoute, presenterStep, resetDemo, setPresenterStep, setUiPreference])
 
   const commands = useMemo(() => [
     ...navItems.map((item) => ({ label: `Go to ${item.label}`, detail: item.path, path: item.path })),
     { label: 'Open Stage Controls', detail: 'Drawer', action: () => setStageOpen(true) },
-    { label: 'Reset demo', detail: 'Rebuild seeded sample world', action: async () => {
-      await apiRequest('/demo/reset', { method: 'POST' })
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
-        queryClient.invalidateQueries({ queryKey: ['health'] }),
-        queryClient.invalidateQueries({ queryKey: ['demo-state'] }),
-      ])
-    } },
+    { label: 'Reset demo', detail: 'Open Stage Controls · confirmation required', action: () => setStageOpen(true) },
   ], [])
   const filteredCommands = commands.filter((command) =>
     `${command.label} ${command.detail}`.toLowerCase().includes(paletteQuery.toLowerCase()))
@@ -195,10 +248,8 @@ export function AppShell() {
         onClose={() => setPaletteOpen(false)}
         onRun={runCommand}
       />
-      <Drawer open={stageOpen} title="Stage Controls" onClose={() => setStageOpen(false)}>
-        <p>Presenter controls, weather switching, reset and snapshot options arrive in F7.</p>
-        <p className="relay-mono">Current mode · {demo.data?.weather_mode || health.data?.weather_mode || 'checking'}</p>
-      </Drawer>
+      <StageControls open={stageOpen} onClose={() => setStageOpen(false)} onReset={resetDemo} />
+      <PresenterStrip onNavigate={go} />
     </div>
     </RelayNavigationContext.Provider>
   )

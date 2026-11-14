@@ -33,6 +33,8 @@ export const router = createBrowserRouter([
         ...(screen.path ? { path: screen.path } : { index: true }),
         element: screen.path === ''
           ? <Desk />
+          : screen.path === 'recovery'
+            ? <RecoveryRoute />
           : <PlaceholderRoute number={screen.number} title={screen.title} route={screen.route} />,
       })),
       { path: 'weak-points', element: <WeakPointsRoute /> },
