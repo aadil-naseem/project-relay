@@ -10,6 +10,7 @@ import RecoveryRoute from './pages/Recovery/RecoveryRoute'
 import PartnersRoute from './pages/Partners/PartnersRoute'
 import PassportsRoute from './pages/Passports/PassportsRoute'
 import Proof from './pages/Proof/Proof'
+import { SystemNotFound } from './pages/System/SystemScreens'
 
 // Route configuration is intentionally a non-component export in this module.
 // oxlint-disable-next-line react/only-export-components
@@ -49,11 +50,11 @@ export const router = createBrowserRouter([
       { path: 'passports', element: <PassportsRoute /> },
       { path: 'passports/:id', element: <PassportsRoute /> },
       { path: '_kit', element: <Suspense fallback={<div className="f0-content">Loading component kit…</div>}><ComponentKit /></Suspense> },
-      { path: '*', element: <PlaceholderRoute number="S10" title="Line not found" route="*" /> },
+      { path: '*', element: <SystemNotFound /> },
     ],
   },
   {
     path: '*',
-    element: <PlaceholderRoute number="S10" title="Line not found" route="*" />,
+    element: <SystemNotFound />,
   },
 ])

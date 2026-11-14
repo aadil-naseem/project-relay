@@ -38,8 +38,8 @@ Technical Phase 14 is intentionally deferred per user direction; do not mark it 
 - [x] F5 Recovery
 - [x] F5 Partners & Readiness
 - [x] F6 Passports & RFQ
-- [ ] F7 Stage Controls, Presenter, Proof, System (S9 and S8 done; S10 pending)
-- [ ] F8 Landing hero
+- [ ] F7 Stage Controls, Presenter, Proof, System (S9/S8/S10 reviewed; snapshot pack/capture deferred to F11)
+- [ ] F8 Landing hero (next; authorized)
 - [ ] F9 Landing scroll story
 - [ ] F10 Persistent world backdrop (stretch)
 - [ ] F11 Integration, performance, rehearsal, freeze
@@ -280,7 +280,7 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Browser smoke using the local golden Pump shaft PNG: extraction returned in 1 ms, confirm created a part, RFQ redaction hid customer/drawing/part identifiers, structured and printable RFQ refs now render consistently in the UI, share consent dialog is present. No live Gemini call was made.
 - **Backend mismatch discovered for Phase 14:** current API can generate different random RFQ refs for `RfqOut.rfq_ref` and the rendered `RfqOut.text`. The frontend normalizes the displayed printable copy to the structured ref; log and fix at the deferred backend gate, not via a provider retry.
 - `npm test` 6/6; lint, palette lint, build pass. User-reviewed 1366×768 screenshot shows sample tray, drawing sheet, confidence/source fields, review state, and consent workflow; no visual blocker. Screenshot is available in chat, not in the repo's docs/screens folder.
-- Passports & RFQ was the last functional screen before the user authorized F7 Stage Controls & Presenter. The user later authorized Proof & Method; System remains unstarted and requires separate confirmation.
+- Passports & RFQ was the last functional screen before the user authorized F7 Stage Controls & Presenter. Proof & Method and System were subsequently authorized and reviewed.
 
 ### Frontend F7-S9 Stage Controls & Presenter - DONE (screenshots reviewed)
 - Replaced the Stage placeholder with the weather mode selector, current weather source/degraded badge, confirmed demo reset, API/DB/weather/vision readout, presenter toggle, projector/reduced-motion controls, scene quality, backdrop/sound, and snapshot preference. UI preferences persist locally; Stage drawer content scrolls independently on shorter screens.
@@ -289,14 +289,21 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Browser smoke: weather replay/synthetic switching; reset confirmation cancel; `R` called `POST /demo/reset` (200) and returned to Desk/step 1; presenter advanced through What-if, Recovery and Partners; `H` hid/restored the strip; accessibility/scene toggles applied and were restored to defaults. Stage readouts were healthy, and the reloaded browser had no console errors.
 - User-reviewed screenshots show the Stage drawer hierarchy/readouts and Presenter strip; the drawer’s bottom controls were made scrollable after review. A reset-state mismatch found in the strip screenshot was corrected.
 - `npm test` 6/6; `npm run lint`, `npm run lint:palette`, and `npm run build` pass.
-- F7 is not complete as a whole: Proof (S8) is done; System (S10) has not started. Wait for user confirmation before beginning it. Phase 14 remains deferred.
+- F7 screen implementations S9, S8 and S10 are reviewed. Snapshot data/capture remains pending for F11, so the F7 checkbox stays open. Phase 14 remains deferred.
 
 ### Frontend F7-S8 Proof & Method - DONE (screenshot reviewed)
 - Replaced the `/app/proof` placeholder with the Michaung exposure back-test table and score bars, four deterministic method summaries (exposure, weak points, matching, readiness), drawing-AI boundary, limits and data sources, and the six brief glossary terms. The Exposure CTA opens the screen with the live trace.
 - Copied the seven sites and +22-point separation from the existing `docs/BACKTEST_EXPOSURE.md` report into static `frontend/src/data/backtest.json`; added a data integrity test. The page labels this as the existing M4 back-test, not the deferred Phase 14 integration gate, and notes that it is a small curated comparison rather than blind validation.
 - User-reviewed screenshot at 2000×1000 shows the result, ranking bars/table, caveat, and start of the method cards clearly; no visual blocker.
 - `npm test` 7/7; `npm run lint`, `npm run lint:palette`, and `npm run build` pass. Browser route/link smoke passed with no console errors.
-- System screens (S10) remain unstarted. Wait for user confirmation before beginning them. Phase 14 remains deferred.
+- System screens (S10) remain unstarted at this point in the log. Wait for user confirmation before beginning them. Phase 14 remains deferred.
+
+### Frontend F7-S10 System screens - DONE (user confirmed)
+- Replaced both nested and app-wide unknown-route placeholders with the “Line not found” relay-contact screen and Back to Desk action.
+- Added an AppShell health-error boundary for the full-page “Can’t reach the server” state with Retry. “Open saved snapshot” is present but disabled because no snapshot pack exists in this build; capture/read-only snapshot wiring remains scheduled for F11.
+- Offline map-tile badges and vector/site-marker fallbacks were already implemented in Desk and Exposure; they remain intact.
+- Browser smoke: nested and global 404 routes render and Back to Desk works; an isolated dev server pointed at an unreachable API showed the backend-unavailable page and the unavailable-snapshot explanation. User confirmed the System screens work as expected.
+- `npm test` 7/7; lint, palette lint and build pass. Phase 14 remains deferred.
 
 ### Phase 12 - DONE (commit 0ef204b, pushed)
 - `scripts/make_sample_drawings.py`: 3 vector PDFs WITH text layers + 200-DPI PNGs (longest side <= 2000 px) + one deliberately messy variant (rotated 90 deg, contrast 0.45); title blocks with fictional customers; `expected.json` ground truth per drawing. Synthetic only - free-tier provider inputs may be stored by the provider (R9).

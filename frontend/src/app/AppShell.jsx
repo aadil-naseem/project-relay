@@ -10,6 +10,7 @@ import { RelayNavigationContext } from './navigation'
 import { StageControls } from './StageControls'
 import { PresenterStrip } from './PresenterStrip'
 import { useUiStore } from '../store/ui'
+import { BackendUnavailable } from '../pages/System/SystemScreens'
 
 const navItems = [
   { path: '/app', label: 'Desk', glyph: '▦' },
@@ -44,7 +45,12 @@ export function AppShell() {
   const navigate = useNavigate()
   const location = useLocation()
   const health = useHealth()
-  const demo = useQuery({ queryKey: ['demo-state'], queryFn: () => apiRequest('/demo/state'), staleTime: 30_000 })
+  const demo = useQuery({
+    queryKey: ['demo-state'],
+    queryFn: () => apiRequest('/demo/state'),
+    staleTime: 30_000,
+    enabled: !health.isError,
+  })
   const presenterMode = useUiStore((state) => state.presenterMode)
   const presenterStep = useUiStore((state) => state.presenterStep)
   const presenterRecoveryId = useUiStore((state) => state.presenterRecoveryId)
@@ -53,7 +59,7 @@ export function AppShell() {
   const presenterDashboard = useQuery({
     queryKey: ['dashboard', 'fac_owner'],
     queryFn: () => apiRequest('/dashboard/fac_owner'),
-    enabled: presenterMode,
+    enabled: presenterMode && !health.isError,
     staleTime: 30_000,
   })
   const [railPinned, setRailPinned] = useState(false)
@@ -168,6 +174,21 @@ export function AppShell() {
   const current = navItems.find((item) => item.path === location.pathname)
     || navItems.find((item) => location.pathname.startsWith(`${item.path}/`))
   const healthState = health.data?.status === 'ok' ? 'ok' : health.isError ? 'error' : 'checking'
+
+  if (health.isError) {
+    const retryBackend = async () => {
+      const result = await health.refetch()
+      if (result.data?.status === 'ok') await queryClient.invalidateQueries()
+    }
+    return (
+      <BackendUnavailable
+        error={health.error}
+        retrying={health.isFetching}
+        onRetry={retryBackend}
+      />
+    )
+  }
+
   return (
     <RelayNavigationContext.Provider value={go}>
     <div className={`relay-app ${railPinned ? 'rail-pinned' : ''}`}>
