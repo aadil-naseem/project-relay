@@ -17,7 +17,7 @@ Phase tracker. Updated at the end of every phase (R11).
 - [x] Phase 10 M8 Readiness
 - [x] Phase 11 M7/M9/M10
 - [x] Phase 12 M2 Passport + RFQ
-- [ ] Phase 13 Orchestration
+- [x] Phase 13 Orchestration
 - [ ] Phase 14 BACKEND TEST GATE
 - [ ] Phase 15 Frontend setup
 - [ ] Phase 16 Frontend screens
@@ -192,3 +192,10 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Tests: 41 new (258 total): rules-only accuracy vs expected.json (>= 80% gate, all core fields hit), merge table cases incl. the real pump-shaft tolerance disagreement, validators, alias normalisation; redaction allow-list/scrub/opaque-ref/deadline-days; API: cache extraction measured < 3 s (16 ms), vision failure -> rules draft (respx), 5xx retried exactly once, 429 -> one call + cooldown holds, messy image -> honest empty draft, manual create, PATCH -> CONFIRMED, confirm guard 409 + part/steps creation with default cycle times, RFQ leak test across fixtures (drawing no / part name / customer never appear in JSON or text), consent gate 403 / RFQ / FULL, stable rfq_ref.
 - Live accuracy (task 9, `-m live` opt-in, excluded by default via addopts `-m 'not live'`): **100% (18/18) title-block fields, 2.6-3.5 s per drawing** -> `docs/TEST_REPORT.md`.
 - Done-when: golden cache pre-generated for all 3 sample drawings (committed), cached extraction 16 ms, rules-only >= 80%, RFQ leak test green, consent gate 403 - the demo never depends on the network for vision.
+
+### Phase 13 - DONE (commit pending, pushed) - TESTS DEFERRED TO PHASE 14 PER USER DECISION
+- `services/dashboard.py` implements the section 8.1 auto-run contract in order: exposure for owner + vendors + partners (TTL-cached weather, snapshot written) -> if alert, run or reuse the AUTO stress test (idempotent on factory_id + forecast_hash) -> top 3 SPOFs -> readiness 24/48/72 with the headline at the default window -> stale-partner count. One payload: factory, data_label SIMULATED SAMPLE, weather (mode/source/degraded/attribution), readiness {headline, windows}, alert {active, headline, onset, stress_test_id, cta=START_RECOVERY}, spof_top, exposure_summary (owner risk, routes, per-site risks), stale_partners.
+- `api/dashboard.py`: GET /dashboard/{id} (409 NOT_AN_OWNER for partners) and POST /demo/reset (calls `reset_demo()`, clears the weather TTL cache, returns DemoStateOut; POST /demo/mode and GET /demo/state already live in the exposure router from Phase 7).
+- Verified live: dashboard fires the alert (SEVERE, onset 23 h, headline text) with the auto stress test attached (deterministic id `str_auto_ff38b47a8b5aba43_fac_owner`), readiness 50.0/53.9 with windows 0/53.9/53.9, SPOF top 3 = heat vendor / grinder / EN24 supplier, 1 stale partner; POST /demo/reset rebuilds and the dashboard reproduces identically (same auto-stress id) - the section 9 invariant 7 behaviour, to be asserted properly in Phase 14.
+- One schema lesson fixed live: the strict DashboardOut rejected an extra replay_event key - keep the payload exactly per schema; demo state carries the event name.
+- Backend is feature-complete through the section 8 contract: health, M1 CRUD + relationships, M3 SPOF, M4 exposure/map, M5 stress, M6 matching, M7/M9/M10 recovery + handover + stepper, M2 passports + RFQ + sharing, M8 readiness, dashboard, demo controls. 258 tests passing; Phase 14 is the dedicated end-to-end gate (dashboard tests + the full 7-step scenario).
