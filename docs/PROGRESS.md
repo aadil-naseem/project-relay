@@ -39,7 +39,7 @@ Technical Phase 14 is intentionally deferred per user direction; do not mark it 
 - [x] F5 Partners & Readiness
 - [x] F6 Passports & RFQ
 - [ ] F7 Stage Controls, Presenter, Proof, System (S9/S8/S10 reviewed; snapshot pack/capture deferred to F11)
-- [ ] F8 Landing hero (next; authorized)
+- [ ] F8 Landing hero (visual review done; 50+ fps measurement deferred to F11)
 - [ ] F9 Landing scroll story
 - [ ] F10 Persistent world backdrop (stretch)
 - [ ] F11 Integration, performance, rehearsal, freeze
@@ -304,6 +304,14 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Offline map-tile badges and vector/site-marker fallbacks were already implemented in Desk and Exposure; they remain intact.
 - Browser smoke: nested and global 404 routes render and Back to Desk works; an isolated dev server pointed at an unreachable API showed the backend-unavailable page and the unavailable-snapshot explanation. User confirmed the System screens work as expected.
 - `npm test` 7/7; lint, palette lint and build pass. Phase 14 remains deferred.
+
+### Frontend F8 Landing hero - VISUAL SCREEN DONE (screenshot reviewed)
+- Replaced `/` with the F8 hero: transparent nav, layered “FIND WHERE YOU BREAK” typography, serif subline, skyline, gantry crane, factory-bay grid with one lit bay, rain, chapter rail and anchored callout cards.
+- Hero metrics come from the live dashboard and its auto stress test. When those calls fail, `src/data/story.fallback.json` supplies the previously verified replay values and the UI labels them “SAVED REPLAY · NOT LIVE”; this is not the full read-only snapshot pack.
+- CSS/SVG hero is the static fallback. The procedural R3F scene is a separate lazy chunk and is selected by scene preference, device size, reduced-motion and WebGL support. `?tier=static` renders without requesting the scene chunk; a forced full-tier browser smoke mounted the WebGL canvas without console errors.
+- User screenshot review requested brighter background; increased yard/facade contrast, grid visibility and 3D fill light. The refreshed screenshot shows the yard and lit bay clearly. “Watch the story” explains that scroll chapters arrive in F9; F9 has not started.
+- `npm test` 10/10; lint, palette lint and build pass. Vite reports the lazy HeroScene chunk at about 244 KB gzip; retain for the F11 performance pass. The 50+ fps budget remains unmeasured.
+- Static fallback is procedural CSS/SVG rather than a captured `poster-hero.webp`; no poster capture was claimed. Phase 14 remains deferred.
 
 ### Phase 12 - DONE (commit 0ef204b, pushed)
 - `scripts/make_sample_drawings.py`: 3 vector PDFs WITH text layers + 200-DPI PNGs (longest side <= 2000 px) + one deliberately messy variant (rotated 90 deg, contrast 0.45); title blocks with fictional customers; `expected.json` ground truth per drawing. Synthetic only - free-tier provider inputs may be stored by the provider (R9).

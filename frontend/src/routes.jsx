@@ -11,6 +11,7 @@ import PartnersRoute from './pages/Partners/PartnersRoute'
 import PassportsRoute from './pages/Passports/PassportsRoute'
 import Proof from './pages/Proof/Proof'
 import { SystemNotFound } from './pages/System/SystemScreens'
+import Landing from './pages/Landing/Landing'
 
 // Route configuration is intentionally a non-component export in this module.
 // oxlint-disable-next-line react/only-export-components
@@ -25,7 +26,7 @@ const appScreens = [
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <PlaceholderRoute number="S0" title="Landing" route="/" />,
+    element: <Landing />,
   },
   {
     path: '/app',
