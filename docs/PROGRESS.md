@@ -32,7 +32,7 @@ Technical Phase 14 is intentionally deferred per user direction; do not mark it 
 - [x] F1 Component library
 - [x] F2 App shell, navigation, shutter
 - [x] F3 Desk
-- [ ] F3 Exposure
+- [x] F3 Exposure
 - [ ] F4 Weak Points
 - [ ] F4 What-if
 - [ ] F5 Recovery
@@ -233,12 +233,13 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Browser verification against replay data: SEVERE owner alert at T+23 h, readiness 50 / weighted 53.9, KPIs ₹39.5 L / 6 at-risk / 2 no-fallback / 1 stale, heat vendor → grinder → EN24 supplier SPOFs, Hosur +17 point action, map and routes shown; no browser console errors. Clicked Start recovery request: it created a request for the highest-value at-risk order (`ord_101`) and navigated to the recovery detail placeholder. Demo reset performed after the smoke run.
 - F3 Desk gates: `npm test` 6/6, `npm run lint`, `npm run lint:palette`, `npm run build` passed. Leaflet is lazy-loaded as its own chunk.
 - Screenshot capture was attempted; the browser tool reported the tab was not visible. No screenshot is claimed for this subphase.
-- **F3 Exposure implementation ready for review** (screen code is committed separately; planner completion/screenshot sign-off pending user review).
+- **F3 Exposure - DONE** (implementation committed; user reviewed the refreshed screenshot in chat).
 - Exposure uses the live `/exposure/map` and owner exposure endpoints, ranks site markers, displays owner drivers and route risks, and overlays the real Phase 4 curated zones and three owner routes from a frontend copy of the committed prefetch cache (`src/data/exposureGeometry.json`). Zones remain labelled illustrative, not official flood maps.
 - The 72-hour scrubber is intentionally hidden because `hourly_mm` is absent from the current API; selected-site panel shows max-24-hour rain and onset when available. Non-owner driver details are not fabricated; the UI states the map contract only supplies site risk.
 - Browser smoke: owner 96 SEVERE with five actual drivers; Oragadam 48 MODERATE; selecting Oragadam updates the selected-site panel. Open-Meteo and OSM attributions visible; no console errors.
 - `npm test` 6/6, `npm run lint`, `npm run lint:palette`, `npm run build` all pass. Leaflet map code is lazy-loaded.
-- **Screenshot capture is pending** (browser screenshot tool reported the tab was not visible). Get user's manual screenshot/review before marking F3 Exposure complete. Do not start F4 until user confirmation.
+- Visual review found the overlays had been too small at the initial all-site map extent. The initial viewport now focuses on the Chennai storm footprint while the ranked list keeps all sites; selecting a distant site pans to it. User-reviewed screenshot confirms the 5 curated zones and 3 owner routes are now visible.
+- Browser screenshot tool could not save a local artifact (`tab not visible`); the user-provided screenshot was reviewed in chat and is not stored under docs/screens. Do not start F4 until user confirmation.
 
 ### Phase 12 - DONE (commit 0ef204b, pushed)
 - `scripts/make_sample_drawings.py`: 3 vector PDFs WITH text layers + 200-DPI PNGs (longest side <= 2000 px) + one deliberately messy variant (rotated 90 deg, contrast 0.45); title blocks with fictional customers; `expected.json` ground truth per drawing. Synthetic only - free-tier provider inputs may be stored by the provider (R9).

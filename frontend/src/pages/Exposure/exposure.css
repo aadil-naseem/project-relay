@@ -43,6 +43,16 @@
 .exposure-map .leaflet-tooltip { padding: 5px 7px; border: 1px solid var(--c-sky); border-radius: 0; color: var(--c-cream); background: var(--c-midnight); font: 10px var(--f-mono); }
 .exposure-map .leaflet-tooltip::before { border-top-color: var(--c-sky); }
 .exposure-map .leaflet-bar a { color: var(--c-cream); border-color: var(--hair); background: var(--c-midnight); }
+.exposure-map .leaflet-overlay-pane .exposure-zone { stroke: var(--c-gold); fill: var(--c-sun); fill-opacity: 0.12; stroke-width: 2; stroke-dasharray: 6 5; }
+.exposure-map .leaflet-overlay-pane .exposure-route { stroke: var(--c-sky); stroke-width: 3; stroke-opacity: 0.9; }
+.exposure-map .leaflet-overlay-pane .exposure-route--exposed { stroke: var(--c-sun); }
+.exposure-map .leaflet-overlay-pane .exposure-route--unknown { stroke-dasharray: 5 5; }
+.exposure-map .leaflet-overlay-pane .exposure-site-marker { stroke-width: 2; fill-opacity: 0.9; }
+.exposure-map .leaflet-overlay-pane .exposure-site-marker--low { stroke: var(--c-sky); fill: var(--c-sky); }
+.exposure-map .leaflet-overlay-pane .exposure-site-marker--moderate { stroke: var(--c-pale); fill: var(--c-pale); }
+.exposure-map .leaflet-overlay-pane .exposure-site-marker--high,
+.exposure-map .leaflet-overlay-pane .exposure-site-marker--severe { stroke: var(--c-sun); fill: var(--c-sun); }
+.exposure-map .leaflet-overlay-pane .exposure-site-marker.is-selected { stroke-width: 4; }
 .exposure-map__offline { position: absolute; z-index: 500; inset: auto 12px 32px; padding: 8px; border: 1px solid var(--c-pale); color: var(--c-pale); background: var(--c-deep-80); font: 10px var(--f-mono); text-align: center; pointer-events: none; }
 .exposure-map__badge { position: absolute; z-index: 500; top: 12px; left: 12px; padding: 7px 9px; border: 1px solid var(--c-sun); color: var(--c-pale); background: var(--c-deep-80); font: 9px var(--f-mono); letter-spacing: 0.06em; }
 .exposure-horizon { padding: 14px 16px; }
