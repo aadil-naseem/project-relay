@@ -9,6 +9,7 @@ import WhatIfRoute from './pages/WhatIf/WhatIfRoute'
 import RecoveryRoute from './pages/Recovery/RecoveryRoute'
 import PartnersRoute from './pages/Partners/PartnersRoute'
 import PassportsRoute from './pages/Passports/PassportsRoute'
+import Proof from './pages/Proof/Proof'
 
 // Route configuration is intentionally a non-component export in this module.
 // oxlint-disable-next-line react/only-export-components
@@ -35,7 +36,9 @@ export const router = createBrowserRouter([
           ? <Desk />
           : screen.path === 'recovery'
             ? <RecoveryRoute />
-          : <PlaceholderRoute number={screen.number} title={screen.title} route={screen.route} />,
+            : screen.path === 'proof'
+              ? <Proof />
+              : <PlaceholderRoute number={screen.number} title={screen.title} route={screen.route} />,
       })),
       { path: 'weak-points', element: <WeakPointsRoute /> },
       { path: 'exposure', element: <ExposureRoute /> },
