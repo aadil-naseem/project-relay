@@ -11,6 +11,8 @@ htmlcov/
 backend/data/*.sqlite
 backend/data/*.sqlite-shm
 backend/data/*.sqlite-wal
+backend/data/*.out
+backend/data/*.err
 backend/data/raw/
 backend/cache/
 
