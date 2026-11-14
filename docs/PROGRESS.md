@@ -30,7 +30,7 @@ Technical Phase 14 is intentionally deferred per user direction; do not mark it 
 
 - [x] F0 Foundations
 - [x] F1 Component library
-- [ ] F2 App shell, navigation, shutter
+- [x] F2 App shell, navigation, shutter
 - [ ] F3 Desk
 - [ ] F3 Exposure
 - [ ] F4 Weak Points
@@ -207,7 +207,7 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Installed verified npm packages: Zustand, Lenis, Big Shoulders Display, Instrument Serif, IBM Plex Sans, IBM Plex Mono. Fonts are imported from self-hosted Fontsource Latin subsets for offline use and smaller output.
 - Added locked palette/design tokens, base reset/blueprint grid/focus ring, type/motion/layout variables, and the initial Foundation route shell with SAMPLE / SIMULATED title block.
 - Wired React Router placeholders for all planner routes; added TanStack Query client, fetch client with 8 s timeout and normalized backend error envelope, and live health hook/chip. Backend `/api/v1/health` returned 200 in browser; every route placeholder loaded.
-- Added `npm run lint:palette`; passed. `npm run lint` passed. `npm run build` passed. Initial JS bundle is 347.69 KB / 109.15 KB gzip (planner F0 target is to keep three/R3F lazy; F0 does not yet lazy-load routes, to revisit before screen bundles).
+- Added `npm run lint:palette`; passed. `npm run lint` passed. `npm run build` passed. Initial JS bundle is 347.69 KB / 109.15 KB gzip, below the planner's 350 KB gzip budget; Three/R3F is not loaded in this initial shell.
 - Browser console had no errors. Screenshot: `docs/screens/F0/desk-foundation.png`.
 - F0 is infrastructure/placeholders only: no functional screen has been designed yet. Next up is F1 shared primitives, then F2 shell; after that implement one screen at a time and wait for user confirmation between screens.
 
@@ -217,7 +217,15 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Added centralized `src/lib/status.js` and `format.js`; all 4 risk levels / 3 order states / 3 fallback levels / 6 backup effective statuses / 5 confidence states are mapped.
 - Added hidden `/app/_kit` visual-regression gallery; no product screen design was started. Browser accessibility snapshot showed all gallery sections and no console errors.
 - Unit tests use Node's built-in runner: money and odometer formatting, distinct risk/status encodings, full backup statuses, and confidence bars: **6/6 pass**.
-- Done gates: `npm test` PASS; `npm run lint` PASS; `npm run lint:palette` PASS; `npm run build` PASS (initial app JS 363.59 KB / 113.88 KB gzip, includes the component kit and is above the planner's 350 KB initial budget; F2/F3 should lazy-load the kit or page chunks). Browser screenshot capture was unavailable during this phase; visual verification used the in-browser accessibility snapshot.
+- Done gates: `npm test` PASS; `npm run lint` PASS; `npm run lint:palette` PASS; `npm run build` PASS (F1 bundle 363.59 KB / 113.88 KB gzip, below the 350 KB gzip budget; Three/R3F is still not loaded). Browser screenshot capture was unavailable during this phase; visual verification used the in-browser accessibility snapshot.
+
+### Frontend F2 - DONE (commit pending)
+- Added the shared app shell: 72 px expandable/pinnable left rail, status strip (RELAY, sample factory, IST clock, sample stamp, source badge, health chip, stack light, Stage button), detail breadcrumbs, and mobile bottom navigation. Every app route and hotkey `1–8` maps to the planner's nav order.
+- Added `useRelayNavigate` behavior in the shell: chevron shutter close/swap/open (240/320 ms); reduced-motion switches navigation to an immediate transition. Rail and screen changes leave page content as placeholders.
+- Added command palette on `/` or Ctrl/Cmd+K with route navigation, Stage Controls entry, and Reset demo action; Escape closes. The Stage drawer remains intentionally a placeholder until F7.
+- F2 browser smoke: shell and health status render, backend health request 200, command palette opens, hotkey `2` navigates to Weak Points, no console errors. All F0 API/test/lint gates remain green.
+- F2 screenshot capture was attempted but the browser tool reported the tab was not visible; no screenshot is claimed for this phase.
+- No functional screen layout has been built. Next planned screen is S1 Desk (F3 split into Desk and Exposure); complete Desk, show it for review, then wait for user confirmation before beginning Exposure.
 
 ### Phase 12 - DONE (commit 0ef204b, pushed)
 - `scripts/make_sample_drawings.py`: 3 vector PDFs WITH text layers + 200-DPI PNGs (longest side <= 2000 px) + one deliberately messy variant (rotated 90 deg, contrast 0.45); title blocks with fictional customers; `expected.json` ground truth per drawing. Synthetic only - free-tier provider inputs may be stored by the provider (R9).
