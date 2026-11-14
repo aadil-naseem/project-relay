@@ -24,12 +24,33 @@ Phase tracker. Updated at the end of every phase (R11).
 - [ ] Phase 17 Integration test
 - [ ] Phase 18 Freeze & submission
 
+## Frontend planner subphases
+
+Technical Phase 14 is intentionally deferred per user direction; do not mark it green or create `backend-v1` until its test gate passes. Frontend work is proceeding against the existing API contract. The backend gate and integration/failure testing remain required before final rehearsal.
+
+- [x] F0 Foundations
+- [ ] F1 Component library
+- [ ] F2 App shell, navigation, shutter
+- [ ] F3 Desk
+- [ ] F3 Exposure
+- [ ] F4 Weak Points
+- [ ] F4 What-if
+- [ ] F5 Recovery
+- [ ] F5 Partners & Readiness
+- [ ] F6 Passports & RFQ
+- [ ] F7 Stage Controls, Presenter, Proof, System
+- [ ] F8 Landing hero
+- [ ] F9 Landing scroll story
+- [ ] F10 Persistent world backdrop (stretch)
+- [ ] F11 Integration, performance, rehearsal, freeze
+
 ## Decisions and deviations from the blueprint
 
 Recorded here so the blueprint stays pristine and both files remain readable to a future session.
 
 | # | Blueprint says | What we did | Why |
 |---|---|---|---|
+| D10 | Frontend Planner FR2: Phase 14 backend gate passes and `backend-v1` is tagged before F0 | Per user direction, Phase 14 is deferred; frontend is proceeding against the current API contract. No `backend-v1` tag has been created | User chose to pause backend work and build the frontend now. The Phase 14 gate remains required before integration/rehearsal |
 | D1 | Root at `E:\Projects\factory-continuity-desk\` | Root at `E:\VihaanX-Build\` | User decision at kickoff. `.env.example` `DATABASE_URL` rewritten to match. No other path assumptions in code (all paths resolved via `pathlib`) |
 | D2 | Python 3.12 installed to `E:\Python312` | Kept existing `C:\Users\Aadil\AppData\Local\Programs\Python\Python312` (3.12.10) | Reinstalling the interpreter mid-event adds risk with no real gain: the bulk (venv + site-packages) is on E:, which is what the C: rule is protecting |
 | D3 | Ollama optional, models on `E:\dev-cache\ollama` | Ollama dropped | E: has 13.3 GB free; a vision model would consume most of the remaining headroom. Provider chain runs cache -> Gemini -> text rules -> manual |
@@ -180,6 +201,15 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Routers: POST/GET /recovery-requests, GET /{id}, POST /{id}/select-partner, GET /{id}/handover, GET+POST /{id}/tracking(/advance).
 - Tests: 10 new (217 total): prefill correctness incl. per-option outstanding checks; validation errors (422/404/409 ORDER_NOT_IN_FACTORY); excluded-partner 409 with exact reason; incapable-partner 409 (Hosur on PRT-A); stepper order + idempotent/guarded selection; handover redaction without consent (drawing number, part name, customer alias all absent); FULL-consent pack releases passport + drawing; handover/advance require selection.
 - Done-when verified live (section 9 demo steps 5-6): prefill from a FLOOD stress test -> 6 options in story shape -> selecting the Ambattur neighbour 409s -> selecting Oragadam -> handover pack (qty 200, SIMULATED SAMPLE) -> 3 advances walk REQUEST_SENT -> PARTNER_RESPONSE -> TECHNICAL_AND_CUSTOMER_APPROVALS -> PRODUCTION_SCHEDULED.
+
+### Frontend F0 - DONE (commit pending)
+- Copied the user-provided frontend planner to `docs/03_FRONTEND_PLANNER.md` as the repository reference.
+- Installed verified npm packages: Zustand, Lenis, Big Shoulders Display, Instrument Serif, IBM Plex Sans, IBM Plex Mono. Fonts are imported from self-hosted Fontsource Latin subsets for offline use and smaller output.
+- Added locked palette/design tokens, base reset/blueprint grid/focus ring, type/motion/layout variables, and the initial Foundation route shell with SAMPLE / SIMULATED title block.
+- Wired React Router placeholders for all planner routes; added TanStack Query client, fetch client with 8 s timeout and normalized backend error envelope, and live health hook/chip. Backend `/api/v1/health` returned 200 in browser; every route placeholder loaded.
+- Added `npm run lint:palette`; passed. `npm run lint` passed. `npm run build` passed. Initial JS bundle is 347.69 KB / 109.15 KB gzip (planner F0 target is to keep three/R3F lazy; F0 does not yet lazy-load routes, to revisit before screen bundles).
+- Browser console had no errors. Screenshot: `docs/screens/F0/desk-foundation.png`.
+- F0 is infrastructure/placeholders only: no functional screen has been designed yet. Next up is F1 shared primitives, then F2 shell; after that implement one screen at a time and wait for user confirmation between screens.
 
 ### Phase 12 - DONE (commit 0ef204b, pushed)
 - `scripts/make_sample_drawings.py`: 3 vector PDFs WITH text layers + 200-DPI PNGs (longest side <= 2000 px) + one deliberately messy variant (rotated 90 deg, contrast 0.45); title blocks with fictional customers; `expected.json` ground truth per drawing. Synthetic only - free-tier provider inputs may be stored by the provider (R9).
