@@ -211,7 +211,7 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Browser console had no errors. Screenshot: `docs/screens/F0/desk-foundation.png`.
 - F0 is infrastructure/placeholders only: no functional screen has been designed yet. Next up is F1 shared primitives, then F2 shell; after that implement one screen at a time and wait for user confirmation between screens.
 
-### Frontend F1 - DONE (commit pending)
+### Frontend F1 - DONE (commit fc1d237, pushed)
 - Added shared primitives under `src/components/primitives/`: Frame with registration ticks, Button variants/loading/disabled, Segmented, Chip, Nameplate, Stamp, Tooltip, Drawer, Dialog, Tabs, Toggle, Slider, Field/Input, striped Table, Skeleton, Toast, Kbd, and an inline glyph set.
 - Added domain components under `src/components/domain/`: Risk/Order/Fallback/Backup status pills (shape + text + semantic palette, including STALE and EXCLUDED reason hatch), ConfidenceBars, DataLabelBadge, WeatherSourceBadge, Money, Odometer, StackLight, ShiftClock, HorizonBar, ReadinessRing, AlertBanner, DimensionLine, CalcLog, PaperSheet, RelayCircuit, ShiftChart, DependencyGraph, CandidateCard, RouteCard, RedactionSheet.
 - Added centralized `src/lib/status.js` and `format.js`; all 4 risk levels / 3 order states / 3 fallback levels / 6 backup effective statuses / 5 confidence states are mapped.
