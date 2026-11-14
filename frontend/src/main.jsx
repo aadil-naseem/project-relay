@@ -20,6 +20,8 @@ import './pages/WeakPoints/weak-points.css'
 import './pages/WhatIf/what-if.css'
 import './pages/Recovery/recovery.css'
 import './pages/Partners/partners.css'
+import './pages/Passports/passports.css'
+import './pages/Passports/passports.css'
 import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(

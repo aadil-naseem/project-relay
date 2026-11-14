@@ -37,7 +37,7 @@ Technical Phase 14 is intentionally deferred per user direction; do not mark it 
 - [x] F4 What-if
 - [x] F5 Recovery
 - [x] F5 Partners & Readiness
-- [ ] F6 Passports & RFQ
+- [ ] F6 Passports & RFQ (implementation ready; visual review pending)
 - [ ] F7 Stage Controls, Presenter, Proof, System
 - [ ] F8 Landing hero
 - [ ] F9 Landing scroll story
@@ -271,6 +271,15 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - “Do it” confirms the counterfactual delta, then completes pending checks + READY or reconfirms. Verified with Hosur: 53.9 → 70.9 weighted (+17); score/history updated. Demo DB reset after smoke run.
 - `npm test` 6/6; lint, palette lint, build pass. User screenshot at 1366×768 reviewed: relay circuit, readiness, review, action and history are legible. Moved the weighted score label below the ring to avoid overlapping the gauge. Screenshot attachment is in chat and could not be copied locally via browser tools.
 - No Passports work has started; wait for confirmation before F6.
+
+### Frontend F6-S4 Passports & RFQ - IMPLEMENTED (review pending)
+- Added the five-step Drawing → Review → Confirm → Redacted RFQ → Share flow. Sample tray has Pump shaft / Piston rod / Valve flange; sample PNGs + PDFs are served locally from `frontend/public/drawings/`. File picker and drop target accept PDF/PNG/JPG. No Gemini calls are needed for golden samples; repeated-provider 429s are not retried from the UI.
+- Extraction pending state uses a scan line only while the request is actually in flight. Provider/latency/degraded metadata is displayed. Rules-only mode has the explicit fallback banner. Manual draft remains available.
+- Passport editor shows confidence/source per field, low-confidence disagreements and candidate picking, editable dimensions, route/material fields, missing-confirm requirements, and planner-cycle-time caveat. Confirmation calls backend and links the created part; edit changes are saved as user-confirmed.
+- Confirmed passports show owner original and API-redacted RFQ sheets, redaction report, opaque `rfq_ref`, and RFQ/FULL share controls. FULL requires the explicit customer-permission dialog.
+- Browser smoke using the local golden Pump shaft PNG: extraction returned in 1 ms, confirm created a part, RFQ redaction hid customer/drawing/part identifiers, structured and printable RFQ refs now render consistently in the UI, share consent dialog is present. No live Gemini call was made.
+- **Backend mismatch discovered for Phase 14:** current API can generate different random RFQ refs for `RfqOut.rfq_ref` and the rendered `RfqOut.text`. The frontend normalizes the displayed printable copy to the structured ref; log and fix at the deferred backend gate, not via a provider retry.
+- `npm test` 6/6; lint, palette lint, build pass. User screenshot review pending; do not start Stage Controls or later screens before confirmation.
 
 ### Phase 12 - DONE (commit 0ef204b, pushed)
 - `scripts/make_sample_drawings.py`: 3 vector PDFs WITH text layers + 200-DPI PNGs (longest side <= 2000 px) + one deliberately messy variant (rotated 90 deg, contrast 0.45); title blocks with fictional customers; `expected.json` ground truth per drawing. Synthetic only - free-tier provider inputs may be stored by the provider (R9).
