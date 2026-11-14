@@ -4,7 +4,7 @@ Phase tracker. Updated at the end of every phase (R11).
 
 ## Phases
 
-- [ ] Phase 0  Environment & E: drive
+- [x] Phase 0  Environment & E: drive
 - [ ] Phase 1  Backend skeleton
 - [ ] Phase 2  Data model & catalogues
 - [ ] Phase 3  Demo world & seeding
@@ -35,6 +35,8 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 | D3 | Ollama optional, models on `E:\dev-cache\ollama` | Ollama dropped | E: has 13.3 GB free; a vision model would consume most of the remaining headroom. Provider chain runs cache -> Gemini -> text rules -> manual |
 | D4 | GitHub repo created in Phase 0 | Local repo only; no `origin` yet | `gh` CLI is not installed. Add the remote when the repo is created on github.com |
 | D5 | `npm_config_cache` / `npm_config_prefix` user env vars | Also written to `C:\Users\Aadil\.npmrc` | npm reads `.npmrc`, not the inherited env block, so the env vars alone left npm pointed at `C:\Users\Aadil\AppData\Local\npm-cache` |
+| D6 | Install `requirements-data.txt` (OSMnx) in Phase 0 | Deferred to Phase 4 | Connection is running ~80 kB/s; OSMnx pulls geopandas/pyproj/fiona/scikit-learn (hundreds of MB). It is only needed for the one-time prefetch. If it still fails, the cut order allows site-only exposure |
+| D7 | - | `check_c_drive_leaks.ps1` rewritten to resolve process -> user -> machine | Windows does not push updated user env into an already-running shell, so a naive `$env:` check reports false leaks. Script now distinguishes STALE-PROCESS from LEAK |
 
 ## Open questions carried forward
 
@@ -43,9 +45,18 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 
 ## Phase log
 
-### Phase 0 - in progress
+### Phase 0 - DONE
 - E: folder layout created; caches and TEMP redirected to `E:\dev-cache`.
 - Tools verified: Node 24.16 on E:, Git on E:, Python 3.12.10 on C: (see D2).
-- Backend venv created on E:; dependencies installing.
-- Frontend scaffolded with Vite (React) on E:; libraries installing.
+- Backend venv on E: with all runtime + dev packages. Versions: fastapi 0.162.7, pydantic 2.14.3, sqlalchemy 2.1.8, numpy 2.5.4, shapely 2.2.0, pymupdf 2.1. All imports verified.
+- Frontend scaffolded with Vite (React 19.3.1, three 0.187, R3F 9.8.2); libraries installed, 0 vulnerabilities; `npm run build` passes (177 ms).
 - Repo tree (section 5) created with stubs; brief and blueprint copied into `docs/`.
+- Git initialised on `main`, first commit `64ceddf`, 134 tracked files; `node_modules`, `.venv`, `.env` confirmed ignored.
+- C: leak audit passes: pip/npm cache, prefix, TEMP, TMP, HF_HOME, Playwright all resolve to E:. Project footprint 599 MB; E: free 11.9 GB.
+- **Open-Meteo verified live** (see VERIFIED_FACTS.md). Two findings that change the plan:
+  1. Live forecast for Ambattur right now is **dry (1.1 mm / 72 h)** - so `live` mode produces no alert. Replay is mandatory for the demo, not optional.
+  2. Michaung archive is strong: **238.7 mm on 2023-12-04**. Replay series should start **2023-12-03T00:00Z** so onset lands at ~37-40 h rather than ~72 h.
+- **Gemini verified live**: `gemini-3.5-flash-lite` is the only responsive model on this key. Text 1.5 s, vision 5.6-13.1 s (variable). Larger flash models are 404/503/timeout. Golden cache is therefore load-bearing, not optional.
+- Outstanding, deliberately deferred: `requirements-data.txt` (OSMnx, D6) and the GitHub remote (D4).
+
+**Phase 0 done-when checklist:** python + node work from E: (PATH) - **PASS**; installs produced no C: leak - **PASS**; repo pushed to GitHub - **NOT DONE** (no `gh`, D4); `.env` has Gemini key - **PASS**; smoke results recorded - **PASS**; folder tree matches section 5 - **PASS**.
