@@ -241,7 +241,7 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Visual review found the overlays had been too small at the initial all-site map extent. The initial viewport now focuses on the Chennai storm footprint while the ranked list keeps all sites; selecting a distant site pans to it. User-reviewed screenshot confirms the 5 curated zones and 3 owner routes are now visible.
 - Browser screenshot tool could not save a local artifact (`tab not visible`); the user-provided screenshot was reviewed in chat and is not stored under docs/screens. Do not start F4 until user confirmation.
 
-### Frontend F4-S2 Weak Points - IMPLEMENTED (review pending)
+### Frontend F4-S2 Weak Points - DONE (commit 73a8d08, pushed; screenshot review pending)
 - Replaced the S2 placeholder with the ranked SPOF list and SVG dependency drawing: active orders → parts → process steps → machines/vendors/suppliers. Order→part edges are joined from the orders endpoint; the remaining links come from the SPOF graph response.
 - Selecting a weak-point row updates its details. **Simulate loss / Pull the plug** uses the backend `orders_broken` result to dim other resources, retract selected-resource edges, and hatch broken orders; Reset restores the graph. “Stress this resource” deep-links to What-if with `hazard=RESOURCE_DOWN&resource_id=...`.
 - Shows exposure markers, affected-order nameplates, revenue at risk, calc log, uncovered requirements separately, and the note that three lathes never appear because two remain.
