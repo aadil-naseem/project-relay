@@ -115,3 +115,12 @@ Vision accuracy on the probe image: returned `shape=shaft`, `material=EN24`, `di
 | Replay: 16 sites x 72 h from 2023-12-03T00:00Z | **VERIFIED** | `data/cache/replay_michaung.json`; owner Dec-4 total **238.7 mm — matches the Phase 0 reference exactly**; flooded back-test sites 225-315 mm; Hosur 0.4 mm, Peenya 2.5 mm, Coimbatore 1.7 mm (dry inland - supports the matching story) |
 | Synthetic fallback | VERIFIED | `data/cache/synthetic_storm.json`, labelled "SYNTHETIC SAMPLE", deterministic ramp (peak 20 mm/h at t+36h) |
 | Routes (OSM drive graph, Chennai metro) | VERIFIED | `data/cache/routes.json` + `data/raw/graph_chennai.graphml` (git-ignored); scope decision: routes only for storm-footprint sites (Ambattur cluster + Guindy); far partners keep null route facts per the cut order |
+
+## Phase 7 exposure (verified/tuned 2026-11-14)
+
+| Item | Status | Notes |
+|---|---|---|
+| Multi-location forecast | **VERIFIED live** | `GET /v1/forecast?latitude=a,b,c&longitude=x,y,z&hourly=precipitation&forecast_days=4&timezone=UTC` returns an **array** of one object per location. 4 days = 96 h from 00:00 UTC today; slicing from the current hour leaves 85 h, enough for the 72 h horizon. Dry right now (1.10 mm/72 h), so `replay` stays the demo mode |
+| Onset threshold tuned | **CHANGED in config, not code** | `config/exposure.yaml` `heavy_onset_mm_3h: 5 -> 10`. At 5 mm/3 h the Michaung series tripped at hour 0 (Dec-3 drizzle is 2-5 mm/h), giving "onset now". The IMD "heavy" 24 h band starts at 64.5 mm, i.e. ~8 mm/3 h; 10 mm/3 h is the conservative equivalent and puts onset at **h23-24**, inside the 24-40 h lead the blueprint wants. No site name is referenced in code or config |
+| Back-test | **PASS, +12 points** | see `docs/BACKTEST_EXPOSURE.md`. Flooded: Thirumudivakkam 82, Ambattur north 73, Villivakkam 70, Perungudi 70. Not flooded: Oragadam 58, Pillaipakkam 31, Irungattukottai 29. Water distances are real OSM measurements (flooded sites 0-330 m from water; not-flooded 683-1495 m) and were **added after the first run** (which passed at +5 with water unknown) - so the separation is not an artefact of tuning |
+| Owner exposure in replay | VERIFIED | site risk **98 SEVERE**, hazard 1.00, vulnerability 0.97, max 24 h 242.3 mm, onset 23 h, wet spell 21 h; Oragadam 58 (HIGH) - lower than Ambattur as the done-when requires |

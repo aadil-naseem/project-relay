@@ -28,7 +28,10 @@ route_weights: {low_share: 0.6, underpass: 0.4}
 underpass_cap: 2
 
 alert_threshold: 50             # HIGH and above raises the banner
-heavy_onset_mm_3h: 5            # defines wet-spell start/end
+# "Heavy onset": the IMD "heavy" band is 64.5 mm/24 h, which is ~8 mm/3 h.
+# 10 mm/3 h marks genuinely heavy rain rather than the drizzle that opens the
+# Michaung series; it puts the demo onset at ~23-24 h, inside the 24-40 h lead.
+heavy_onset_mm_3h: 10
 recession_hours: {HIGH: 24, SEVERE: 72}   # flood water outlasts the rain
 wet_spell_cap_hours: 72
 cache_ttl_minutes: 10

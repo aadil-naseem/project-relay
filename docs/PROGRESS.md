@@ -11,7 +11,7 @@ Phase tracker. Updated at the end of every phase (R11).
 - [x] Phase 4  Real-data prefetch
 - [x] Phase 5  M1 API
 - [x] Phase 6  M3 SPOF
-- [ ] Phase 7  M4 Exposure
+- [x] Phase 7  M4 Exposure
 - [ ] Phase 8  M5 Stress test
 - [ ] Phase 9  M6 Matching
 - [ ] Phase 10 M8 Readiness
@@ -130,3 +130,15 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Done-when verified against the seeded world: top SPOF is `ven_heat` (₹19 L, ord_101+ord_106), then `mch_own_grind_1` (₹12 L) and `sup_steel` (₹12 L), all `exposed=true`; the three lathes and both VMCs never appear. Section 9 invariant 3 holds.
 
 **Lessons recorded for later phases:** a single supplier is itself a SPOF - test fixtures that want "material is not the point" need two suppliers of the same grade. Uncovered requirements are a normal state in the demo world (only EN24 has an approved supplier), so later modules must not assume full material coverage. The hypothesis strategy must collapse duplicate ids, since generated ids can repeat.
+
+### Phase 7 - DONE (commit pending, pushed)
+- `adapters/weather.py`: `get_hourly_precip(session, sites, mode)` with the full section 3.4 ladder. **live** = one batched Open-Meteo call (multi-location returns an array - verified live), sliced from the current UTC hour over a 4-day request; good responses are written to `forecast_cache`. **cache** on live failure; **replay** (real Michaung series, index 0 = now) as the last fallback; **synthetic** reads the labelled generated profile. Every result carries `source` and `degraded`.
+- `core/exposure_score.py` (pure): rolling sums, `piecewise`, `rain_hazard` (H = max of 24 h and 3 h bands), `vulnerability` (depression/water/zone with clamps), `site_risk`, `route_risk` (`V_route`), `is_isolated`, `onset_and_wet_spell`, `alert_affected`, `explain_drivers`. Honest nulls throughout: unknown water distance = no evidence, missing route facts = `route_risk: null`.
+- `services/exposure.py`: TTL cache (`cache_ttl_minutes`) around the *weather fetch* only (arithmetic is cheap and always recomputed so a demo reset cannot be masked), writes an `exposure_snapshots` row per computation keyed by a 32-char forecast hash, resolves mode as `?mode=` > `app_state` > `.env`, and emits a full trace (weather, per-site arithmetic, routes, alert).
+- Routers: `GET /factories/{id}/exposure?mode=`, `GET /exposure/map`, `POST /demo/mode`, `GET /demo/state`.
+- Tests: 38 new (148 total) - pure-function maths with hand-computed numbers (148 mm -> 0.873), route risk with/without underpasses, isolation edge cases, onset/spell, alert threshold edges (49 vs 50), and respx-mocked live/cache/replay/synthetic ladder including malformed payloads and HTTP 503.
+- **Tuned one config constant** (`heavy_onset_mm_3h: 5 -> 10`, recorded in VERIFIED_FACTS): at 5 mm/3 h the Dec-3 drizzle tripped onset at hour 0; 10 mm/3 h is the IMD "heavy" 24 h rate expressed per 3 h and puts onset at h23.
+- Back-test written to `docs/BACKTEST_EXPOSURE.md`: **PASS with +12 points separation** (flooded 70-82, not flooded 29-58). Real OSM water distances for the back-test sites were added after the first run and *increased* separation, so the result is not tuned to the labels.
+- Done-when verified live: owner **98 SEVERE** with readable drivers (242 mm/24 h, 56 mm/3 h, 4.7 m depression, 169 m from water, in a planning zone), alert active (owner + heat vendor + supplier), onset 23 h, Oragadam 58 < Ambattur 96.
+
+**Lessons recorded for later phases:** Oragadam scores 58 (HIGH) in the replay because the archive really did drop ~180 mm/24 h there - it is *less* exposed than Ambattur, not unexposed. Phase 9 must not use "risk >= alert_threshold" alone as the correlated-risk test or the hero backup would be excluded; use a relative test and document it. The TTL cache keys on (mode, site set) and must be cleared by `reset_weather_ttl()` after a demo reset, otherwise a stale live result can survive.

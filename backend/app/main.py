@@ -5,7 +5,7 @@ from __future__ import annotations
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import factories, health, relationships, spof
+from app.api import exposure, factories, health, relationships, spof
 from app.errors import register_error_handlers
 from app.settings import get_settings
 
@@ -36,6 +36,7 @@ def create_app() -> FastAPI:
     api.include_router(factories.router)
     api.include_router(relationships.router)
     api.include_router(spof.router)
+    api.include_router(exposure.router)
     app.include_router(api)
     return app
 
