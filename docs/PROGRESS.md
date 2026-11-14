@@ -265,7 +265,7 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Browser smoke against live `rr_20261114173203_ord_102`: six candidates (Oragadam READY, Hosur APPROVAL_PENDING, Ambattur/Guindy excluded, Peenya STALE, Coimbatore potential); selected Oragadam, request ACTIVE, handover redacted and labelled, responsibilities/milestones visible, route card at REQUEST_SENT. No browser console errors.
 - `npm test` 6/6; lint, palette lint, build pass. User-reviewed screenshot at 1366×768 shows request summary, Ready / Approval Pending / Excluded columns and unverified checks with no visual blocker. Screenshot attachment remains in chat; the browser tool could not copy it to `docs/screens/`.
 
-### Frontend F5-S7 Partners & Readiness - IMPLEMENTED (review pending)
+### Frontend F5-S7 Partners & Readiness - IMPLEMENTED (commit a4cf09c, pushed; review pending)
 - Replaced the Partners placeholder with the relay circuit and partner drawer, 24/48/72 readiness ring/breakdown, stale/expiring preparedness review, score history chart, and next-best-action counterfactuals.
 - Circuit uses live relationships and M6 exclusions/reasons, with solid/dashed/hatched paths. Drawer exposes all five checks, reconfirm, and guarded status changes; backend `409 details.missing_checks` is rendered as CANNOT SET READY.
 - “Do it” confirms the counterfactual delta, then completes pending checks + READY or reconfirms. Verified with Hosur: 53.9 → 70.9 weighted (+17); score/history updated. Demo DB reset after smoke run.
