@@ -226,7 +226,7 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - F2 browser smoke: shell and health status render, backend health request 200, command palette opens, hotkey `2` navigates to Weak Points, no console errors. All F0 API/test/lint gates remain green.
 - F2 screenshot capture was attempted but the browser tool reported the tab was not visible; no screenshot is claimed for this phase.
 
-### Frontend F3-S1 Desk - DONE (commit pending)
+### Frontend F3-S1 Desk - DONE (commit f7d0010, pushed)
 - Replaced the S1 `/app` placeholder with the live Desk: alert banner and Start Recovery / See Test actions, 24/48/72 readiness ring + breakdown drawer, KPI odometers, top-3 SPOFs, rain dimension-line fallback, calc-log drawer, next-best actions, and Leaflet mini-map with risk-coded site markers and route-risk summaries.
 - Data comes from the live dashboard, readiness, actions, exposure, exposure-map, and stress-test endpoints via TanStack Query. The primary CTA selects the highest-value at-risk order from the auto stress result, creates the recovery request, then navigates through the shutter.
 - Honest API gaps handled explicitly: hourly rain samples are unavailable, so the Desk shows max-24h and onset callouts rather than invented bars; route geometry and zone geometry are not in the current map response, so the mini-map shows site markers and route risk summaries and states that route geometry is unavailable. OSM tile errors retain markers and report tile degradation.
