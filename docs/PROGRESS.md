@@ -202,7 +202,7 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Tests: 10 new (217 total): prefill correctness incl. per-option outstanding checks; validation errors (422/404/409 ORDER_NOT_IN_FACTORY); excluded-partner 409 with exact reason; incapable-partner 409 (Hosur on PRT-A); stepper order + idempotent/guarded selection; handover redaction without consent (drawing number, part name, customer alias all absent); FULL-consent pack releases passport + drawing; handover/advance require selection.
 - Done-when verified live (section 9 demo steps 5-6): prefill from a FLOOD stress test -> 6 options in story shape -> selecting the Ambattur neighbour 409s -> selecting Oragadam -> handover pack (qty 200, SIMULATED SAMPLE) -> 3 advances walk REQUEST_SENT -> PARTNER_RESPONSE -> TECHNICAL_AND_CUSTOMER_APPROVALS -> PRODUCTION_SCHEDULED.
 
-### Frontend F0 - DONE (commit pending)
+### Frontend F0 - DONE (commit 9001df9, pushed)
 - Copied the user-provided frontend planner to `docs/03_FRONTEND_PLANNER.md` as the repository reference.
 - Installed verified npm packages: Zustand, Lenis, Big Shoulders Display, Instrument Serif, IBM Plex Sans, IBM Plex Mono. Fonts are imported from self-hosted Fontsource Latin subsets for offline use and smaller output.
 - Added locked palette/design tokens, base reset/blueprint grid/focus ring, type/motion/layout variables, and the initial Foundation route shell with SAMPLE / SIMULATED title block.
