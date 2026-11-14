@@ -19,5 +19,16 @@
     "revenue_exposed_inr": 3950000,
     "orders_at_risk": 6,
     "orders_no_fallback": 2
+  },
+  "partners": [
+    { "name": "Oragadam", "status": "READY", "risk": 48 },
+    { "name": "Hosur", "status": "APPROVAL_PENDING", "risk": 0 },
+    { "name": "Peenya", "status": "STALE", "risk": 1 },
+    { "name": "Sample Precision Works (Ambattur)", "status": "EXCLUDED", "reason": "SAME_HAZARD_ZONE", "risk": 96 }
+  ],
+  "readiness": {
+    "weighted_score": 53.9,
+    "projected_score": 70.9,
+    "uplift_points": 17
   }
 }

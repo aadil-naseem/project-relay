@@ -40,14 +40,14 @@ Phase 14 was initially deferred by user choice. The user later authorized it; su
 - [x] F6 Passports & RFQ
 - [ ] F7 Stage Controls, Presenter, Proof, System (S9/S8/S10 reviewed; snapshot pack/capture deferred to F11)
 - [ ] F8 Landing hero (visual review done; 50+ fps measurement deferred to F11)
-- [ ] F9 Landing scroll story (implementation in progress; paused at user request while Phase 14 was completed)
+- [x] F9 Landing scroll story (visual review approved; smoother scroll verified)
 - [ ] F10 Persistent world backdrop (stretch)
 - [ ] F11 Integration, performance, rehearsal, freeze
 
 ## Required-first completion plan (user direction 2026-11-15)
 
 1. **Phase 14 closeout — DONE:** suites A–K and M passed; `docs/TEST_REPORT.md` and `docs/openapi.snapshot.json` committed/pushed; `backend-v1` tagged. Optional suite L was not run.
-2. **F9 Landing scroll story:** implementation is in the working tree but paused and unreviewed; finish visual review, fixes, commit and push.
+2. **F9 Landing scroll story — DONE:** visual review approved; smoothing, checks, commit and push complete.
 3. **Snapshot safety net:** in F11, capture the replay snapshot pack and wire read-only snapshot mode/System action.
 4. **Phase 17 integration:** run frontend/backend integration and failure-injection checks; record results.
 5. **Phase 18 freeze/submission:** performance and accessibility pass, rehearsal, final screenshots and submission freeze.
@@ -300,7 +300,7 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Browser smoke: weather replay/synthetic switching; reset confirmation cancel; `R` called `POST /demo/reset` (200) and returned to Desk/step 1; presenter advanced through What-if, Recovery and Partners; `H` hid/restored the strip; accessibility/scene toggles applied and were restored to defaults. Stage readouts were healthy, and the reloaded browser had no console errors.
 - User-reviewed screenshots show the Stage drawer hierarchy/readouts and Presenter strip; the drawer’s bottom controls were made scrollable after review. A reset-state mismatch found in the strip screenshot was corrected.
 - `npm test` 6/6; `npm run lint`, `npm run lint:palette`, and `npm run build` pass.
-- F7 screen implementations S9, S8 and S10 are reviewed. Snapshot data/capture remains pending for F11, so the F7 checkbox stays open. Phase 14 required test suites have passed; report/tag closeout is pending.
+- F7 screen implementations S9, S8 and S10 are reviewed. Snapshot data/capture remains pending for F11, so the F7 checkbox stays open. Phase 14 was subsequently completed and tagged.
 
 ### Frontend F7-S8 Proof & Method - DONE (screenshot reviewed)
 - Replaced the `/app/proof` placeholder with the Michaung exposure back-test table and score bars, four deterministic method summaries (exposure, weak points, matching, readiness), drawing-AI boundary, limits and data sources, and the six brief glossary terms. The Exposure CTA opens the screen with the live trace.
@@ -350,4 +350,9 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Suites D–J and K pass: forecast 500/timeout and cache/replay fallbacks; deleted DB reset; malformed image 422; five identical reset/dashboard cycles; ten parallel dashboard requests with one auto stress row; RFQ/consent and secret-log checks; guarded transitions; +22 Michaung separation; zero-key story.
 - Performance sample: dashboard cold/warm 0.083/0.011 s; manual stress 0.032 s; matching 0.007 s; cached passport 0.025 s.
 - Suite L (live Open-Meteo/Gemini) intentionally not run; it is informational/optional and no provider calls were needed. Suite M E: audit passes; TEMP/TMP are stale in this long-lived process but persisted user paths are on E: and there are no C: cache leaks.
-- `docs/TEST_REPORT.md` and `docs/openapi.snapshot.json` are committed. Optional live smoke L was not run; no Gemini/Open-Meteo calls were made. F9 frontend work remains uncommitted and paused at the user’s request.
+- `docs/TEST_REPORT.md` and `docs/openapi.snapshot.json` are committed. Optional live smoke L was not run; no Gemini/Open-Meteo calls were made.
+
+### Frontend F9 — Landing scroll story - DONE (reviewed)
+- Added a reversible five-chapter pinned story with GSAP ScrollTrigger + Lenis, a static/mobile fallback, story callouts, partner relay, readiness close, and post-story method/proof/limits/CTA sections.
+- Smoothed wheel response and camera transitions after user review. Honest replay labels are retained; sample values are not represented as live.
+- User approved the final visuals and scroll feel. `npm test` 11/11, lint, palette lint and production build pass. Desktop Lenis interaction was previously smoke-tested without console errors; the final smoothing was build/test verified.
