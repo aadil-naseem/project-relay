@@ -219,7 +219,7 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Unit tests use Node's built-in runner: money and odometer formatting, distinct risk/status encodings, full backup statuses, and confidence bars: **6/6 pass**.
 - Done gates: `npm test` PASS; `npm run lint` PASS; `npm run lint:palette` PASS; `npm run build` PASS (F1 bundle 363.59 KB / 113.88 KB gzip, below the 350 KB gzip budget; Three/R3F is still not loaded). Browser screenshot capture was unavailable during this phase; visual verification used the in-browser accessibility snapshot.
 
-### Frontend F2 - DONE (commit pending)
+### Frontend F2 - DONE (commit 00a586b, pushed)
 - Added the shared app shell: 72 px expandable/pinnable left rail, status strip (RELAY, sample factory, IST clock, sample stamp, source badge, health chip, stack light, Stage button), detail breadcrumbs, and mobile bottom navigation. Every app route and hotkey `1–8` maps to the planner's nav order.
 - Added `useRelayNavigate` behavior in the shell: chevron shutter close/swap/open (240/320 ms); reduced-motion switches navigation to an immediate transition. Rail and screen changes leave page content as placeholders.
 - Added command palette on `/` or Ctrl/Cmd+K with route navigation, Stage Controls entry, and Reset demo action; Escape closes. The Stage drawer remains intentionally a placeholder until F7.
