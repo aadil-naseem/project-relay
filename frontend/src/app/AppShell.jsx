@@ -106,7 +106,7 @@ export function AppShell() {
   const presenterRoute = useCallback((step) => {
     if (step === 0) return '/'
     if (step === 2 && presenterDashboard.data?.alert?.stress_test_id) return `/app/what-if/${presenterDashboard.data.alert.stress_test_id}`
-    if (step === 6 && presenterRecoveryId) return `/app/recovery/${presenterRecoveryId}`
+    if ((step === 5 || step === 6) && presenterRecoveryId) return `/app/recovery/${presenterRecoveryId}`
     return ['/app', '/app', '/app/what-if', '/app/weak-points', '/app/passports', '/app/recovery', '/app/recovery', '/app/partners'][step] || '/app'
   }, [presenterDashboard.data, presenterRecoveryId])
 

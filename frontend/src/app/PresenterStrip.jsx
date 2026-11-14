@@ -58,6 +58,6 @@ export function PresenterStrip({ onNavigate }) {
 
 function resolveRoute(step, dashboard, recoveryId) {
   if (step === 2 && dashboard?.alert?.stress_test_id) return `/app/what-if/${dashboard.alert.stress_test_id}`
-  if (step === 6 && recoveryId) return `/app/recovery/${recoveryId}`
+  if ((step === 5 || step === 6) && recoveryId) return `/app/recovery/${recoveryId}`
   return scriptSteps[step]?.route || '/app'
 }

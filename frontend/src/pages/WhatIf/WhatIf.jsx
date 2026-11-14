@@ -121,6 +121,7 @@ export default function WhatIf() {
         method: 'POST',
         body: JSON.stringify({ from_stress_test_id: stressId, order_id: orderId }),
       })
+      useUiStore.getState().setPreference('presenterRecoveryId', request.id)
       navigate(`/app/recovery/${request.id}`)
     } catch (requestError) {
       setRecoveryError(requestError.message)

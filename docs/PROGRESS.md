@@ -21,12 +21,12 @@ Phase tracker. Updated at the end of every phase (R11).
 - [x] Phase 14 BACKEND TEST GATE (required suites and C: audit passed; `backend-v1` tagged)
 - [ ] Phase 15 Frontend setup
 - [ ] Phase 16 Frontend screens
-- [ ] Phase 17 Integration test
+- [x] Phase 17 Integration test (replay UI/API path and failure fallback verified)
 - [ ] Phase 18 Freeze & submission
 
 ## Frontend planner subphases
 
-Phase 14 was initially deferred by user choice. The user later authorized it; suites A–K and M passed and `backend-v1` was tagged on 2026-11-15. Snapshot capture is complete; F11 integration, performance and final rehearsal remain pending.
+Phase 14 was initially deferred by user choice. The user later authorized it; suites A–K and M passed and `backend-v1` was tagged on 2026-11-15. Snapshot capture and Phase 17 replay integration are complete; F11 performance/accessibility/rehearsal and Phase 18 freeze remain pending.
 
 - [x] F0 Foundations
 - [x] F1 Component library
@@ -49,7 +49,7 @@ Phase 14 was initially deferred by user choice. The user later authorized it; su
 1. **Phase 14 closeout — DONE:** suites A–K and M passed; `docs/TEST_REPORT.md` and `docs/openapi.snapshot.json` committed/pushed; `backend-v1` tagged. Optional suite L was not run.
 2. **F9 Landing scroll story — DONE:** visual review approved; smoothing, checks, commit and push complete.
 3. **Snapshot safety net — DONE:** captured the isolated replay pack and wired the offline System action, global saved-snapshot ribbon, and read-only API/UI mode.
-4. **Phase 17 integration:** run frontend/backend integration and failure-injection checks; record results.
+4. **Phase 17 integration — DONE:** live replay UI/API flow, presenter routing, recovery handoff, readiness uplift and failure fallback verified; details below. External live-provider mode was not exercised.
 5. **Phase 18 freeze/submission:** performance and accessibility pass, rehearsal, final screenshots and submission freeze.
 
 After those required items, handle remaining optional work: F10 persistent world backdrop (stretch/cuttable), optional live provider smoke (L), and a captured hero poster if useful. F8's 50+ fps target is measured in the required F11 performance pass.
@@ -363,3 +363,12 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - “Open saved snapshot” now enters `/app` without health/API requests. The persistent ribbon says “SAVED SNAPSHOT · NOT LIVE”, shows capture time, and offers a return-to-live action. The client resolves captured GETs locally, permits only the read-only matching search POST, and rejects all writes; persistent write controls are disabled.
 - Recovery and passport navigation open their captured records automatically in snapshot mode. Read-only data views for Desk, Weak Points, Exposure, What-if, Recovery, Partners, Passports and Proof were browser-smoke-tested; the outage action was tested with backend requests blocked in the browser. No browser console errors or backend requests occurred after entering snapshot mode.
 - Frontend tests 15/15, lint, palette lint, production build, and Ruff on the capture script pass. The 50+ fps/accessibility/rehearsal parts of F11 remain pending.
+
+### Phase 17 — Frontend/backend replay integration - DONE
+- Live replay browser smoke: Health, demo state, dashboard, exposure map/site, readiness/actions, auto stress test, SPOF/orders, matching, passport, RFQ, recovery request/tracking/handover, and relationships/readiness screens connected to the running API; checked responses returned 200 (recovery create returned 201).
+- Exercised a manual Flood test (result rendered with 4 at-risk orders), golden-cache Pump Shaft extraction → confirm → redacted RFQ, then order `ord_102` recovery → Ready Oragadam selection → handover → tracking advance. No browser console errors.
+- Partners integration completed Hosur's remaining checks and READY transition; weighted readiness rose **53.9 → 70.9 (+17)** and the backend readback confirmed `READY`.
+- Presenter navigation visited What-if, Weak Points, Passports, Recovery request/handover and Partners. This exposed that What-if-created requests were not saved for Presenter steps 5–6; now those steps retain and reuse the created recovery ID.
+- Backend scenario test: `pytest tests/scenario/test_demo_story.py -q` passed. Failure-injection tests: `pytest tests/phase14/test_failure_injection.py -q` passed (3 tests). Frontend tests 15/15, lint and palette lint pass.
+- Reset the demo from Stage Controls at the end; backend is back in replay baseline. Browser snapshot mode was also exercised with backend fetches blocked and made no backend requests; the backend process itself was not stopped.
+- External Open-Meteo live mode was not run. The Vite build could not be re-run in this session because the host repeatedly failed native memory allocation (free virtual memory fell below 700 MB); the last successful production build predates only the small Presenter recovery-ID routing fix. Retry build during F11 when host memory is available.
