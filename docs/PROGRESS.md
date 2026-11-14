@@ -100,7 +100,7 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 
 **Lessons recorded for later phases:** cluster.yaml `sites` includes the vendor and supplier, so "seed factories == config sites" is wrong - the union of factories.json and vendors.json must equal the site list. seed() wiping its own tables (not drop_all) keeps prefetch data safe once Phase 4 lands; `POST /demo/reset` (Phase 13) should call `reset_demo()` which drops everything.
 
-### Phase 4 - DONE (commit pending, pushed)
+### Phase 4 - DONE (commit 8f03adc, pushed)
 - **OSMnx installed after all (D6 risk cleared):** osmnx 2.1.1 + geopandas 1.2.0 + pyproj 3.8.0 installed cleanly; scipy-free nearest-node lookup written by hand (vectorised numpy haversine over the 77k-node graph) to avoid the scikit-learn optional dependency.
 - `prefetch_terrain.py` -> `data/cache/terrain.json`: 16 sites (9 demo + 7 back-test), centre + 3 rings (500/1000/2000 m) x 8 bearings via the Open-Meteo elevation API (batch 100 VERIFIED live); owner -4.7 m below ring mean (depression), Oragadam 53 m plateau; 15x15 cluster grid -> `low_threshold_m` 13.0 m.
 - `prefetch_routes.py` -> `data/cache/routes.json`: Chennai drive graph downloaded once (77,285 nodes, cached in git-ignored `data/raw/graph_chennai.graphml`); 14 routes (4 Ambattur sites x 3 exits + Guindy x 2), 3.6-13.1 km, sampled every 250 m, 488 sample elevations batched, low_share + underpass counts (tunnel/layer<0). Scope decision: routes only for storm-footprint sites; far partners keep null route facts (schema supports; M4 degrades to site-only). Nearest-water distances filled for all 9 demo sites (Overpass 502 retries needed; fac_owner 169.4 m - Ambattur lake vicinity).
