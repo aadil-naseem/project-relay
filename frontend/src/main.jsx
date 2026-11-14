@@ -10,9 +10,11 @@ import '@fontsource/ibm-plex-sans/latin-500'
 import '@fontsource/ibm-plex-sans/latin-600'
 import '@fontsource/ibm-plex-mono/latin-400'
 import '@fontsource/ibm-plex-mono/latin-500'
+import 'leaflet/dist/leaflet.css'
 import './styles/tokens.css'
 import './styles/base.css'
 import './app/app-shell.css'
+import './pages/Desk/desk.css'
 import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(

@@ -6,6 +6,7 @@ import { queryClient } from '../api/queryClient'
 import { useHealth } from '../api/hooks/useHealth'
 import { DataLabelBadge, ShiftClock, StackLight, WeatherSourceBadge } from '../components/domain'
 import { Button, Drawer, Kbd } from '../components/primitives'
+import { RelayNavigationContext } from './navigation'
 
 const navItems = [
   { path: '/app', label: 'Desk', glyph: '▦' },
@@ -115,6 +116,7 @@ export function AppShell() {
     || navItems.find((item) => location.pathname.startsWith(`${item.path}/`))
   const healthState = health.data?.status === 'ok' ? 'ok' : health.isError ? 'error' : 'checking'
   return (
+    <RelayNavigationContext.Provider value={go}>
     <div className={`relay-app ${railPinned ? 'rail-pinned' : ''}`}>
       <header className="relay-status-strip">
         <button className="relay-wordmark" type="button" onClick={() => go('/')}>RELAY</button>
@@ -198,6 +200,7 @@ export function AppShell() {
         <p className="relay-mono">Current mode · {demo.data?.weather_mode || health.data?.weather_mode || 'checking'}</p>
       </Drawer>
     </div>
+    </RelayNavigationContext.Provider>
   )
 }
 

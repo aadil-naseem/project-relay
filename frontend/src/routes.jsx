@@ -1,7 +1,12 @@
+import { lazy, Suspense } from 'react'
 import { createBrowserRouter } from 'react-router-dom'
 import { AppShell } from './app/AppShell'
 import { PlaceholderRoute } from './app/PlaceholderRoute'
-import ComponentKit from './pages/Kit/ComponentKit'
+import Desk from './pages/Desk/Desk'
+
+// Route configuration is intentionally a non-component export in this module.
+// oxlint-disable-next-line react/only-export-components
+const ComponentKit = lazy(() => import('./pages/Kit/ComponentKit'))
 
 const appScreens = [
   { path: '', number: 'S1', title: 'Desk', route: '/app' },
@@ -28,9 +33,11 @@ export const router = createBrowserRouter([
     children: [
       ...appScreens.map((screen) => ({
         ...(screen.path ? { path: screen.path } : { index: true }),
-        element: <PlaceholderRoute number={screen.number} title={screen.title} route={screen.route} />,
+        element: screen.path === ''
+          ? <Desk />
+          : <PlaceholderRoute number={screen.number} title={screen.title} route={screen.route} />,
       })),
-      { path: '_kit', element: <ComponentKit /> },
+      { path: '_kit', element: <Suspense fallback={<div className="f0-content">Loading component kit…</div>}><ComponentKit /></Suspense> },
       { path: '*', element: <PlaceholderRoute number="S10" title="Line not found" route="*" /> },
     ],
   },

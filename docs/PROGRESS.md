@@ -31,7 +31,7 @@ Technical Phase 14 is intentionally deferred per user direction; do not mark it 
 - [x] F0 Foundations
 - [x] F1 Component library
 - [x] F2 App shell, navigation, shutter
-- [ ] F3 Desk
+- [x] F3 Desk
 - [ ] F3 Exposure
 - [ ] F4 Weak Points
 - [ ] F4 What-if
@@ -225,6 +225,15 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Added command palette on `/` or Ctrl/Cmd+K with route navigation, Stage Controls entry, and Reset demo action; Escape closes. The Stage drawer remains intentionally a placeholder until F7.
 - F2 browser smoke: shell and health status render, backend health request 200, command palette opens, hotkey `2` navigates to Weak Points, no console errors. All F0 API/test/lint gates remain green.
 - F2 screenshot capture was attempted but the browser tool reported the tab was not visible; no screenshot is claimed for this phase.
+
+### Frontend F3-S1 Desk - DONE (commit pending)
+- Replaced the S1 `/app` placeholder with the live Desk: alert banner and Start Recovery / See Test actions, 24/48/72 readiness ring + breakdown drawer, KPI odometers, top-3 SPOFs, rain dimension-line fallback, calc-log drawer, next-best actions, and Leaflet mini-map with risk-coded site markers and route-risk summaries.
+- Data comes from the live dashboard, readiness, actions, exposure, exposure-map, and stress-test endpoints via TanStack Query. The primary CTA selects the highest-value at-risk order from the auto stress result, creates the recovery request, then navigates through the shutter.
+- Honest API gaps handled explicitly: hourly rain samples are unavailable, so the Desk shows max-24h and onset callouts rather than invented bars; route geometry and zone geometry are not in the current map response, so the mini-map shows site markers and route risk summaries and states that route geometry is unavailable. OSM tile errors retain markers and report tile degradation.
+- Browser verification against replay data: SEVERE owner alert at T+23 h, readiness 50 / weighted 53.9, KPIs ₹39.5 L / 6 at-risk / 2 no-fallback / 1 stale, heat vendor → grinder → EN24 supplier SPOFs, Hosur +17 point action, map and routes shown; no browser console errors. Clicked Start recovery request: it created a request for the highest-value at-risk order (`ord_101`) and navigated to the recovery detail placeholder. Demo reset performed after the smoke run.
+- F3 Desk gates: `npm test` 6/6, `npm run lint`, `npm run lint:palette`, `npm run build` passed. Leaflet is lazy-loaded as its own chunk.
+- Screenshot capture was attempted; the browser tool reported the tab was not visible. No screenshot is claimed for this subphase.
+- **Next subphase: F3 Exposure. Do not start it until user confirmation.**
 - No functional screen layout has been built. Next planned screen is S1 Desk (F3 split into Desk and Exposure); complete Desk, show it for review, then wait for user confirmation before beginning Exposure.
 
 ### Phase 12 - DONE (commit 0ef204b, pushed)

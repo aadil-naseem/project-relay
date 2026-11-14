@@ -122,7 +122,7 @@ export function ReadinessRing({ score = 0, weighted, size = 148 }) {
   )
 }
 
-export function AlertBanner({ level = 'HIGH', headline, onset, action, onAction }) {
+export function AlertBanner({ level = 'HIGH', headline, onset, action, onAction, disabled = false }) {
   return (
     <Frame className={`relay-alert relay-alert--${String(level).toLowerCase()}`}>
       <div className="relay-alert__copy">
@@ -130,7 +130,7 @@ export function AlertBanner({ level = 'HIGH', headline, onset, action, onAction 
         <strong>{headline || 'Risk indicator: review the affected sites and orders.'}</strong>
         {onset !== undefined && <span className="relay-mono">ONSET T+{onset}h</span>}
       </div>
-      {action && <Button onClick={onAction}>{action}</Button>}
+      {action && <Button disabled={disabled} onClick={onAction}>{action}</Button>}
     </Frame>
   )
 }
