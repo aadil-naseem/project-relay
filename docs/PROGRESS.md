@@ -6,7 +6,7 @@ Phase tracker. Updated at the end of every phase (R11).
 
 - [x] Phase 0  Environment & E: drive
 - [x] Phase 1  Backend skeleton
-- [ ] Phase 2  Data model & catalogues
+- [x] Phase 2  Data model & catalogues
 - [ ] Phase 3  Demo world & seeding
 - [ ] Phase 4  Real-data prefetch
 - [ ] Phase 5  M1 API
@@ -43,7 +43,7 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 ## Open questions carried forward
 
 - `docs/03_FRONTEND_PLAN.md` was never supplied. Phases 15-17 therefore build the **basic** UI only; the 3D scroll landing remains unplanned.
-- Zone membership has two possible sources of truth (`factories.hazard_zone_id` vs `site_terrain.zone_ids`). Pin this in Phase 2.
+- Zone membership source of truth pinned in Phase 2: `factories.hazard_zone_id` (and vendors/suppliers alike) is authoritative; `site_terrain.zone_ids` is derived at prefetch time only.
 
 ## Phase log
 
@@ -78,3 +78,14 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Done-when: uvicorn serves `/docs` (200) and `/api/v1/health` (status ok, db ok, weather_mode replay, both vision providers configured); pytest green; ruff clean.
 
 **Lessons recorded for later phases:** YAML parses unquoted ISO timestamps as datetime (model now typed `datetime`) and unquoted commas inside flow mappings split keys (quote strings with commas). Numeric-looking material aliases must be quoted.
+
+### Phase 2 - DONE (commit 633f6d4, pushed)
+- `enums.py` per section 6 plus extras the data model needs: Trigger, VendorKind, PassportStatus, ShareLevel. `RiskLevel.from_score` carries the bands (LOW < 25, MODERATE < 50, HIGH < 75, SEVERE >= 75).
+- All 22 ORM tables in `app/models/`: factory aggregate (factories, machines, vendors, vendor_links), parts spine (parts, part_steps, orders), passports (passports, rfqs, passport_shares), relationships (backup_relationships, relationship_checks), hazard facts (hazard_zones, site_terrain, routes), computed stores (forecast_cache, exposure_snapshots, stress_tests, readiness_snapshots), recovery (recovery_requests, recovery_steps), app_state.
+- `parts.passport_id <-> passports.part_id` cycle solved with `use_alter=True, ondelete="SET NULL"` on both sides; insert ordering consequence handled (passport committed before parts reference it).
+- Pydantic schemas for every section 8 endpoint (shapes only; routers are Phase 5+). Uniform error envelope and TraceEntry in `schemas/common.py`.
+- `scripts/init_db.py` (with sys.path bootstrap): builds all 22 tables against `backend/data/fcd.sqlite`, WAL verified.
+- Tests: 46 passing (enum coverage, full write->read round trips through real schema, FK enforcement, table-set equality). Ruff clean. Server boots with models loaded.
+- Done-when: `init_db.py` creates 22 tables; WAL on, foreign_keys on through the app engine; pytest green; ruff clean; `/api/v1/health` ok.
+
+**Lessons recorded for later phases:** SQLite PRAGMAs are per-connection - the engine's connect listener sets them, so a raw `sqlite3.connect` shows foreign_keys=0 (not a bug). `use_alter` FKs are excluded from insert ordering, so seed/test code must commit the referenced row first. Scripts need `sys.path.insert(0, backend)` to import `app` when run as files.
