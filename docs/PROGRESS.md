@@ -248,7 +248,7 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Browser smoke against the live backend: ranks heat vendor ₹19 L, grinder ₹12 L, EN24 supplier ₹12 L, drill/tap ₹9.5 L; Pull the plug on the vendor highlights ord_101 + ord_106; What-if link carries `RESOURCE_DOWN&resource_id=ven_heat`. No console errors.
 - `npm test` 6/6; lint, palette lint, and production build pass. User reviewed the uploaded Weak Points screenshot in chat; the browser screenshot tool could not save a local artifact. Hold before What-if until user confirmation.
 
-### Frontend F4-S5 What-if - DONE (commit pending; user screenshot reviewed)
+### Frontend F4-S5 What-if - DONE (commit 0477781, pushed; user screenshot reviewed)
 - Replaced the S5 placeholder with the disruption form: all five hazards, zone/cluster/grid/site/current-alert/resource scopes, curated-zone map picker, start-in and duration controls. Scope options use the committed seed/config views and live exposure/SPOF responses.
 - Result view renders stress headline, at-risk/revenue/no-fallback metrics, SVG shift chart with baseline and stressed finish bars, due flags and hatched downtime band, and order rows with state/fallback/best-backup plus Open Recovery.
 - `/app/what-if/:id` loads an existing stress test as **AUTO TEST · READ ONLY** with no Run button; the Desk and Weak Points deep links retain their IDs/parameters. Recovery actions prefill the matching order from the source stress test.
