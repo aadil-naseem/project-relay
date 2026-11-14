@@ -125,3 +125,13 @@ Vision accuracy on the probe image: returned `shape=shaft`, `material=EN24`, `di
 | Depression constant recalibrated (Phase 9) | **CHANGED in config, not code** | `config/exposure.yaml` `depression_full_m: 3.0 -> 5.0`. The SIPCOT plateau sites dip ~3 m below their ring mean at 50+ m elevation without flooding, while the flooded floodplain estates sit 4-5 m low; at 3.0 the plateau dips saturated the depression term. Effect: back-test separation **+12 -> +22**; owner 98 -> 96 (SEVERE, alert unchanged); Oragadam 58 -> 48. Recorded because M6's correlated-risk exclusion uses the alert threshold |
 | Back-test | **PASS, +22 points** | see `docs/BACKTEST_EXPOSURE.md`. Flooded: Thirumudivakkam 78, Ambattur north 73, Villivakkam 70, Perungudi 70. Not flooded: Oragadam 48, Irungattukottai 29, Pillaipakkam 28. Water distances are real OSM measurements (flooded sites 0-330 m from water; not-flooded 683-1495 m) and were **added after the first run** (which passed at +5 with water unknown); the depression recalibration (Phase 9) raised the margin to +22 - so the result is not an artefact of tuning |
 | Owner exposure in replay | VERIFIED | site risk **96 SEVERE**, hazard 1.00, vulnerability 0.95, max 24 h 242.3 mm, onset 23 h, wet spell 21 h; Oragadam 48 (MODERATE) - lower than Ambattur and below the alert threshold, so the hero backup stays viable (Phase 9 invariant 4) |
+
+## Phase 12 passport / vision (verified 2026-11-14)
+
+| Item | Status | Notes |
+|---|---|---|
+| Gemini vision accuracy on the sample drawings | **VERIFIED live, 100% (18/18)** | title-block fields (part, dwg no, rev, customer, qty, material) on all 3 PNGs; latency 2.6-3.5 s per call (faster than the Phase 0 probe suggested). Report: `docs/TEST_REPORT.md` |
+| Golden cache | VERIFIED | 3 committed files in `data/golden/<sha>.json` (one per sample PNG), produced by real Gemini calls via `scripts/pregen_golden.py`; cache extraction measured at **16 ms** (< 3 s budget) |
+| Rules-only accuracy | **VERIFIED >= 80%** | vector PDFs with text layer; all core fields found on all 3 drawings; tightest tolerances 0.02 / 0.005 / 0.05 mm exact; test enforces the >= 80% gate |
+| Merge behaviour with real data | VERIFIED | the pump-shaft tolerance disagreement (+0.02/-0.00: rules 0.02, vision 0.0) follows the table: LOW + both candidates + rules default |
+| Tests never touch the network or the committed cache | BY DESIGN | golden writes go to `FCD_GOLDEN_WRITE_DIR` (temp) in tests; Gemini `available()` is monkeypatched off; transport tests use respx; the live accuracy test is excluded by default (`-m 'not live'` opt-in) |
