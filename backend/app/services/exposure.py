@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from datetime import timedelta
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.adapters import weather
@@ -365,11 +366,19 @@ def compute_exposure(session: Session, factory_id: str, mode: str | None = None)
     existing = session.get(ExposureSnapshot, snapshot.id)
     if existing is None:
         session.add(snapshot)
+        try:
+            session.commit()
+        except IntegrityError:
+            # Concurrent dashboard requests can compute the same deterministic
+            # snapshot. Keep the winner and continue with the same calculation.
+            session.rollback()
+            if session.get(ExposureSnapshot, snapshot.id) is None:
+                raise
     else:
         existing.result = snapshot.result
         existing.alert = snapshot.alert
         existing.computed_at = computed_at
-    session.commit()
+        session.commit()
 
     return ExposureResult(
         factory_id=factory_id,

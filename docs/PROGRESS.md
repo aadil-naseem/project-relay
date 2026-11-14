@@ -18,7 +18,7 @@ Phase tracker. Updated at the end of every phase (R11).
 - [x] Phase 11 M7/M9/M10
 - [x] Phase 12 M2 Passport + RFQ
 - [x] Phase 13 Orchestration
-- [ ] Phase 14 BACKEND TEST GATE
+- [x] Phase 14 BACKEND TEST GATE (required suites and C: audit passed; `backend-v1` tagged)
 - [ ] Phase 15 Frontend setup
 - [ ] Phase 16 Frontend screens
 - [ ] Phase 17 Integration test
@@ -26,7 +26,7 @@ Phase tracker. Updated at the end of every phase (R11).
 
 ## Frontend planner subphases
 
-Technical Phase 14 is intentionally deferred per user direction; do not mark it green or create `backend-v1` until its test gate passes. Frontend work is proceeding against the existing API contract. The backend gate and integration/failure testing remain required before final rehearsal.
+Phase 14 was initially deferred by user choice. The user later authorized it; suites A–K and M passed and `backend-v1` was tagged on 2026-11-15. F11 integration, snapshot capture, performance and final rehearsal remain pending.
 
 - [x] F0 Foundations
 - [x] F1 Component library
@@ -40,9 +40,19 @@ Technical Phase 14 is intentionally deferred per user direction; do not mark it 
 - [x] F6 Passports & RFQ
 - [ ] F7 Stage Controls, Presenter, Proof, System (S9/S8/S10 reviewed; snapshot pack/capture deferred to F11)
 - [ ] F8 Landing hero (visual review done; 50+ fps measurement deferred to F11)
-- [ ] F9 Landing scroll story
+- [ ] F9 Landing scroll story (implementation in progress; paused at user request while Phase 14 was completed)
 - [ ] F10 Persistent world backdrop (stretch)
 - [ ] F11 Integration, performance, rehearsal, freeze
+
+## Required-first completion plan (user direction 2026-11-15)
+
+1. **Phase 14 closeout — DONE:** suites A–K and M passed; `docs/TEST_REPORT.md` and `docs/openapi.snapshot.json` committed/pushed; `backend-v1` tagged. Optional suite L was not run.
+2. **F9 Landing scroll story:** implementation is in the working tree but paused and unreviewed; finish visual review, fixes, commit and push.
+3. **Snapshot safety net:** in F11, capture the replay snapshot pack and wire read-only snapshot mode/System action.
+4. **Phase 17 integration:** run frontend/backend integration and failure-injection checks; record results.
+5. **Phase 18 freeze/submission:** performance and accessibility pass, rehearsal, final screenshots and submission freeze.
+
+After those required items, handle remaining optional work: F10 persistent world backdrop (stretch/cuttable), optional live provider smoke (L), and a captured hero poster if useful. F8's 50+ fps target is measured in the required F11 performance pass.
 
 ## Decisions and deviations from the blueprint
 
@@ -50,7 +60,8 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 
 | # | Blueprint says | What we did | Why |
 |---|---|---|---|
-| D10 | Frontend Planner FR2: Phase 14 backend gate passes and `backend-v1` is tagged before F0 | Per user direction, Phase 14 is deferred; frontend is proceeding against the current API contract. No `backend-v1` tag has been created | User chose to pause backend work and build the frontend now. The Phase 14 gate remains required before integration/rehearsal |
+| D10 | Frontend Planner FR2: Phase 14 backend gate passes and `backend-v1` is tagged before F0 | The frontend proceeded against the existing API contract while Phase 14 was deferred; the user later authorized it, and the gate passed | The user initially chose to build frontend screens first, then explicitly reauthorized the backend gate |
+| D11 | Phase 14 / `backend-v1` | Suites A–K and M passed on 2026-11-15; optional live suite L was not run. Tag `backend-v1` points at the Phase 14 completion commit | Phase 14 was explicitly reauthorized by the user; see `docs/TEST_REPORT.md` |
 | D1 | Root at `E:\Projects\factory-continuity-desk\` | Root at `E:\VihaanX-Build\` | User decision at kickoff. `.env.example` `DATABASE_URL` rewritten to match. No other path assumptions in code (all paths resolved via `pathlib`) |
 | D2 | Python 3.12 installed to `E:\Python312` | Kept existing `C:\Users\Aadil\AppData\Local\Programs\Python\Python312` (3.12.10) | Reinstalling the interpreter mid-event adds risk with no real gain: the bulk (venv + site-packages) is on E:, which is what the C: rule is protecting |
 | D3 | Ollama optional, models on `E:\dev-cache\ollama` | Ollama dropped | E: has 13.3 GB free; a vision model would consume most of the remaining headroom. Provider chain runs cache -> Gemini -> text rules -> manual |
@@ -278,7 +289,7 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Passport editor shows confidence/source per field, low-confidence disagreements and candidate picking, editable dimensions, route/material fields, missing-confirm requirements, and planner-cycle-time caveat. Confirmation calls backend and links the created part; edit changes are saved as user-confirmed.
 - Confirmed passports show owner original and API-redacted RFQ sheets, redaction report, opaque `rfq_ref`, and RFQ/FULL share controls. FULL requires the explicit customer-permission dialog.
 - Browser smoke using the local golden Pump shaft PNG: extraction returned in 1 ms, confirm created a part, RFQ redaction hid customer/drawing/part identifiers, structured and printable RFQ refs now render consistently in the UI, share consent dialog is present. No live Gemini call was made.
-- **Backend mismatch discovered for Phase 14:** current API can generate different random RFQ refs for `RfqOut.rfq_ref` and the rendered `RfqOut.text`. The frontend normalizes the displayed printable copy to the structured ref; log and fix at the deferred backend gate, not via a provider retry.
+- **Backend mismatch fixed in Phase 14:** the RFQ builder now supplies one opaque reference to both the JSON field and printable text; regression tests enforce equality.
 - `npm test` 6/6; lint, palette lint, build pass. User-reviewed 1366×768 screenshot shows sample tray, drawing sheet, confidence/source fields, review state, and consent workflow; no visual blocker. Screenshot is available in chat, not in the repo's docs/screens folder.
 - Passports & RFQ was the last functional screen before the user authorized F7 Stage Controls & Presenter. Proof & Method and System were subsequently authorized and reviewed.
 
@@ -289,29 +300,29 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Browser smoke: weather replay/synthetic switching; reset confirmation cancel; `R` called `POST /demo/reset` (200) and returned to Desk/step 1; presenter advanced through What-if, Recovery and Partners; `H` hid/restored the strip; accessibility/scene toggles applied and were restored to defaults. Stage readouts were healthy, and the reloaded browser had no console errors.
 - User-reviewed screenshots show the Stage drawer hierarchy/readouts and Presenter strip; the drawer’s bottom controls were made scrollable after review. A reset-state mismatch found in the strip screenshot was corrected.
 - `npm test` 6/6; `npm run lint`, `npm run lint:palette`, and `npm run build` pass.
-- F7 screen implementations S9, S8 and S10 are reviewed. Snapshot data/capture remains pending for F11, so the F7 checkbox stays open. Phase 14 remains deferred.
+- F7 screen implementations S9, S8 and S10 are reviewed. Snapshot data/capture remains pending for F11, so the F7 checkbox stays open. Phase 14 required test suites have passed; report/tag closeout is pending.
 
 ### Frontend F7-S8 Proof & Method - DONE (screenshot reviewed)
 - Replaced the `/app/proof` placeholder with the Michaung exposure back-test table and score bars, four deterministic method summaries (exposure, weak points, matching, readiness), drawing-AI boundary, limits and data sources, and the six brief glossary terms. The Exposure CTA opens the screen with the live trace.
 - Copied the seven sites and +22-point separation from the existing `docs/BACKTEST_EXPOSURE.md` report into static `frontend/src/data/backtest.json`; added a data integrity test. The page labels this as the existing M4 back-test, not the deferred Phase 14 integration gate, and notes that it is a small curated comparison rather than blind validation.
 - User-reviewed screenshot at 2000×1000 shows the result, ranking bars/table, caveat, and start of the method cards clearly; no visual blocker.
 - `npm test` 7/7; `npm run lint`, `npm run lint:palette`, and `npm run build` pass. Browser route/link smoke passed with no console errors.
-- System screens (S10) remain unstarted at this point in the log. Wait for user confirmation before beginning them. Phase 14 remains deferred.
+- System screens (S10) were unstarted at this point in the log; they were later implemented and user-confirmed. Phase 14 required test suites have passed.
 
 ### Frontend F7-S10 System screens - DONE (user confirmed)
 - Replaced both nested and app-wide unknown-route placeholders with the “Line not found” relay-contact screen and Back to Desk action.
 - Added an AppShell health-error boundary for the full-page “Can’t reach the server” state with Retry. “Open saved snapshot” is present but disabled because no snapshot pack exists in this build; capture/read-only snapshot wiring remains scheduled for F11.
 - Offline map-tile badges and vector/site-marker fallbacks were already implemented in Desk and Exposure; they remain intact.
 - Browser smoke: nested and global 404 routes render and Back to Desk works; an isolated dev server pointed at an unreachable API showed the backend-unavailable page and the unavailable-snapshot explanation. User confirmed the System screens work as expected.
-- `npm test` 7/7; lint, palette lint and build pass. Phase 14 remains deferred.
+- `npm test` 7/7; lint, palette lint and build pass. Phase 14 required test suites have passed.
 
 ### Frontend F8 Landing hero - VISUAL SCREEN DONE (screenshot reviewed)
 - Replaced `/` with the F8 hero: transparent nav, layered “FIND WHERE YOU BREAK” typography, serif subline, skyline, gantry crane, factory-bay grid with one lit bay, rain, chapter rail and anchored callout cards.
 - Hero metrics come from the live dashboard and its auto stress test. When those calls fail, `src/data/story.fallback.json` supplies the previously verified replay values and the UI labels them “SAVED REPLAY · NOT LIVE”; this is not the full read-only snapshot pack.
 - CSS/SVG hero is the static fallback. The procedural R3F scene is a separate lazy chunk and is selected by scene preference, device size, reduced-motion and WebGL support. `?tier=static` renders without requesting the scene chunk; a forced full-tier browser smoke mounted the WebGL canvas without console errors.
-- User screenshot review requested brighter background; increased yard/facade contrast, grid visibility and 3D fill light. The refreshed screenshot shows the yard and lit bay clearly. “Watch the story” explains that scroll chapters arrive in F9; F9 has not started.
+- User screenshot review requested brighter background; increased yard/facade contrast, grid visibility and 3D fill light. The refreshed screenshot shows the yard and lit bay clearly. “Watch the story” explains that scroll chapters arrive in F9; F9 implementation began and is now held at the user’s request during Phase 14 closeout.
 - `npm test` 10/10; lint, palette lint and build pass. Vite reports the lazy HeroScene chunk at about 244 KB gzip; retain for the F11 performance pass. The 50+ fps budget remains unmeasured.
-- Static fallback is procedural CSS/SVG rather than a captured `poster-hero.webp`; no poster capture was claimed. Phase 14 remains deferred.
+- Static fallback is procedural CSS/SVG rather than a captured `poster-hero.webp`; no poster capture was claimed. Poster/performance polish remains in F11.
 
 ### Phase 12 - DONE (commit 0ef204b, pushed)
 - `scripts/make_sample_drawings.py`: 3 vector PDFs WITH text layers + 200-DPI PNGs (longest side <= 2000 px) + one deliberately messy variant (rotated 90 deg, contrast 0.45); title blocks with fictional customers; `expected.json` ground truth per drawing. Synthetic only - free-tier provider inputs may be stored by the provider (R9).
@@ -325,9 +336,18 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Live accuracy (task 9, `-m live` opt-in, excluded by default via addopts `-m 'not live'`): **100% (18/18) title-block fields, 2.6-3.5 s per drawing** -> `docs/TEST_REPORT.md`.
 - Done-when: golden cache pre-generated for all 3 sample drawings (committed), cached extraction 16 ms, rules-only >= 80%, RFQ leak test green, consent gate 403 - the demo never depends on the network for vision.
 
-### Phase 13 - DONE (commit ca0a4cd, pushed) - TESTS DEFERRED TO PHASE 14 PER USER DECISION
+### Phase 13 - DONE (commit ca0a4cd, pushed; Phase 14 tests were deferred at the time)
 - `services/dashboard.py` implements the section 8.1 auto-run contract in order: exposure for owner + vendors + partners (TTL-cached weather, snapshot written) -> if alert, run or reuse the AUTO stress test (idempotent on factory_id + forecast_hash) -> top 3 SPOFs -> readiness 24/48/72 with the headline at the default window -> stale-partner count. One payload: factory, data_label SIMULATED SAMPLE, weather (mode/source/degraded/attribution), readiness {headline, windows}, alert {active, headline, onset, stress_test_id, cta=START_RECOVERY}, spof_top, exposure_summary (owner risk, routes, per-site risks), stale_partners.
 - `api/dashboard.py`: GET /dashboard/{id} (409 NOT_AN_OWNER for partners) and POST /demo/reset (calls `reset_demo()`, clears the weather TTL cache, returns DemoStateOut; POST /demo/mode and GET /demo/state already live in the exposure router from Phase 7).
-- Verified live: dashboard fires the alert (SEVERE, onset 23 h, headline text) with the auto stress test attached (deterministic id `str_auto_ff38b47a8b5aba43_fac_owner`), readiness 50.0/53.9 with windows 0/53.9/53.9, SPOF top 3 = heat vendor / grinder / EN24 supplier, 1 stale partner; POST /demo/reset rebuilds and the dashboard reproduces identically (same auto-stress id) - the section 9 invariant 7 behaviour, to be asserted properly in Phase 14.
+- Verified live: dashboard fires the alert (SEVERE, onset 23 h, headline text) with the auto stress test attached (deterministic id `str_auto_ff38b47a8b5aba43_fac_owner`), readiness 50.0/53.9 with windows 0/53.9/53.9, SPOF top 3 = heat vendor / grinder / EN24 supplier, 1 stale partner; POST /demo/reset rebuilds and the dashboard reproduces identically (same auto-stress id), now asserted in Phase 14.
 - One schema lesson fixed live: the strict DashboardOut rejected an extra replay_event key - keep the payload exactly per schema; demo state carries the event name.
-- Backend is feature-complete through the section 8 contract: health, M1 CRUD + relationships, M3 SPOF, M4 exposure/map, M5 stress, M6 matching, M7/M9/M10 recovery + handover + stepper, M2 passports + RFQ + sharing, M8 readiness, dashboard, demo controls. 258 tests passing; Phase 14 is the dedicated end-to-end gate (dashboard tests + the full 7-step scenario).
+- Backend is feature-complete through the section 8 contract: health, M1 CRUD + relationships, M3 SPOF, M4 exposure/map, M5 stress, M6 matching, M7/M9/M10 recovery + handover + stepper, M2 passports + RFQ + sharing, M8 readiness, dashboard and demo controls. The Phase 14 end-to-end gate has now been run; see the Phase 14 log and `docs/TEST_REPORT.md`.
+
+### Phase 14 - REQUIRED TESTS PASS; COMMIT/TAG CLOSEOUT PENDING
+- Full regression: `271 passed, 1 deselected`; ruff clean. Branch-aware coverage: `app/core` 94%, `app/services` 90%.
+- Suite B OpenAPI path/response-schema checks pass against `docs/openapi.snapshot.json`; key request schemas include examples. `backend/README.md` documents run/reset/modes.
+- Suite C runs the complete replay story with Gemini credentials cleared: dashboard/auto stress, SPOF, golden passport + RFQ, matching, recovery handover/stepper, and Hosur readiness uplift.
+- Suites D–J and K pass: forecast 500/timeout and cache/replay fallbacks; deleted DB reset; malformed image 422; five identical reset/dashboard cycles; ten parallel dashboard requests with one auto stress row; RFQ/consent and secret-log checks; guarded transitions; +22 Michaung separation; zero-key story.
+- Performance sample: dashboard cold/warm 0.083/0.011 s; manual stress 0.032 s; matching 0.007 s; cached passport 0.025 s.
+- Suite L (live Open-Meteo/Gemini) intentionally not run; it is informational/optional and no provider calls were needed. Suite M E: audit passes; TEMP/TMP are stale in this long-lived process but persisted user paths are on E: and there are no C: cache leaks.
+- Phase14 closeout remains: finalize report/commit, push, then create and push `backend-v1`. F9 frontend work remains uncommitted and paused at the user’s request.

@@ -363,6 +363,7 @@ def test_rfq_leak_test_across_fixtures(client, png_bytes):
         assert rfq["content"]["material"]["grade"] == "EN8"
         assert rfq["redaction_report"]["removed_keys"]
         assert rfq["rfq_ref"].startswith("RFQ-")
+        assert rfq["rfq_ref"] in rfq["text"]
         # stable reference on re-fetch
         again = client.get(f"/api/v1/passports/{passport_id}/rfq").json()
         assert again["rfq_ref"] == rfq["rfq_ref"]

@@ -53,7 +53,10 @@ class DashboardOut(_Out):
 
 
 class DemoModeIn(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={"examples": [{"weather": "replay"}, {"weather": "synthetic"}]},
+    )
 
     weather: str  # live | replay | synthetic
 

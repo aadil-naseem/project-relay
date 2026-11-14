@@ -45,7 +45,18 @@ class RecommendedSet(_Out):
 
 
 class MatchRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={
+            "examples": [
+                {"order_id": "ord_102"},
+                {
+                    "order_id": "ord_102",
+                    "scenario": {"hazard": "FLOOD", "affected_sites": ["fac_owner", "ven_heat"]},
+                },
+            ]
+        },
+    )
 
     order_id: str
     scenario: dict | None = None  # optional scenario override from a stress test

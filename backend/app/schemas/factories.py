@@ -45,6 +45,23 @@ class MachineUpdate(_In):
 
 
 class FactoryCreate(_In):
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={
+            "examples": [
+                {
+                    "role": "PARTNER",
+                    "name": "Sample Partner Works",
+                    "lat": 12.85,
+                    "lon": 79.95,
+                    "cluster_id": "cl_oragadam",
+                    "grid_id": "grid_kanchi_south",
+                    "materials_handled": ["EN8"],
+                }
+            ]
+        },
+    )
+
     role: Role
     name: str
     lat: float
@@ -106,6 +123,21 @@ class PartOut(_Out):
 
 
 class OrderCreate(_In):
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={
+            "examples": [
+                {
+                    "part_id": "prt_b",
+                    "qty": 200,
+                    "due_at": "2026-11-20T09:00:00Z",
+                    "value_inr": 850000,
+                    "customer_alias": "SAMPLE CUSTOMER",
+                }
+            ]
+        },
+    )
+
     part_id: str
     qty: int = Field(ge=1)
     due_at: datetime

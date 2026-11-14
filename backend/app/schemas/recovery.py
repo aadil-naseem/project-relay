@@ -21,6 +21,16 @@ DATA_LABEL = "SIMULATED SAMPLE"
 
 
 class RecoveryCreate(_In):
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={
+            "examples": [
+                {"from_stress_test_id": "str_auto_sample", "order_id": "ord_102"},
+                {"factory_id": "fac_owner", "order_id": "ord_102"},
+            ]
+        },
+    )
+
     # Prefill from an alert: both ids required together (section 7.3).
     from_stress_test_id: str | None = None
     order_id: str | None = None
@@ -55,6 +65,11 @@ class RecoveryOut(_Out):
 
 
 class SelectPartnerIn(_In):
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={"examples": [{"partner_id": "fac_oragadam"}]},
+    )
+
     partner_id: str
 
 

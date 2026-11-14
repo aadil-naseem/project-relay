@@ -51,7 +51,11 @@ def _site_risk(item, isolation: bool) -> SiteRisk:
     )
 
 
-@router.get("/factories/{factory_id}/exposure", response_model=ExposureOut)
+@router.get(
+    "/factories/{factory_id}/exposure",
+    response_model=ExposureOut,
+    summary="Compute site and route exposure",
+)
 def get_exposure(
     factory_id: str,
     mode: str | None = Query(default=None, pattern="^(live|replay|synthetic)$"),
@@ -90,7 +94,11 @@ def get_exposure(
     )
 
 
-@router.get("/exposure/map", response_model=ExposureMapOut)
+@router.get(
+    "/exposure/map",
+    response_model=ExposureMapOut,
+    summary="Compute risk-ranked sites for the map",
+)
 def get_exposure_map(
     mode: str | None = Query(default=None, pattern="^(live|replay|synthetic)$"),
     session: Session = Depends(get_db),
@@ -120,7 +128,11 @@ def get_exposure_map(
     )
 
 
-@router.post("/demo/mode", response_model=DemoStateOut)
+@router.post(
+    "/demo/mode",
+    response_model=DemoStateOut,
+    summary="Set the demo weather mode",
+)
 def post_demo_mode(payload: DemoModeIn, session: Session = Depends(get_db)):
     mode = service.set_mode(session, payload.weather)
     settings = get_settings()
@@ -131,7 +143,11 @@ def post_demo_mode(payload: DemoModeIn, session: Session = Depends(get_db)):
     )
 
 
-@router.get("/demo/state", response_model=DemoStateOut)
+@router.get(
+    "/demo/state",
+    response_model=DemoStateOut,
+    summary="Read current demo mode and sample label",
+)
 def get_demo_state(session: Session = Depends(get_db)):
     settings = get_settings()
     return DemoStateOut(

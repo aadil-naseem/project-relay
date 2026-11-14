@@ -56,18 +56,53 @@ def _mime_for(filename: str, declared: str | None) -> str:
 
 def _prepare(data: bytes, mime: str) -> tuple[str, bytes, str]:
     """(text_layer, image_bytes, image_mime) from the upload (section 7.6 step 2)."""
+    if mime not in {"application/pdf", "image/png", "image/jpeg"}:
+        raise AppError(
+            "INVALID_DOCUMENT",
+            "Upload a PDF, PNG or JPEG drawing.",
+            status_code=422,
+        )
+
     if mime == "application/pdf":
-        doc = pymupdf.open(stream=data, filetype="pdf")
         try:
+            doc = pymupdf.open(stream=data, filetype="pdf")
+        except Exception as error:
+            raise AppError(
+                "INVALID_DOCUMENT",
+                "The uploaded PDF could not be opened.",
+                status_code=422,
+            ) from error
+        try:
+            if doc.page_count < 1:
+                raise AppError("INVALID_DOCUMENT", "The uploaded PDF has no pages.", status_code=422)
             text = doc[0].get_text()
             page = doc[0]
             zoom = min(RENDER_DPI / 72.0, MAX_IMAGE_SIDE / max(page.rect.width, page.rect.height))
             pixmap = page.get_pixmap(matrix=pymupdf.Matrix(zoom, zoom))
             image_bytes = pixmap.tobytes("png")
+        except AppError:
+            raise
+        except Exception as error:
+            raise AppError(
+                "INVALID_DOCUMENT",
+                "The uploaded PDF could not be rendered.",
+                status_code=422,
+            ) from error
         finally:
             doc.close()
         return text, image_bytes, "image/png"
-    # image upload: no text layer (OCR is optional and not installed - honest draft)
+
+    try:
+        image = pymupdf.Pixmap(data)
+        if image.width < 1 or image.height < 1:
+            raise ValueError("empty image dimensions")
+    except Exception as error:
+        raise AppError(
+            "INVALID_DOCUMENT",
+            "The uploaded image is corrupt or unsupported.",
+            status_code=422,
+        ) from error
+    # Image uploads have no text layer (OCR is optional and not installed - honest draft).
     return "", data, mime
 
 
@@ -356,11 +391,12 @@ def rfq_out(session: Session, passport_id: str, partner_id: str | None = None) -
 
     stored = _stored_rfq(session, passport.id)
     if stored is None:
-        content, text, report = redaction.build_rfq(_plain(passport), current=now())
+        rfq_ref = redaction.new_rfq_ref()
+        content, text, report = redaction.build_rfq(_plain(passport), current=now(), rfq_ref=rfq_ref)
         stored = Rfq(
             id=f"rfq_{uuid.uuid4().hex[:10]}",
             passport_id=passport.id,
-            rfq_ref=content.get("rfq_ref") or redaction.new_rfq_ref(),
+            rfq_ref=rfq_ref,
             content={"fields": content, "redaction_report": report},
             text=text,
         )

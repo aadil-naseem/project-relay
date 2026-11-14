@@ -28,6 +28,21 @@ class ScopeIn(_In):
 
 
 class StressCreate(_In):
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={
+            "examples": [
+                {
+                    "factory_id": "fac_owner",
+                    "hazard": "FLOOD",
+                    "scope": {"type": "exposure_alert", "ids": ["fac_owner", "ven_heat"]},
+                    "start_in_hours": 24,
+                    "duration_hours": 72,
+                }
+            ]
+        },
+    )
+
     factory_id: str
     hazard: HazardType
     scope: ScopeIn

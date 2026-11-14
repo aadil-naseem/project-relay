@@ -13,9 +13,11 @@ from __future__ import annotations
 
 import uuid
 from datetime import timedelta
+from threading import Lock
 from typing import Any
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.config_loader import load_configs
@@ -38,6 +40,8 @@ from app.models import (
 )
 from app.schemas.common import TraceEntry
 from app.schemas.stress import OrderImpact, ScopeIn, StressCreate, StressOut, StressSummary
+
+_AUTO_STRESS_LOCK = Lock()
 
 
 def format_inr_short(value: float) -> str:
@@ -464,6 +468,15 @@ def run_auto_for_alert(
     session: Session,
     exposure_snapshot: ExposureSnapshot,
 ) -> StressOut | None:
+    """Serialize auto-run creation in-process; the deterministic ID handles retries."""
+    with _AUTO_STRESS_LOCK:
+        return _run_auto_for_alert(session, exposure_snapshot)
+
+
+def _run_auto_for_alert(
+    session: Session,
+    exposure_snapshot: ExposureSnapshot,
+) -> StressOut | None:
     """Run or reuse the auto stress test triggered by an exposure alert (idempotent)."""
     if not exposure_snapshot.alert:
         return None
@@ -604,7 +617,16 @@ def run_auto_for_alert(
         created_at=current_time,
     )
     session.add(db_row)
-    session.commit()
+    try:
+        session.commit()
+    except IntegrityError:
+        # A second worker may win the same deterministic auto-run between the
+        # lookup above and this insert. Roll back, then return the committed row.
+        session.rollback()
+        existing_row = session.scalar(select(StressTest).where(StressTest.id == test_id))
+        if existing_row is None or not existing_row.result:
+            raise
+        return StressOut(**existing_row.result)
 
     return stress_out
 

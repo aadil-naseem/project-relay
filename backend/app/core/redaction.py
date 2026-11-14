@@ -76,7 +76,12 @@ def _collect_identifying(passport: dict[str, Any]) -> list[str]:
     return needles
 
 
-def build_rfq(passport_plain: dict[str, Any], current: Any = None) -> tuple[dict[str, Any], str, dict[str, Any]]:
+def build_rfq(
+    passport_plain: dict[str, Any],
+    current: Any = None,
+    *,
+    rfq_ref: str | None = None,
+) -> tuple[dict[str, Any], str, dict[str, Any]]:
     """(rfq_content, rfq_text, redaction_report) from the plain passport view."""
     identifying = _collect_identifying(passport_plain)
     content: dict[str, Any] = {}
@@ -150,7 +155,7 @@ def build_rfq(passport_plain: dict[str, Any], current: Any = None) -> tuple[dict
         "scrubbed_text_fields": sorted(set(scrubbed_fields)),
         "kept_keys": kept_keys,
     }
-    rfq_ref = new_rfq_ref()
+    rfq_ref = rfq_ref or new_rfq_ref()
     text = _jinja.get_template("rfq.md.j2").render(
         rfq_ref=rfq_ref,
         content=content,

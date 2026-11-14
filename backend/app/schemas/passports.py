@@ -76,7 +76,15 @@ class RfqOut(_Out):
 
 
 class ShareIn(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={
+            "examples": [
+                {"partner_id": "fac_oragadam", "level": "RFQ"},
+                {"partner_id": "fac_oragadam", "level": "FULL"},
+            ]
+        },
+    )
 
     partner_id: str
     level: str = "RFQ"  # RFQ | FULL

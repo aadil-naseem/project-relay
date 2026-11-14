@@ -12,7 +12,11 @@ from app.services import spof as service
 router = APIRouter(tags=["spof"])
 
 
-@router.get("/factories/{factory_id}/spof", response_model=SpofOut)
+@router.get(
+    "/factories/{factory_id}/spof",
+    response_model=SpofOut,
+    summary="Rank single points of failure and dependency graph",
+)
 def get_spof(factory_id: str, session: Session = Depends(get_db)):
     result, trace = service.compute_spof(session, factory_id)
     return SpofOut(

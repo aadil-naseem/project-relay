@@ -19,12 +19,20 @@ def _out(relationship, session: Session) -> RelationshipOut:
     return data
 
 
-@router.get("/factories/{factory_id}/relationships", response_model=list[RelationshipOut])
+@router.get(
+    "/factories/{factory_id}/relationships",
+    response_model=list[RelationshipOut],
+    summary="List owner backup relationships and effective status",
+)
 def get_relationships(factory_id: str, session: Session = Depends(get_db)):
     return [_out(r, session) for r in service.list_relationships_for_owner(session, factory_id)]
 
 
-@router.get("/relationships/{relationship_id}", response_model=RelationshipOut)
+@router.get(
+    "/relationships/{relationship_id}",
+    response_model=RelationshipOut,
+    summary="Read a backup relationship",
+)
 def get_relationship(relationship_id: str, session: Session = Depends(get_db)):
     return _out(service.get_relationship(session, relationship_id), session)
 

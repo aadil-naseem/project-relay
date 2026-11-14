@@ -23,7 +23,10 @@ def _provider_configured(provider: str, settings: Settings) -> bool:
     return False
 
 
-@router.get("/health")
+@router.get(
+    "/health",
+    summary="Check API, database and configured provider health",
+)
 def health(db: Session = Depends(get_db)) -> dict:
     settings = get_settings()
     try:

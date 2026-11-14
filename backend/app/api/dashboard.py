@@ -15,12 +15,21 @@ from app.settings import get_settings
 router = APIRouter(tags=["dashboard"])
 
 
-@router.get("/dashboard/{factory_id}", response_model=DashboardOut)
+@router.get(
+    "/dashboard/{factory_id}",
+    response_model=DashboardOut,
+    summary="Load the owner continuity dashboard",
+    description="Computes replay/live exposure, auto-runs an idempotent alert stress test, and returns SPOFs and readiness.",
+)
 def get_dashboard(factory_id: str, session: Session = Depends(get_db)):
     return DashboardOut.model_validate(dashboard_service.dashboard_out(session, factory_id))
 
 
-@router.post("/demo/reset", response_model=DemoStateOut)
+@router.post(
+    "/demo/reset",
+    response_model=DemoStateOut,
+    summary="Reset the fictional sample world",
+)
 def post_demo_reset(session: Session = Depends(get_db)):
     """Rebuild the demo world from seed (section 8 Demo row; section 3.4 last-resort DB fallback)."""
     reset_demo()

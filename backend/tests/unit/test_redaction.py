@@ -69,6 +69,18 @@ def test_leak_test_holds_for_json_and_text():
         assert needle not in flat, needle
 
 
+def test_report_reference_matches_printable_rfq_reference():
+    reference = "RFQ-PHASE14"
+    content, text, report = redaction.build_rfq(
+        _passport(),
+        current=datetime(2026, 11, 14, 9, 0, tzinfo=timezone.utc),
+        rfq_ref=reference,
+    )
+    assert reference in text
+    assert "rfq_ref" not in content  # the opaque reference is not a technical field
+    assert "rfq_ref" not in report
+
+
 def test_rfq_ref_is_opaque_and_random():
     ref_a = redaction.new_rfq_ref()
     ref_b = redaction.new_rfq_ref()

@@ -12,7 +12,11 @@ from app.services import matching as matching_service
 router = APIRouter(prefix="/matching", tags=["matching"])
 
 
-@router.post("/search", response_model=MatchingOut)
+@router.post(
+    "/search",
+    response_model=MatchingOut,
+    summary="Find risk-aware backup partners for an order",
+)
 def search_matching_backups(
     body: MatchRequest,
     db: Session = Depends(get_db),

@@ -26,17 +26,17 @@ from app.services import factories as service
 router = APIRouter(tags=["factories"])
 
 
-@router.get("/factories", response_model=FactoryListOut)
+@router.get("/factories", response_model=FactoryListOut, summary="List sample and configured factories")
 def get_factories(session: Session = Depends(get_db)):
     return {"items": [FactoryOut.model_validate(f) for f in service.list_factories(session)]}
 
 
-@router.post("/factories", response_model=FactoryOut, status_code=201)
+@router.post("/factories", response_model=FactoryOut, status_code=201, summary="Create a factory")
 def post_factory(payload: FactoryCreate, session: Session = Depends(get_db)):
     return FactoryOut.model_validate(service.create_factory(session, payload))
 
 
-@router.get("/factories/{factory_id}", response_model=FactoryOut)
+@router.get("/factories/{factory_id}", response_model=FactoryOut, summary="Read a factory")
 def get_factory(factory_id: str, session: Session = Depends(get_db)):
     return FactoryOut.model_validate(service.get_factory(session, factory_id))
 

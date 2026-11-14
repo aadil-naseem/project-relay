@@ -12,7 +12,12 @@ from app.services import stress as stress_service
 router = APIRouter(prefix="/stress-tests", tags=["stress-tests"])
 
 
-@router.post("", response_model=StressOut, status_code=201)
+@router.post(
+    "",
+    response_model=StressOut,
+    status_code=201,
+    summary="Run a what-if production stress test",
+)
 def create_stress_test(
     body: StressCreate,
     db: Session = Depends(get_db),
@@ -21,7 +26,7 @@ def create_stress_test(
     return stress_service.run_manual_stress_test(db, body)
 
 
-@router.get("/{test_id}", response_model=StressOut)
+@router.get("/{test_id}", response_model=StressOut, summary="Read a stress-test result")
 def get_stress_test(
     test_id: str,
     db: Session = Depends(get_db),
