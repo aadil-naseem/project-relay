@@ -7,7 +7,7 @@ Phase tracker. Updated at the end of every phase (R11).
 - [x] Phase 0  Environment & E: drive
 - [x] Phase 1  Backend skeleton
 - [x] Phase 2  Data model & catalogues
-- [ ] Phase 3  Demo world & seeding
+- [x] Phase 3  Demo world & seeding
 - [ ] Phase 4  Real-data prefetch
 - [ ] Phase 5  M1 API
 - [ ] Phase 6  M3 SPOF
@@ -89,3 +89,13 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Done-when: `init_db.py` creates 22 tables; WAL on, foreign_keys on through the app engine; pytest green; ruff clean; `/api/v1/health` ok.
 
 **Lessons recorded for later phases:** SQLite PRAGMAs are per-connection - the engine's connect listener sets them, so a raw `sqlite3.connect` shows foreign_keys=0 (not a bug). `use_alter` FKs are excluded from insert ordering, so seed/test code must commit the referenced row first. Scripts need `sys.path.insert(0, backend)` to import `app` when run as files.
+
+### Phase 3 - DONE (commit d421634, pushed)
+- Seed JSON per section 9 in `backend/data/seed/`: `factories.json` (owner + 6 partners, coordinates matching cluster.yaml), `vendors.json` (ven_heat + sup_steel, both inside the owner's flood zone), `machines.json` (32 machines: owner fleet 3 TURN / 2 MILL / 1 DRILL_TAP / 1 GRIND_CYL +-0.005 = the SPOF; partner fleets sized to the story), `parts.json` (6 parts, 12 steps, routes exactly per the table), `orders.json` (8 orders, `due_in_days`: three worth 2.47M INR due within 5 days behind the storm window), `relationships.json` (6 relationships + 30 checks).
+- Relationship story per Phase 3 task 2: Oragadam READY fresh (~40 d, all checks), Hosur APPROVAL_PENDING missing exactly CUSTOMER_APPROVED + CAPACITY_RECONFIRMED, Peenya READY ~120 d (stale, > 90), Coimbatore POTENTIAL_MATCH (assessment found the tolerance gap, never confirmed), Ambattur neighbour + Guindy READY (exclusion, not status, is the reason they fail invariant 4).
+- `app/demo_seed.py`: loader with fail-fast count validation; relative dates converted against the frozen clock; `seed()` wipes its own tables first (re-runnable, prefetch/runtime tables untouched); `reset_demo()` = drop + create + seed + initial readiness snapshot row (`rdy_initial`); `verify_counts()` for tests/scripts.
+- `scripts/seed.py` (seed into existing schema) and `scripts/reset_demo.py` (one-command reset, checks the < 3 s done-when itself).
+- Tests: 12 new (58 total): counts, is_sample everywhere, relative dates vs frozen clock, reset-twice identical full-table dump, initial snapshot, section 9 story shape, owner fleet, part routes, seed-files vs cluster.yaml consistency (factories + vendors cover every config site).
+- Done-when: `reset_demo.py` runs in **0.09 s** (< 3 s budget) and produces all section 9 entities; ruff clean; server boots.
+
+**Lessons recorded for later phases:** cluster.yaml `sites` includes the vendor and supplier, so "seed factories == config sites" is wrong - the union of factories.json and vendors.json must equal the site list. seed() wiping its own tables (not drop_all) keeps prefetch data safe once Phase 4 lands; `POST /demo/reset` (Phase 13) should call `reset_demo()` which drops everything.
