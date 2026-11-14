@@ -16,6 +16,7 @@ import './styles/base.css'
 import './app/app-shell.css'
 import './pages/Desk/desk.css'
 import './pages/Exposure/exposure.css'
+import './pages/WeakPoints/weak-points.css'
 import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(

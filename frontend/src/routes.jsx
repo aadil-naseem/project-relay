@@ -4,6 +4,7 @@ import { AppShell } from './app/AppShell'
 import { PlaceholderRoute } from './app/PlaceholderRoute'
 import Desk from './pages/Desk/Desk'
 import ExposureRoute from './pages/Exposure/ExposureRoute'
+import WeakPointsRoute from './pages/WeakPoints/WeakPointsRoute'
 
 // Route configuration is intentionally a non-component export in this module.
 // oxlint-disable-next-line react/only-export-components
@@ -11,7 +12,6 @@ const ComponentKit = lazy(() => import('./pages/Kit/ComponentKit'))
 
 const appScreens = [
   { path: '', number: 'S1', title: 'Desk', route: '/app' },
-  { path: 'weak-points', number: 'S2', title: 'Weak Points', route: '/app/weak-points' },
   { path: 'passports', number: 'S4', title: 'Passports', route: '/app/passports' },
   { path: 'passports/:id', number: 'S4', title: 'Passport Detail', route: '/app/passports/:id' },
   { path: 'what-if', number: 'S5', title: 'What-if', route: '/app/what-if' },
@@ -37,6 +37,7 @@ export const router = createBrowserRouter([
           ? <Desk />
           : <PlaceholderRoute number={screen.number} title={screen.title} route={screen.route} />,
       })),
+      { path: 'weak-points', element: <WeakPointsRoute /> },
       { path: 'exposure', element: <ExposureRoute /> },
       { path: '_kit', element: <Suspense fallback={<div className="f0-content">Loading component kit…</div>}><ComponentKit /></Suspense> },
       { path: '*', element: <PlaceholderRoute number="S10" title="Line not found" route="*" /> },

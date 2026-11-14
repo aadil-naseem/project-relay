@@ -33,7 +33,7 @@ Technical Phase 14 is intentionally deferred per user direction; do not mark it 
 - [x] F2 App shell, navigation, shutter
 - [x] F3 Desk
 - [x] F3 Exposure
-- [ ] F4 Weak Points
+- [x] F4 Weak Points
 - [ ] F4 What-if
 - [ ] F5 Recovery
 - [ ] F5 Partners & Readiness
@@ -240,6 +240,13 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - `npm test` 6/6, `npm run lint`, `npm run lint:palette`, `npm run build` all pass. Leaflet map code is lazy-loaded.
 - Visual review found the overlays had been too small at the initial all-site map extent. The initial viewport now focuses on the Chennai storm footprint while the ranked list keeps all sites; selecting a distant site pans to it. User-reviewed screenshot confirms the 5 curated zones and 3 owner routes are now visible.
 - Browser screenshot tool could not save a local artifact (`tab not visible`); the user-provided screenshot was reviewed in chat and is not stored under docs/screens. Do not start F4 until user confirmation.
+
+### Frontend F4-S2 Weak Points - IMPLEMENTED (review pending)
+- Replaced the S2 placeholder with the ranked SPOF list and SVG dependency drawing: active orders → parts → process steps → machines/vendors/suppliers. Order→part edges are joined from the orders endpoint; the remaining links come from the SPOF graph response.
+- Selecting a weak-point row updates its details. **Simulate loss / Pull the plug** uses the backend `orders_broken` result to dim other resources, retract selected-resource edges, and hatch broken orders; Reset restores the graph. “Stress this resource” deep-links to What-if with `hazard=RESOURCE_DOWN&resource_id=...`.
+- Shows exposure markers, affected-order nameplates, revenue at risk, calc log, uncovered requirements separately, and the note that three lathes never appear because two remain.
+- Browser smoke against the live backend: ranks heat vendor ₹19 L, grinder ₹12 L, EN24 supplier ₹12 L, drill/tap ₹9.5 L; Pull the plug on the vendor highlights ord_101 + ord_106; What-if link carries `RESOURCE_DOWN&resource_id=ven_heat`. No console errors.
+- `npm test` 6/6; lint, palette lint, and production build pass. Screenshot capture tool is unavailable; request a manual screenshot for visual review. Hold before What-if until user confirmation.
 
 ### Phase 12 - DONE (commit 0ef204b, pushed)
 - `scripts/make_sample_drawings.py`: 3 vector PDFs WITH text layers + 200-DPI PNGs (longest side <= 2000 px) + one deliberately messy variant (rotated 90 deg, contrast 0.45); title blocks with fictional customers; `expected.json` ground truth per drawing. Synthetic only - free-tier provider inputs may be stored by the provider (R9).
