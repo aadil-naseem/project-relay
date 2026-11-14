@@ -249,7 +249,7 @@
 .landing-final-cta__bay i { position: absolute; right: 7px; bottom: 4px; width: 9px; height: 15px; background: var(--c-sun); box-shadow: 0 0 14px var(--c-sun); }
 .landing-final-cta > div { flex: 1; }
 .landing-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 16px clamp(20px, 7.5vw, 120px); color: var(--c-pale); background: var(--c-deep); font: 8px var(--f-mono); }
-.landing-footer a { color: var(--c-sky); text-underline-offset: 3px; }
+.landing-footer a { color: var(--c-pale); text-underline-offset: 3px; }
 .landing-dive { position: fixed; z-index: 50; inset: 0; transform: scaleY(0); transform-origin: bottom; background: radial-gradient(ellipse at 50% 100%, var(--c-sun), var(--c-ocean) 28%, var(--c-deep) 72%); transition: transform 520ms var(--ease-settle); pointer-events: none; }
 .landing-dive.is-active { transform: scaleY(1); }
 

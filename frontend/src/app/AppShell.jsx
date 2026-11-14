@@ -222,7 +222,7 @@ export function AppShell() {
           </span>
           <StackLight exposure="SEVERE" readiness={54} freshness={demo.data?.weather_mode || 'replay'} />
           <Button variant="ghost" size="small" onClick={() => setStageOpen(true)}>Stage <Kbd>`</Kbd></Button>
-          <Button variant="ghost" size="small" aria-label="Open command palette" onClick={() => setPaletteOpen(true)}><Kbd>⌘K</Kbd></Button>
+          <Button variant="ghost" size="small" aria-label="Open command palette ⌘K" onClick={() => setPaletteOpen(true)}><Kbd>⌘K</Kbd></Button>
         </div>
       </header>
 
