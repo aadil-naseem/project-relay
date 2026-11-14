@@ -36,6 +36,14 @@ class MachineOut(_Out):
     available: bool
 
 
+class MachineUpdate(_In):
+    process: ProcessCode | None = None
+    name: str | None = None
+    achievable_tolerance_mm: float | None = None
+    envelope_mm: float | None = None
+    available: bool | None = None
+
+
 class FactoryCreate(_In):
     role: Role
     name: str
@@ -117,3 +125,15 @@ class OrderOut(_Out):
 
 class FactoryListOut(_Out):
     items: list[FactoryOut]
+
+
+class MachineListOut(_Out):
+    items: list[MachineOut]
+
+
+class PartListOut(_Out):
+    items: list[PartOut]
+
+
+class OrderListOut(_Out):
+    items: list[OrderOut]

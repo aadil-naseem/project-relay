@@ -24,7 +24,9 @@ class RelationshipOut(_Out):
     owner_id: str
     partner_id: str
     status: BackupStatus
-    effective_status: EffectiveStatus  # computed at read time; STALE never stored
+    # default exists only so the ORM row validates before the service overwrites
+    # it with the computed value (STALE is read-time, never stored - section 7.5)
+    effective_status: EffectiveStatus = EffectiveStatus.POTENTIAL_MATCH
     last_confirmed_at: datetime | None
     customer_approval_required: bool
     notes: str | None
