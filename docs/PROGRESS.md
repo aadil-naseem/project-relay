@@ -343,11 +343,11 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - One schema lesson fixed live: the strict DashboardOut rejected an extra replay_event key - keep the payload exactly per schema; demo state carries the event name.
 - Backend is feature-complete through the section 8 contract: health, M1 CRUD + relationships, M3 SPOF, M4 exposure/map, M5 stress, M6 matching, M7/M9/M10 recovery + handover + stepper, M2 passports + RFQ + sharing, M8 readiness, dashboard and demo controls. The Phase 14 end-to-end gate has now been run; see the Phase 14 log and `docs/TEST_REPORT.md`.
 
-### Phase 14 - REQUIRED TESTS PASS; COMMIT/TAG CLOSEOUT PENDING
+### Phase 14 - DONE (commit 70bca53; tag `backend-v1` pushed)
 - Full regression: `271 passed, 1 deselected`; ruff clean. Branch-aware coverage: `app/core` 94%, `app/services` 90%.
 - Suite B OpenAPI path/response-schema checks pass against `docs/openapi.snapshot.json`; key request schemas include examples. `backend/README.md` documents run/reset/modes.
 - Suite C runs the complete replay story with Gemini credentials cleared: dashboard/auto stress, SPOF, golden passport + RFQ, matching, recovery handover/stepper, and Hosur readiness uplift.
 - Suites D–J and K pass: forecast 500/timeout and cache/replay fallbacks; deleted DB reset; malformed image 422; five identical reset/dashboard cycles; ten parallel dashboard requests with one auto stress row; RFQ/consent and secret-log checks; guarded transitions; +22 Michaung separation; zero-key story.
 - Performance sample: dashboard cold/warm 0.083/0.011 s; manual stress 0.032 s; matching 0.007 s; cached passport 0.025 s.
 - Suite L (live Open-Meteo/Gemini) intentionally not run; it is informational/optional and no provider calls were needed. Suite M E: audit passes; TEMP/TMP are stale in this long-lived process but persisted user paths are on E: and there are no C: cache leaks.
-- Phase14 closeout remains: finalize report/commit, push, then create and push `backend-v1`. F9 frontend work remains uncommitted and paused at the user’s request.
+- `docs/TEST_REPORT.md` and `docs/openapi.snapshot.json` are committed. Optional live smoke L was not run; no Gemini/Open-Meteo calls were made. F9 frontend work remains uncommitted and paused at the user’s request.
