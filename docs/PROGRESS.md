@@ -37,6 +37,8 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 | D5 | `npm_config_cache` / `npm_config_prefix` user env vars | Also written to `C:\Users\Aadil\.npmrc` | npm reads `.npmrc`, not the inherited env block, so the env vars alone left npm pointed at `C:\Users\Aadil\AppData\Local\npm-cache` |
 | D6 | Install `requirements-data.txt` (OSMnx) in Phase 0 | Deferred to Phase 4 | Connection is running ~80 kB/s; OSMnx pulls geopandas/pyproj/fiona/scikit-learn (hundreds of MB). It is only needed for the one-time prefetch. If it still fails, the cut order allows site-only exposure |
 | D7 | - | `check_c_drive_leaks.ps1` rewritten to resolve process -> user -> machine | Windows does not push updated user env into an already-running shell, so a naive `$env:` check reports false leaks. Script now distinguishes STALE-PROCESS from LEAK |
+| D8 | `PIP_CACHE_DIR` user env var | Also written to `C:\Users\Aadil\AppData\Roaming\pip\pip.ini` | Same reason as D5: a shell without the env var makes pip fall back to `C:\Users\Aadil\AppData\Local\pip\cache`. **The file must be UTF-8 without BOM** - with a BOM, pip silently outputs nothing and exits 0 |
+| D9 | - | Deleted the pre-existing `C:\...\Local\npm-cache` (5.10 GB) and `C:\...\Local\pip` (0.75 GB) | C: had **0.00 GB free**. After cleanup: **6.36 GB free**. These were caches from before the redirect, not project data |
 
 ## Open questions carried forward
 
