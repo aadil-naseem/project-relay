@@ -34,7 +34,7 @@ Technical Phase 14 is intentionally deferred per user direction; do not mark it 
 - [x] F3 Desk
 - [x] F3 Exposure
 - [x] F4 Weak Points
-- [ ] F4 What-if
+- [x] F4 What-if
 - [ ] F5 Recovery
 - [ ] F5 Partners & Readiness
 - [ ] F6 Passports & RFQ
@@ -247,6 +247,14 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Shows exposure markers, affected-order nameplates, revenue at risk, calc log, uncovered requirements separately, and the note that three lathes never appear because two remain.
 - Browser smoke against the live backend: ranks heat vendor ₹19 L, grinder ₹12 L, EN24 supplier ₹12 L, drill/tap ₹9.5 L; Pull the plug on the vendor highlights ord_101 + ord_106; What-if link carries `RESOURCE_DOWN&resource_id=ven_heat`. No console errors.
 - `npm test` 6/6; lint, palette lint, and production build pass. Screenshot capture tool is unavailable; request a manual screenshot for visual review. Hold before What-if until user confirmation.
+
+### Frontend F4-S5 What-if - DONE (commit pending; screenshot review pending)
+- Replaced the S5 placeholder with the disruption form: all five hazards, zone/cluster/grid/site/current-alert/resource scopes, curated-zone map picker, start-in and duration controls. Scope options use the committed seed/config views and live exposure/SPOF responses.
+- Result view renders stress headline, at-risk/revenue/no-fallback metrics, SVG shift chart with baseline and stressed finish bars, due flags and hatched downtime band, and order rows with state/fallback/best-backup plus Open Recovery.
+- `/app/what-if/:id` loads an existing stress test as **AUTO TEST · READ ONLY** with no Run button; the Desk and Weak Points deep links retain their IDs/parameters. Recovery actions prefill the matching order from the source stress test.
+- Browser smoke: `RESOURCE_DOWN` deep link populated the selected grinder and returned a 1-order/₹12 L/no-fallback result; manual FLOOD zone run returned 4 at-risk orders/₹30.7 L and rendered due/fallback rows; auto test opened read-only; Open Recovery created a prefilled recovery request. Demo reset performed afterwards. No console errors.
+- Gates: `npm test` 6/6; lint, palette lint, build pass. Map/scope zones are explicitly labelled illustrative. Rain samples/hourly scrubber unavailable by API contract; what-if visualization is based on actual baseline/stressed finish timestamps.
+- Screenshot capture still unavailable in browser tooling. Request a manual screenshot for review. Do not start F5 Recovery until user confirmation.
 
 ### Phase 12 - DONE (commit 0ef204b, pushed)
 - `scripts/make_sample_drawings.py`: 3 vector PDFs WITH text layers + 200-DPI PNGs (longest side <= 2000 px) + one deliberately messy variant (rotated 90 deg, contrast 0.45); title blocks with fictional customers; `expected.json` ground truth per drawing. Synthetic only - free-tier provider inputs may be stored by the provider (R9).
