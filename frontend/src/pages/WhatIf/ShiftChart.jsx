@@ -50,11 +50,19 @@ export function ShiftChart({ result, onOpenRecovery }) {
           const baseline = elapsedHours(order.baseline_finish_at, createdAt)
           const stressed = elapsedHours(order.stressed_finish_at, createdAt)
           const due = elapsedHours(order.due_at, createdAt)
+          const overflow = Math.max(0, stressed - MAX_HOURS)
           return (
             <g key={order.order_id} className="whatif-chart__row">
               <text x="12" y={y + 5} className="whatif-chart__order">{order.order_id}</text>
               <rect x={CHART_X} y={y - 12} width={Math.max(2, xAt(baseline) - CHART_X)} height="6" className="whatif-chart__baseline" />
               <rect x={CHART_X} y={y + 1} width={Math.max(2, xAt(stressed) - CHART_X)} height="11" className={order.state === 'LATE' ? 'whatif-chart__bar whatif-chart__bar--late' : 'whatif-chart__bar'} />
+              {overflow > 0 && (
+                <g className="whatif-chart__overflow" aria-label={`${overflow.toFixed(0)} hours beyond chart horizon`}>
+                  <path d={`M ${CHART_X + CHART_W - 2} ${y + 1} l 10 5.5 l -10 5.5 z`} />
+                  <text x={CHART_X + CHART_W + 12} y={y + 9}>+{overflow.toFixed(0)}h</text>
+                  <title>{`${overflow.toFixed(1)} hours beyond T+168`}</title>
+                </g>
+              )}
               <line x1={xAt(due)} x2={xAt(due)} y1={y - 20} y2={y + 18} className="whatif-chart__due" />
               <text x={xAt(due) + 4} y={y - 10} className="whatif-chart__due-label">DUE</text>
               <text x={CHART_X} y={y + 27} className="whatif-chart__detail">

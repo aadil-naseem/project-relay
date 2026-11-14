@@ -58,6 +58,8 @@
 .whatif-chart__baseline { fill: none; stroke: var(--c-cream); stroke-width: 2; }
 .whatif-chart__bar { fill: var(--c-sun); }
 .whatif-chart__bar--late { fill: var(--c-sun); }
+.whatif-chart__overflow path { fill: var(--c-sun); }
+.whatif-chart__overflow text { fill: var(--c-sun); font: 9px var(--f-mono); }
 .whatif-chart__order { fill: var(--c-cream); font: 10px var(--f-mono); }
 .whatif-order-list { display: grid; min-width: 820px; margin-top: 8px; }
 .whatif-order-list article { display: grid; grid-template-columns: auto auto 1fr auto auto 1fr auto; align-items: center; gap: 10px; min-height: 48px; padding: 6px 3px; border-top: 1px solid var(--c-cream-12); color: var(--c-cream); font-size: 11px; }
