@@ -45,15 +45,16 @@
 .relay-horizon > i { position: relative; flex: 1; height: 2px; background: var(--c-sky); }
 .relay-horizon b { position: absolute; top: -4px; width: 10px; height: 10px; border: 2px solid var(--c-deep); background: var(--c-sun); transform: translateX(-50%); }
 
-.relay-readiness { position: relative; display: grid; place-items: center; }
+.relay-readiness { position: relative; display: grid; justify-items: center; gap: 4px; }
+.relay-readiness__face { position: relative; }
 .relay-readiness svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
 .relay-readiness circle { fill: none; stroke-width: 11; }
 .relay-readiness__track { stroke: var(--c-navy); }
 .relay-readiness__gap { stroke: var(--c-gold); stroke-dasharray: 3 4; }
 .relay-readiness__fill { stroke: var(--c-sky); stroke-linecap: square; transition: stroke-dashoffset var(--t-panel) var(--ease-settle); }
-.relay-readiness__value { z-index: 1; color: var(--c-white); font: 700 28px/1 var(--f-display); }
+.relay-readiness__value { position: absolute; inset: 50% auto auto 50%; z-index: 1; width: max-content; color: var(--c-white); font: 700 28px/1 var(--f-display); transform: translate(-50%, -50%); }
 .relay-readiness__value small { font: 12px var(--f-mono); color: var(--c-cream); }
-.relay-readiness__weighted { z-index: 1; align-self: start; margin-top: 58%; color: var(--c-pale); font: 10px var(--f-mono); }
+.relay-readiness__weighted { color: var(--c-pale); font: 10px var(--f-mono); }
 
 .relay-alert { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 20px 24px; border-left: 6px solid var(--c-sun); }
 .relay-alert--severe { border-left-color: var(--c-sun); background: repeating-linear-gradient(135deg, var(--c-midnight) 0 9px, var(--c-navy) 9px 11px); }

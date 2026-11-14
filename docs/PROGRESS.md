@@ -270,6 +270,7 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Circuit uses live relationships and M6 exclusions/reasons, with solid/dashed/hatched paths. Drawer exposes all five checks, reconfirm, and guarded status changes; backend `409 details.missing_checks` is rendered as CANNOT SET READY.
 - “Do it” confirms the counterfactual delta, then completes pending checks + READY or reconfirms. Verified with Hosur: 53.9 → 70.9 weighted (+17); score/history updated. Demo DB reset after smoke run.
 - `npm test` 6/6; lint, palette lint, build pass. User screenshot review pending; no Passports work has started.
+- After the first Partners screenshot review, moved the weighted score label below the ring to prevent overlap with the gauge. The screenshot predates this polish; request an updated capture before marking S7 complete.
 
 ### Phase 12 - DONE (commit 0ef204b, pushed)
 - `scripts/make_sample_drawings.py`: 3 vector PDFs WITH text layers + 200-DPI PNGs (longest side <= 2000 px) + one deliberately messy variant (rotated 90 deg, contrast 0.45); title blocks with fictional customers; `expected.json` ground truth per drawing. Synthetic only - free-tier provider inputs may be stored by the provider (R9).

@@ -109,14 +109,16 @@ export function ReadinessRing({ score = 0, weighted, size = 148 }) {
   const circumference = 2 * Math.PI * radius
   const covered = Math.min(100, Math.max(0, Number(score) || 0))
   return (
-    <div className="relay-readiness" style={{ width: size, height: size }}>
-      <svg viewBox="0 0 140 140" role="img" aria-label={`Readiness ${covered} out of 100`}>
-        <circle className="relay-readiness__track" cx="70" cy="70" r={radius} />
-        <circle className="relay-readiness__gap" cx="70" cy="70" r={radius} />
-        <circle className="relay-readiness__fill" cx="70" cy="70" r={radius}
-          style={{ strokeDasharray: circumference, strokeDashoffset: circumference * (1 - covered / 100) }} />
-      </svg>
-      <span className="relay-readiness__value">{formatOdometerValue(covered)}<small>/100</small></span>
+    <div className="relay-readiness" style={{ width: size }}>
+      <div className="relay-readiness__face" style={{ width: size, height: size }}>
+        <svg viewBox="0 0 140 140" role="img" aria-label={`Readiness ${covered} out of 100`}>
+          <circle className="relay-readiness__track" cx="70" cy="70" r={radius} />
+          <circle className="relay-readiness__gap" cx="70" cy="70" r={radius} />
+          <circle className="relay-readiness__fill" cx="70" cy="70" r={radius}
+            style={{ strokeDasharray: circumference, strokeDashoffset: circumference * (1 - covered / 100) }} />
+        </svg>
+        <span className="relay-readiness__value">{formatOdometerValue(covered)}<small>/100</small></span>
+      </div>
       {weighted !== undefined && <span className="relay-readiness__weighted">weighted {formatOdometerValue(weighted)}</span>}
     </div>
   )

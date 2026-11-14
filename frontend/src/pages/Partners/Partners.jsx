@@ -190,7 +190,7 @@ export default function Partners() {
           {headline && (
             <button type="button" className="partners-readiness__ring" onClick={() => setSelectedPartnerId(null)}>
               <ReadinessRing score={headline.score} weighted={headline.weighted_score} size={172} />
-              <span>Weighted score · {windowHours} h</span>
+              <span>OPEN PART BREAKDOWN · {windowHours} h</span>
             </button>
           )}
           <div className="partners-readiness__windows">
