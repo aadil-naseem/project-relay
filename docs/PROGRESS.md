@@ -5,7 +5,7 @@ Phase tracker. Updated at the end of every phase (R11).
 ## Phases
 
 - [x] Phase 0  Environment & E: drive
-- [ ] Phase 1  Backend skeleton
+- [x] Phase 1  Backend skeleton
 - [ ] Phase 2  Data model & catalogues
 - [ ] Phase 3  Demo world & seeding
 - [ ] Phase 4  Real-data prefetch
@@ -62,3 +62,19 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Outstanding, deliberately deferred: `requirements-data.txt` (OSMnx, D6) and the GitHub remote (D4).
 
 **Phase 0 done-when checklist:** python + node work from E: (PATH) - **PASS**; installs produced no C: leak - **PASS**; repo pushed to GitHub - **NOT DONE** (no `gh`, D4); `.env` has Gemini key - **PASS**; smoke results recorded - **PASS**; folder tree matches section 5 - **PASS**.
+
+### Phase 1 - DONE (commit 2615245)
+- `settings.py`: pydantic-settings reading `backend/.env` resolved from the file location, not CWD; env vars beat .env (pytest depends on this).
+- `db.py`: engine + WAL + FK pragma + `Base` (tables land in Phase 2) + `get_db` dependency + `init_db()`.
+- `core/clock.py`: UTC-aware `now()` with `set_now` / `reset_now` / `frozen_time` for deterministic tests.
+- `core/geo.py`: haversine + point-in-circle.
+- `core/trace.py`: JSON-safe calculation-log builder (recursive stringification).
+- `errors.py`: `AppError` + handlers for AppError / validation (422) / HTTP (404) / unexpected (500), all through `{"error": {code, message, details}}`.
+- `config_loader.py`: all 7 YAMLs load into typed pydantic models with fail-fast validators (weights sum to 1, breakpoints ascending, default window in windows list). Generic aliases validated via `TypeAdapter`.
+- All 7 YAML constants written from section 7 + the demo world (section 9) + back-test sites; replay start 2023-12-03T00:00Z per Phase 0 verification.
+- `api/health.py`: status + db + weather mode + vision chain (cache/gemini configured booleans).
+- `pyproject.toml`: ruff (E4/E7/E9/F/I, line 120) + pytest config + `live` marker.
+- Tests: 27 passing (health, clock, geo, trace, errors, config loader). Test DB on E:, disposed before deletion (Windows file-lock lesson).
+- Done-when: uvicorn serves `/docs` (200) and `/api/v1/health` (status ok, db ok, weather_mode replay, both vision providers configured); pytest green; ruff clean.
+
+**Lessons recorded for later phases:** YAML parses unquoted ISO timestamps as datetime (model now typed `datetime`) and unquoted commas inside flow mappings split keys (quote strings with commas). Numeric-looking material aliases must be quoted.
