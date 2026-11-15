@@ -19,7 +19,9 @@ or the `v1.0` tag.
 ## 1. Backend on Render
 
 1. Render dashboard → **New → Blueprint** → pick this repository.
-2. Render reads `backend/render.yaml` and creates the `relay-api` service.
+2. Render reads `render.yaml` **at the repository root** and creates the
+   `relay-api` service. The service itself is scoped to `backend/` through
+   `rootDir`, so Render only sees the backend.
 3. Set the one unset variable when prompted:
    - `CORS_ORIGINS` = `https://<your-frontend-domain>` (comma-separate extra
      origins, e.g. Vercel preview URLs).
@@ -36,7 +38,8 @@ or the `v1.0` tag.
 
 **Railway instead:** New Project → Deploy from GitHub → set the service **root
 directory** to `backend`, then add the same variables. `backend/railway.json`
-already carries the start command and health check.
+already carries the start command and health check. (Railway, unlike Render,
+does read its config from the service directory.)
 
 ### Backend variables
 
