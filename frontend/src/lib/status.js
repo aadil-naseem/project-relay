@@ -83,7 +83,7 @@ const processName = {
 }
 
 const recoveryStatus = {
-  OPEN: 'Request open',
+  OPEN: 'Open',
   ACTIVE: 'Partner engaged',
   IN_PROGRESS: 'In progress',
   COMPLETE: 'Complete',
