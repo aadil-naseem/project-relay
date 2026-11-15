@@ -1,4 +1,6 @@
 import { useMemo } from 'react'
+import { orderLabel, stepLabel } from '../../lib/status'
+
 const columns = [
   { kind: 'order', label: 'ORDERS' },
   { kind: 'part', label: 'PARTS' },
@@ -9,12 +11,17 @@ const columns = [
 export function DependencyDrawing({ nodes = [], edges = [], orders = [], spofs = [], selectedResourceId, failedOrderIds = [] }) {
   const graph = useMemo(() => {
     const partNodes = nodes.filter((node) => node.kind === 'part').sort((a, b) => a.id.localeCompare(b.id))
-    const stepNodes = nodes.filter((node) => node.kind === 'step').sort((a, b) => a.id.localeCompare(b.id))
+    const stepNodes = nodes
+      .filter((node) => node.kind === 'step')
+      .sort((a, b) => a.id.localeCompare(b.id))
+      .map((node) => ({ ...node, name: stepLabel(node.name) }))
     const resourceNodes = nodes.filter((node) => ['machine', 'vendor', 'supplier'].includes(node.kind)).sort((a, b) => a.name.localeCompare(b.name))
     const orderNodes = orders.map((order) => ({
       id: `order:${order.id}`,
       kind: 'order',
-      name: order.id,
+      // `orderId` keeps the raw id for matching; `name` is what a person reads.
+      orderId: order.id,
+      name: orderLabel(order.id),
       part_id: order.part_id,
       state: order.state,
     }))
@@ -44,7 +51,7 @@ export function DependencyDrawing({ nodes = [], edges = [], orders = [], spofs =
     if (edge.to_node === selectedResourceId) return true
     if (edge.from_node.startsWith('step:') && edge.to_node === selectedResourceId) return true
     const from = graph.positions.get(edge.from_node)?.node
-    return from?.kind === 'order' && failed.has(from.name)
+    return from?.kind === 'order' && failed.has(from.orderId)
   }
 
   return (
@@ -83,7 +90,7 @@ export function DependencyDrawing({ nodes = [], edges = [], orders = [], spofs =
           const { node, x, y } = point
           const isSpof = spofIds.has(id)
           const dimmed = selectedResourceId && node.kind === 'resource' && id !== selectedResourceId
-          const brokenOrder = node.kind === 'order' && failed.has(node.name)
+          const brokenOrder = node.kind === 'order' && failed.has(node.orderId)
           return (
             <g key={id} className={`weak-graph__node weak-graph__node--${node.kind} ${isSpof ? 'is-spof' : ''} ${dimmed ? 'is-dimmed' : ''} ${brokenOrder ? 'is-broken' : ''}`}>
               <rect x={x - 74} y={y - 14} width="148" height="28" fill={brokenOrder ? 'url(#weak-hatch)' : undefined} />

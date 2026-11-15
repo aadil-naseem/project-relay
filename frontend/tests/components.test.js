@@ -1,7 +1,15 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { formatMoney, formatOdometerValue } from '../src/lib/format.js'
-import { statusStyle } from '../src/lib/status.js'
+import {
+  backupStatusLabel,
+  exclusionReasonLabel,
+  hazardName,
+  readinessReasonLabel,
+  recoveryStatusLabel,
+  routeStepLabel,
+  statusStyle,
+} from '../src/lib/status.js'
 
 test('Money formatting uses lakhs and crores', () => {
   assert.equal(formatMoney(2_150_000), '₹21.5 L')
@@ -43,7 +51,20 @@ test('all backup statuses including STALE have distinct textual/shape treatment'
   const items = values.map((value) => statusStyle('backup', value))
   assert.equal(new Set(items.map((item) => item.label)).size, values.length)
   assert.equal(new Set(items.map((item) => item.shape)).size, values.length)
-  assert.equal(statusStyle('backup', 'READY', 'SAME_HAZARD_ZONE').label, 'Excluded: SAME_HAZARD_ZONE')
+  const excluded = statusStyle('backup', 'READY', 'SAME_HAZARD_ZONE')
+  assert.equal(excluded.label, 'Excluded · in the same flood zone as you')
+  assert.ok(!excluded.label.includes('_'), 'exclusion reasons must read as plain language')
+})
+
+test('API reason codes are explained in plain language', () => {
+  assert.equal(exclusionReasonLabel('ALSO_EXPOSED_SAME_EVENT'), 'in the same storm footprint as you')
+  assert.equal(readinessReasonLabel('NO_PARTNER_ELIGIBLE'), 'no capable partner')
+  assert.equal(backupStatusLabel('APPROVAL_PENDING'), 'Approval pending')
+  assert.equal(routeStepLabel('TECHNICAL_AND_CUSTOMER_APPROVALS'), 'Technical and customer approvals')
+  assert.equal(hazardName('ACCESS_BLOCKED'), 'Access blocked')
+  assert.equal(recoveryStatusLabel('ACTIVE'), 'Partner engaged')
+  // Unknown codes still degrade to readable text rather than raw snake_case.
+  assert.equal(exclusionReasonLabel('SOME_NEW_REASON'), 'Some new reason')
 })
 
 test('confidence levels carry distinct signal-bar counts', () => {

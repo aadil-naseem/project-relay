@@ -4,6 +4,7 @@ import { apiRequest } from '../../api/client'
 import { useDashboard, useExposureMap, useOwnerExposure, useReadiness, useReadinessActions, useStressTest } from '../../api/hooks/useDeskData'
 import { AlertBanner, CalcLog, DimensionLine, Money, Odometer, ReadinessRing, RiskPill } from '../../components/domain'
 import { Button, Frame, Nameplate, Segmented, Skeleton, Toast } from '../../components/primitives'
+import { readinessReasonLabel } from '../../lib/status'
 import { useRelayNavigate } from '../../app/navigation'
 import { useUiStore } from '../../store/ui'
 
@@ -142,7 +143,7 @@ export default function Desk() {
             ) : readiness.isLoading ? <Skeleton lines={3} /> : (
               <button className="desk-readiness__button" type="button" onClick={() => setBreakdownOpen(true)}>
                 <ReadinessRing score={score} weighted={weighted} size={160} />
-                <span className="desk-readiness__hint">OPEN PART BREAKDOWN</span>
+                <span className="desk-readiness__hint">OPEN PART-BY-PART BREAKDOWN</span>
               </button>
             )}
           </Frame>
@@ -287,7 +288,7 @@ function BreakdownDrawer({ open, onClose, items }) {
         <ul>{items.map((item) => (
           <li key={item.part_id}>
             <div><strong>{item.part_name}</strong><small>{item.reason || item.detail}</small></div>
-            <span>{item.covered ? `Covered by ${item.covered_by}` : item.reason?.replaceAll('_', ' ')}</span>
+            <span>{item.covered ? `Covered by ${item.covered_by}` : readinessReasonLabel(item.reason)}</span>
           </li>
         ))}</ul>
       </section>

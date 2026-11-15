@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { formatMoney, formatOdometerValue } from '../../lib/format'
-import { statusStyle } from '../../lib/status'
+import { exclusionReasonLabel, routeStepLabel, statusStyle } from '../../lib/status'
 import { Button, Chip, Frame, Nameplate, Stamp } from '../primitives'
 
 export function StatusPill({ kind, value, reason }) {
@@ -43,7 +43,7 @@ export function ConfidenceBars({ value }) {
 }
 
 export function ExcludedReason({ reason }) {
-  return <span className="relay-excluded"><i aria-hidden="true" /> EXCLUDED · {reason || 'CORRELATED RISK'}</span>
+  return <span className="relay-excluded"><i aria-hidden="true" /> Excluded · {exclusionReasonLabel(reason)}</span>
 }
 
 export function DataLabelBadge({ children = 'SAMPLE / SIMULATED' }) {
@@ -119,7 +119,7 @@ export function ReadinessRing({ score = 0, weighted, size = 148 }) {
         </svg>
         <span className="relay-readiness__value">{formatOdometerValue(covered)}<small>/100</small></span>
       </div>
-      {weighted !== undefined && <span className="relay-readiness__weighted">weighted {formatOdometerValue(weighted)}</span>}
+      {weighted !== undefined && <span className="relay-readiness__weighted">weighted score {formatOdometerValue(weighted)}</span>}
     </div>
   )
 }
@@ -227,7 +227,7 @@ export function CandidateCard({ candidate, onSelect }) {
 export function RouteCard({ steps = [], onAdvance }) {
   return (
     <section className="relay-route-card">
-      <ol>{steps.map((step) => <li className={step.state === 'DONE' ? 'is-done' : ''} key={step.step_key}>{step.step_key.replaceAll('_', ' ')}</li>)}</ol>
+      <ol>{steps.map((step) => <li className={step.state === 'DONE' ? 'is-done' : ''} key={step.step_key}>{routeStepLabel(step.step_key)}</li>)}</ol>
       <Button variant="secondary" disabled={!onAdvance} onClick={onAdvance}>Advance simulated step →</Button>
       <small>SIMULATED TRACKING</small>
     </section>

@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { formatMoney } from '../../lib/format'
 import { FallbackShield, OrderStatePill } from '../../components/domain'
+import { orderLabel, orderStateLabel } from '../../lib/status'
 import { Nameplate } from '../../components/primitives'
 
 const CHART_X = 220
@@ -53,7 +54,7 @@ export function ShiftChart({ result, onOpenRecovery, readOnly = false }) {
           const overflow = Math.max(0, stressed - MAX_HOURS)
           return (
             <g key={order.order_id} className="whatif-chart__row">
-              <text x="12" y={y + 5} className="whatif-chart__order">{order.order_id}</text>
+              <text x="12" y={y + 5} className="whatif-chart__order">{orderLabel(order.order_id)}</text>
               <rect x={CHART_X} y={y - 12} width={Math.max(2, xAt(baseline) - CHART_X)} height="6" className="whatif-chart__baseline" />
               <rect x={CHART_X} y={y + 1} width={Math.max(2, xAt(stressed) - CHART_X)} height="11" className={order.state === 'LATE' ? 'whatif-chart__bar whatif-chart__bar--late' : 'whatif-chart__bar'} />
               {overflow > 0 && (
@@ -66,7 +67,7 @@ export function ShiftChart({ result, onOpenRecovery, readOnly = false }) {
               <line x1={xAt(due)} x2={xAt(due)} y1={y - 20} y2={y + 18} className="whatif-chart__due" />
               <text x={xAt(due) + 4} y={y - 10} className="whatif-chart__due-label">DUE</text>
               <text x={CHART_X} y={y + 27} className="whatif-chart__detail">
-                base {baseline.toFixed(0)}h · stressed {stressed.toFixed(0)}h · {order.days_late == null ? order.state : `+${order.days_late.toFixed(1)}d`}
+                base {baseline.toFixed(0)}h · stressed {stressed.toFixed(0)}h · {order.days_late == null ? orderStateLabel(order.state) : `+${order.days_late.toFixed(1)}d`}
               </text>
             </g>
           )
@@ -75,7 +76,7 @@ export function ShiftChart({ result, onOpenRecovery, readOnly = false }) {
       <div className="whatif-order-list">
         {rows.map((order) => (
           <article key={order.order_id}>
-            <Nameplate>{order.order_id}</Nameplate>
+            <Nameplate>{orderLabel(order.order_id)}</Nameplate>
             <OrderStatePill value={order.state} />
             <span>{order.days_late == null ? 'On schedule' : `${order.days_late.toFixed(1)} days late`}</span>
             <span>{formatMoney(order.value_inr)}</span>

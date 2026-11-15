@@ -5,6 +5,7 @@ import { apiRequest } from '../../api/client'
 import { FACTORY_ID } from '../../api/hooks/useDeskData'
 import { BackupStatusPill, ReadinessRing } from '../../components/domain'
 import { Button, Frame, Nameplate, Segmented, Skeleton, Stamp, Toast } from '../../components/primitives'
+import { backupStatusLabel, exclusionReasonLabel, readinessReasonLabel } from '../../lib/status'
 import { useUiStore } from '../../store/ui'
 
 const CHECKS = [
@@ -177,7 +178,7 @@ export default function Partners() {
 
       <Frame className="partners-circuit-frame">
         <header className="partners-section-heading">
-          <div><span className="f0-kicker">RELAY CIRCUIT</span><h2>Owner to backup contacts</h2></div>
+          <div><span className="f0-kicker">BACKUP NETWORK</span><h2>Who can cover your work</h2></div>
           <div className="partners-circuit-legend"><span className="is-ready">━ Ready</span><span className="is-pending">┄ Pending</span><span className="is-excluded">░ Excluded</span></div>
         </header>
         <RelayCircuit partners={partners} onSelect={setSelectedPartnerId} />
@@ -186,13 +187,13 @@ export default function Partners() {
       <section className="partners-panels">
         <Frame className="partners-readiness">
           <header className="partners-section-heading">
-            <div><span className="f0-kicker">COVERED SHARE</span><h2>Readiness</h2></div>
+            <div><span className="f0-kicker">COVERED SHARE</span><h2>Readiness of your parts</h2></div>
             <Segmented label="Readiness window" value={windowHours} onChange={setWindowHours} options={[24, 48, 72]} />
           </header>
           {headline && (
             <button type="button" className="partners-readiness__ring" onClick={() => setSelectedPartnerId(null)}>
               <ReadinessRing score={headline.score} weighted={headline.weighted_score} size={172} />
-              <span>OPEN PART BREAKDOWN · {windowHours} h</span>
+              <span>OPEN PART-BY-PART BREAKDOWN · {windowHours} h</span>
             </button>
           )}
           <div className="partners-readiness__windows">
@@ -205,7 +206,7 @@ export default function Partners() {
               {readiness.data.breakdown.map((item) => (
                 <div key={item.part_id}>
                   <span>{item.covered ? '✓' : '░'}</span><b>{item.part_name}</b>
-                  <small>{item.covered ? `Covered by ${partnerName(partners, item.covered_by)}` : String(item.reason || 'UNASSIGNED').replaceAll('_', ' ')}</small>
+                  <small>{item.covered ? `Covered by ${partnerName(partners, item.covered_by)}` : readinessReasonLabel(item.reason)}</small>
                 </div>
               ))}
             </div>
@@ -213,15 +214,15 @@ export default function Partners() {
         </Frame>
 
         <Frame className="partners-review">
-          <header className="partners-section-heading"><div><span className="f0-kicker">PREPAREDNESS REVIEW</span><h2>Freshness & checks</h2></div></header>
+          <header className="partners-section-heading"><div><span className="f0-kicker">NEEDS ATTENTION</span><h2>Partner confirmations</h2></div></header>
           <div className="partners-counts">
-            <span><b>{counts.ready}</b> READY</span><span><b>{counts.pending}</b> PENDING</span><span><b>{counts.stale}</b> STALE</span>
+            <span><b>{counts.ready}</b> ready</span><span><b>{counts.pending}</b> pending</span><span><b>{counts.stale}</b> needs reconfirming</span>
           </div>
           <div className="partners-review__list">
             {(readiness.data?.review || []).map((item) => (
               <button type="button" key={item.relationship_id} onClick={() => setSelectedPartnerId(item.partner_id)}>
                 <span>{item.effective_status === 'STALE' ? '◷' : item.expiring ? '⌛' : '✓'}</span>
-                <span><b>{item.partner_name}</b><small>{item.effective_status} · {item.days_since_confirm ?? '—'} days since confirmation{item.expiring ? ' · expiring soon' : ''}</small></span>
+                <span><b>{item.partner_name}</b><small>{backupStatusLabel(item.effective_status)} · confirmed {item.days_since_confirm ?? '—'} days ago{item.expiring ? ' · expiring soon' : ''}</small></span>
                 <span className="partners-review__action">REVIEW →</span>
               </button>
             ))}
@@ -240,7 +241,7 @@ export default function Partners() {
         </Frame>
 
         <Frame className="partners-actions">
-          <header className="partners-section-heading"><div><span className="f0-kicker">COUNTERFACTUAL ACTIONS</span><h2>Next best actions</h2></div></header>
+          <header className="partners-section-heading"><div><span className="f0-kicker">WHAT WOULD RAISE YOUR SCORE</span><h2>Next best actions</h2></div></header>
           {actions.isLoading ? <Skeleton lines={3} /> : actions.isError ? (
             <InlineError message={actions.error.message} onRetry={() => actions.refetch()} />
           ) : actions.data?.actions?.length ? actions.data.actions.slice(0, 5).map((action) => (
@@ -251,7 +252,7 @@ export default function Partners() {
             </div>
           )) : <p>No positive-uplift actions at this window.</p>}
           <div className="partners-history">
-            <div className="partners-section-heading"><div><span className="f0-kicker">SCORE HISTORY</span><h2>Earned over time</h2></div></div>
+            <div className="partners-section-heading"><div><span className="f0-kicker">SCORE HISTORY</span><h2>How your readiness changed</h2></div></div>
             {history.isLoading ? <Skeleton lines={3} /> : history.isError ? <InlineError message={history.error.message} onRetry={() => history.refetch()} />
               : <ReadinessHistory points={history.data?.points || []} />}
           </div>
@@ -279,7 +280,7 @@ function RelayCircuit({ partners, onSelect }) {
           return (
             <button className={`relay-network__partner is-${className}`} type="button" key={partner.id} onClick={() => onSelect(partner.id)}>
               <i aria-hidden="true">{className === 'ready' ? '●' : className === 'excluded' ? '░' : className === 'pending' ? '◷' : '○'}</i>
-              <span><b>{partner.name}</b><small>{partner.excluded ? `EXCLUDED · ${partner.exclusionReason || 'CORRELATED RISK'}` : status}</small></span>
+              <span><b>{partner.name}</b><small>{partner.excluded ? `Excluded · ${exclusionReasonLabel(partner.exclusionReason)}` : backupStatusLabel(status)}</small></span>
               <BackupStatusPill value={status} excludedReason={partner.exclusionReason} />
             </button>
           )
@@ -302,7 +303,7 @@ function PartnerDrawer({ partner, error, onClose, onComplete, onReconfirm, onSet
         <Nameplate>{partner.id}</Nameplate><span>{partner.cluster_id}</span><span>{partner.materials_handled?.join(' · ')}</span>
       </div>
       <BackupStatusPill value={relationship.effective_status} />
-      <h4>Relationship checks</h4>
+      <h4>Checks before this partner is Ready</h4>
       <ul className="partners-checks">
         {CHECKS.map((key) => {
           const check = checks.find((item) => item.key === key)
@@ -320,7 +321,7 @@ function PartnerDrawer({ partner, error, onClose, onComplete, onReconfirm, onSet
       )}
       <div className="partners-drawer__actions">
         <label>Set status<select value={partner.relationship.status} disabled={readOnly || busy} onChange={(event) => onSetStatus(event.target.value)}>
-          {['POTENTIAL_MATCH', 'ASSESSMENT_IN_PROGRESS', 'APPROVAL_PENDING', 'READY', 'UNAVAILABLE_EXPIRED'].map((status) => <option key={status} value={status}>{status.replaceAll('_', ' ')}</option>)}
+          {['POTENTIAL_MATCH', 'ASSESSMENT_IN_PROGRESS', 'APPROVAL_PENDING', 'READY', 'UNAVAILABLE_EXPIRED'].map((option) => <option key={option} value={option}>{backupStatusLabel(option)}</option>)}
         </select></label>
         <Button variant="secondary" disabled={readOnly || busy || !partner.relationship.last_confirmed_at} onClick={onReconfirm}>Reconfirm</Button>
       </div>
@@ -343,9 +344,11 @@ function ConfirmAction({ action, onCancel, onConfirm, loading, readOnly = false 
 
 function ReadinessHistory({ points }) {
   if (!points.length) return <p>No readiness snapshots yet. The score history starts after the first computation.</p>
-  const series = points.map((point, index) => ({
+  const series = points.map((point) => ({
     ...point,
-    name: `${point.window_hours} h · ${index + 1}`,
+    name: new Date(point.computed_at).toLocaleString('en-GB', {
+      timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit',
+    }),
     weighted_score: point.weighted_score,
   }))
   return (

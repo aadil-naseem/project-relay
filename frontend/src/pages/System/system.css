@@ -15,7 +15,7 @@
 .system-contact-glyph--offline circle { stroke: var(--c-pale); }
 .system-offline__message { max-width: 470px; margin: 0; color: var(--c-cream); font-size: 12px; line-height: 1.5; }
 .system-offline__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 9px; margin-top: 5px; }
-.system-offline__snapshot { max-width: 480px; margin: 2px 0 0; color: var(--c-pale); font-size: 10px; line-height: 1.45; }
+.system-offline__snapshot { max-width: 480px; margin: 2px 0 0; color: var(--c-pale); font-size: 11px; line-height: 1.45; }
 
 @media (max-width: 760px) {
   .system-page { min-height: calc(100vh - var(--strip) - 58px); padding: 25px 14px 85px; }

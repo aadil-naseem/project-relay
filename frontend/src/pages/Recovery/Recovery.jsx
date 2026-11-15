@@ -5,18 +5,9 @@ import { apiRequest } from '../../api/client'
 import { BackupStatusPill, CalcLog } from '../../components/domain'
 import { PaperSheet } from '../../components/domain'
 import { Button, Frame, Nameplate, Skeleton, Stamp, Toast } from '../../components/primitives'
+import { hazardName, orderLabel, recoveryStatusLabel, routeStepLabel } from '../../lib/status'
 import { useRelayNavigate } from '../../app/navigation'
 import { useUiStore } from '../../store/ui'
-
-const STEP_LABELS = {
-  REQUEST_SENT: 'Request sent',
-  PARTNER_RESPONSE: 'Partner response',
-  TECHNICAL_AND_CUSTOMER_APPROVALS: 'Technical and customer approvals',
-  PRODUCTION_SCHEDULED: 'Production scheduled',
-  PRODUCTION_STARTED: 'Production started',
-  QUALITY_INSPECTION: 'Quality inspection',
-  DISPATCH_AND_DELIVERY: 'Dispatch and delivery',
-}
 
 const FILTER_LABELS = {
   process: 'Process',
@@ -147,11 +138,11 @@ export default function Recovery() {
 
       <Frame className="recovery-request-summary">
         <div>
-          <span className="f0-kicker">REQUEST · {request.data.status}</span>
-          <h2>{stress.data ? `${stress.data.hazard.replaceAll('_', ' ')} · ${stress.data.params?.scope?.type || 'scenario'}` : 'Manual recovery request'}</h2>
+          <span className="f0-kicker">REQUEST · {recoveryStatusLabel(request.data.status).toUpperCase()}</span>
+          <h2>{stress.data ? `${hazardName(stress.data.hazard)} · ${stress.data.params?.scope?.type || 'scenario'}` : 'Manual recovery request'}</h2>
         </div>
         <div className="recovery-request-summary__facts">
-          <Nameplate>{request.data.order_id}</Nameplate>
+          <Nameplate>{orderLabel(request.data.order_id)}</Nameplate>
           <span>{detail?.part?.name || 'Loading order…'} × {detail?.order?.qty ?? '—'}</span>
           <span>Due {detail?.order?.due_at ? new Date(detail.order.due_at).toLocaleString('en-GB', { timeZone: 'Asia/Kolkata', dateStyle: 'medium' }) : '—'}</span>
           {stress.data?.affected_sites?.length > 0 && <span>Sites · {stress.data.affected_sites.join(', ')}</span>}
@@ -201,7 +192,7 @@ export default function Recovery() {
                 <h3>Responsibilities</h3>
                 <ul>{handover.data.responsibilities.map((item) => <li key={`${item.party}-${item.responsibility}`}><b>{item.party}:</b> {item.responsibility}</li>)}</ul>
                 <h3>Simulated milestones</h3>
-                <ul>{handover.data.milestones.map((item) => <li key={item.step_key}>{item.step_key.replaceAll('_', ' ')} · T+{item.target_offset_hours} h</li>)}</ul>
+                <ul>{handover.data.milestones.map((item) => <li key={item.step_key}>{routeStepLabel(item.step_key)} · T+{item.target_offset_hours} h</li>)}</ul>
                 <p className="recovery-contacts-note">Contact details are not included in the current handover API response.</p>
                 <details className="recovery-pack-text"><summary>Printable pack</summary><pre>{handover.data.text}</pre></details>
                 <p className="recovery-approval-note">{activationNote}</p>
@@ -219,7 +210,7 @@ export default function Recovery() {
                 <ol className="recovery-stepper">
                   {tracking.data.steps.map((step, index) => (
                     <li key={step.step_key} className={`${step.state === 'DONE' ? 'is-done' : ''} ${pendingStep?.step_key === step.step_key ? 'is-current' : ''}`}>
-                      <span>{String(index + 1).padStart(2, '0')}</span><small>{step.step_key.replaceAll('_', ' ')}</small>
+                      <span>{String(index + 1).padStart(2, '0')}</span><small>{routeStepLabel(step.step_key)}</small>
                     </li>
                   ))}
                 </ol>
@@ -229,7 +220,7 @@ export default function Recovery() {
                   loading={advance.isPending}
                   onClick={() => advance.mutate()}
                 >
-                  {snapshotMode ? 'Saved snapshot · read only' : pendingStep ? `Advance · ${STEP_LABELS[pendingStep.step_key]}` : 'Simulated route complete'}
+                  {snapshotMode ? 'Saved snapshot · read only' : pendingStep ? `Advance · ${routeStepLabel(pendingStep.step_key)}` : 'Simulated route complete'}
                 </Button>
               </>
             )}

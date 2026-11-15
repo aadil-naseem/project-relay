@@ -216,7 +216,7 @@ a {
   background: var(--c-deep-80);
   color: var(--c-cream);
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.04em;
 }
 
@@ -240,7 +240,7 @@ a {
 
   .f0-status-meta {
     gap: 10px;
-    font-size: 10px;
+    font-size: 11px;
   }
 
   .f0-title-block {

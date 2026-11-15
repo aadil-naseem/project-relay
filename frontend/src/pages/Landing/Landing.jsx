@@ -6,6 +6,7 @@ import { DataLabelBadge, Money, ReadinessRing, WeatherSourceBadge } from '../../
 import { Button, Nameplate, Stamp } from '../../components/primitives'
 import { useUiStore } from '../../store/ui'
 import { formatMoney } from '../../lib/format'
+import { backupStatusLabel, exclusionReasonLabel } from '../../lib/status'
 import backtest from '../../data/backtest.json'
 import fallbackStory from '../../data/story.fallback.json'
 import { chapterAt, localChapterProgress, STORY_CHAPTERS } from '../../lib/storyProgress'
@@ -496,8 +497,8 @@ function RelayPanel({ partners, loading, compact = false }) {
             <li className={`is-${String(partner.status || 'POTENTIAL_MATCH').toLowerCase()}`} key={`${partner.name}-${partner.status}`}>
               <i aria-hidden="true" />
               <span>{partner.name}</span>
-              <b>{String(partner.status || 'POTENTIAL_MATCH').replaceAll('_', ' ')}</b>
-              {partner.reason && <small>{partner.reason.replaceAll('_', ' ')}</small>}
+              <b>{backupStatusLabel(partner.status)}</b>
+              {partner.reason && <small>Excluded · {exclusionReasonLabel(partner.reason)}</small>}
             </li>
           ))}
         </ul>

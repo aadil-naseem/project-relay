@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useFactoryOrders, useSpof } from '../../api/hooks/useSpof'
 import { CalcLog, Money } from '../../components/domain'
+import { orderLabel } from '../../lib/status'
 import { Button, Frame, Nameplate, Skeleton, Toast } from '../../components/primitives'
 import { useRelayNavigate } from '../../app/navigation'
 import { DependencyDrawing } from './DependencyDrawing'
@@ -131,7 +132,7 @@ export default function WeakPoints() {
               <span className="f0-kicker">{simulatedId ? 'BREAKS' : 'ORDERS AT RISK IF LOST'}</span>
               <div>{(simulatedId ? simulatedOrders : brokenOrders).length
                 ? (simulatedId ? simulatedOrders : brokenOrders).map((order) => (
-                  <Nameplate key={order.id}>{order.id} · {order.customer_alias || 'SAMPLE ORDER'}</Nameplate>
+                  <Nameplate key={order.id}>{orderLabel(order.id)} · {order.customer_alias || 'Sample order'}</Nameplate>
                 ))
                 : <span>No active orders depend on this resource.</span>}</div>
             </div>

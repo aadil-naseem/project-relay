@@ -54,7 +54,7 @@
 .relay-readiness__fill { stroke: var(--c-sky); stroke-linecap: square; transition: stroke-dashoffset var(--t-panel) var(--ease-settle); }
 .relay-readiness__value { position: absolute; inset: 50% auto auto 50%; z-index: 1; width: max-content; color: var(--c-white); font: 700 28px/1 var(--f-display); transform: translate(-50%, -50%); }
 .relay-readiness__value small { font: 12px var(--f-mono); color: var(--c-cream); }
-.relay-readiness__weighted { color: var(--c-pale); font: 10px var(--f-mono); }
+.relay-readiness__weighted { color: var(--c-pale); font: 11px var(--f-mono); }
 
 .relay-alert { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 20px 24px; border-left: 6px solid var(--c-sun); }
 .relay-alert--severe { border-left-color: var(--c-sun); background: repeating-linear-gradient(135deg, var(--c-midnight) 0 9px, var(--c-navy) 9px 11px); }
@@ -101,9 +101,9 @@
 .relay-candidate.is-excluded { background: repeating-linear-gradient(135deg, var(--c-midnight) 0 8px, var(--c-navy) 8px 10px); }
 .relay-route-card { display: grid; gap: 12px; padding: 16px; border: 1px solid var(--hair); }
 .relay-route-card ol { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
-.relay-route-card li { padding: 6px 8px; border: 1px dashed var(--hair); color: var(--c-pale); font: 10px var(--f-mono); }
+.relay-route-card li { padding: 6px 8px; border: 1px dashed var(--hair); color: var(--c-pale); font: 11px var(--f-mono); }
 .relay-route-card li.is-done { border-style: solid; border-color: var(--c-sky); color: var(--c-sky); }
-.relay-route-card small { color: var(--c-pale); font: 10px var(--f-mono); letter-spacing: 0.08em; }
+.relay-route-card small { color: var(--c-pale); font: 11px var(--f-mono); letter-spacing: 0.08em; }
 .relay-redaction-sheet { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .relay-redaction-bars { display: grid; gap: 7px; margin-top: 16px; }
 .relay-redaction-bars i { display: block; width: 70%; height: 12px; background: var(--c-midnight); }
