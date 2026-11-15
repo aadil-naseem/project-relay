@@ -69,7 +69,14 @@ working.
    `vercel.json` already carries the install, build and output settings.
    (`frontend/vercel.json` is kept for the alternative where you set Root
    Directory to `frontend`; use one approach or the other, not both.)
-3. Add one environment variable, for the Production environment:
+3. **The API URL is committed** in `frontend/.env.production`, which Vite loads
+   for production builds only. Nothing has to be configured in the dashboard,
+   and `npm run dev` still points at `localhost:8000`.
+
+   The optional dashboard variable below **overrides** that file if you ever
+   need a different backend. Note that a host environment variable set to an
+   empty string also overrides it — if the deployed site calls `localhost`, check
+   for a blank `VITE_API_URL` and delete it.
 
    | Key | Value |
    |---|---|
