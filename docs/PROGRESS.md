@@ -19,10 +19,10 @@ Phase tracker. Updated at the end of every phase (R11).
 - [x] Phase 12 M2 Passport + RFQ
 - [x] Phase 13 Orchestration
 - [x] Phase 14 BACKEND TEST GATE (required suites and C: audit passed; `backend-v1` tagged)
-- [ ] Phase 15 Frontend setup
-- [ ] Phase 16 Frontend screens
+- [x] Phase 15 Frontend setup (delivered as F0–F2)
+- [x] Phase 16 Frontend screens (delivered as F3–F9; F10 backdrop is an optional stretch)
 - [x] Phase 17 Integration test (replay UI/API path and failure fallback verified)
-- [ ] Phase 18 Freeze & submission
+- [x] Phase 18 Freeze & submission (checks passed on the demo machine; `v1.0` tagged)
 
 ## Frontend planner subphases
 
@@ -39,10 +39,10 @@ Phase 14 was initially deferred by user choice. The user later authorized it; su
 - [x] F5 Partners & Readiness
 - [x] F6 Passports & RFQ
 - [x] F7 Stage Controls, Presenter, Proof, System (snapshot fallback captured and wired)
-- [ ] F8 Landing hero (visual review done; 50+ fps measurement deferred to F11)
+- [x] F8 Landing hero (visual review approved; full-tier performance confirmed smooth)
 - [x] F9 Landing scroll story (visual review approved; smoother scroll verified)
-- [ ] F10 Persistent world backdrop (stretch)
-- [ ] F11 Integration, performance, rehearsal, freeze
+- [ ] F10 Persistent world backdrop (optional stretch, deliberately cut)
+- [x] F11 Integration, performance, rehearsal, freeze (machine checks passed; `v1.0` tagged)
 
 ## Required-first completion plan (user direction 2026-11-15)
 
@@ -389,3 +389,9 @@ Recorded here so the blueprint stays pristine and both files remain readable to 
 - Frontend tests 16/16 (added a test that reason codes are explained in plain language), lint, palette lint and the production build pass. Lighthouse: Landing and Desk both 100 (accessibility, best practices, SEO). All eight screens browser-checked with zero console errors.
 - **Note:** the dev server had to be restarted once — it was serving a stale `Landing.jsx` transform, which briefly showed an "Unexpected Application Error" and a false Lighthouse `landmark-one-main` failure. The source was valid; a clean rebuild and fresh dev server cleared it. Verified against the production build.
 - **Still not renamed:** seeded demo entity names still read "Sample …" (e.g. "Sample Engineering (Hosur)"), and internal ids such as `fac_owner` / `ven_heat` still appear on engineering nameplates. Renaming those touches the backend seed, the snapshot pack and the data tests, so it is held for an explicit decision.
+
+### Phase 18 — Freeze and submission - DONE (`v1.0` tagged)
+- All F11 checks are complete. The four machine-dependent checks were run by the user on the demo machine: full-tier performance is smooth (50+ fps), the keyboard-only pass works, nothing clips at 1920×1080 or 1366×768, and presenter mode runs cleanly. The human-paced rehearsal is under the 4-minute budget.
+- Freeze screenshots are committed to `docs/screens/final/` (Desk, What-if, Weak Points) and document the readability/copy pass. The remaining screens were not captured because automated screenshots are unavailable in this environment.
+- Final state: frontend tests 16/16, lint, palette lint and the production build pass; backend `pytest` and `ruff` pass; Lighthouse 100 (accessibility, best practices, SEO) on Landing and Desk; no console errors across the eight screens.
+- Optional work deliberately not done: F10 persistent world backdrop (cut as a stretch) and the external live-provider smoke (suite L). Neither is required by the brief; the demo runs fully offline on replay.
