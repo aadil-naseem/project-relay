@@ -16,11 +16,13 @@ from datetime import timedelta
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.exc import StaleDataError
 
 from app.adapters import weather
 from app.config_loader import load_configs
 from app.core import exposure_score
 from app.core.clock import now
+from app.core.locks import DEMO_WRITE_LOCK
 from app.core.trace import TraceBuilder
 from app.enums import RiskLevel
 from app.errors import AppError
@@ -363,22 +365,33 @@ def compute_exposure(session: Session, factory_id: str, mode: str | None = None)
         },
         alert=alert.active,
     )
-    existing = session.get(ExposureSnapshot, snapshot.id)
-    if existing is None:
-        session.add(snapshot)
-        try:
-            session.commit()
-        except IntegrityError:
-            # Concurrent dashboard requests can compute the same deterministic
-            # snapshot. Keep the winner and continue with the same calculation.
-            session.rollback()
-            if session.get(ExposureSnapshot, snapshot.id) is None:
-                raise
-    else:
-        existing.result = snapshot.result
-        existing.alert = snapshot.alert
-        existing.computed_at = computed_at
-        session.commit()
+    # End any earlier read transaction so this check-then-write sees the latest
+    # committed world (a concurrent demo reset may have just replaced the rows).
+    session.rollback()
+    with DEMO_WRITE_LOCK:
+        existing = session.get(ExposureSnapshot, snapshot.id)
+        if existing is None:
+            session.add(snapshot)
+            try:
+                session.commit()
+            except IntegrityError:
+                # Concurrent dashboard requests can compute the same deterministic
+                # snapshot. Keep the winner and continue with the same calculation.
+                session.rollback()
+                if session.get(ExposureSnapshot, snapshot.id) is None:
+                    raise
+        else:
+            try:
+                existing.result = snapshot.result
+                existing.alert = snapshot.alert
+                existing.computed_at = computed_at
+                session.commit()
+            except StaleDataError:
+                # The row was replaced by a demo reset between the read and the
+                # write. Re-read and store the freshly computed snapshot.
+                session.rollback()
+                session.merge(snapshot)
+                session.commit()
 
     return ExposureResult(
         factory_id=factory_id,

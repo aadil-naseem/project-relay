@@ -27,6 +27,14 @@
 
 **Known non-blocking notes:** Vite/Starlette dependency warnings are documented in their respective phases. External provider availability is not certified by this offline gate.
 
+## Follow-up fix — demo reset under concurrent reads (2026-11-15)
+
+Found during the Phase 17 browser rehearsal: a background refetch landing inside a `POST /demo/reset` returned HTTP 500. Because an unhandled 500 is produced outside the CORS middleware, the browser reported it as a CORS failure.
+
+- **Cause:** `reset_demo()` dropped and recreated the schema, and `compute_exposure()` wrote the deterministic snapshot row without serialization. Concurrent reads saw a missing table (`no such table`), and concurrent exposure calls either hit `UNIQUE constraint failed: exposure_snapshots.id` or `StaleDataError` on the follow-up `UPDATE`.
+- **Fix:** `reset_demo()` now wipes rows instead of dropping tables (DDL is not atomic on pysqlite, so a schema window always existed) and reseeds in one transaction. A shared `app/core/locks.py:DEMO_WRITE_LOCK` serializes the reset and the exposure snapshot write; the exposure write also rolls back any earlier read transaction and retries as an insert if its row was replaced.
+- **Verification:** the full `pytest` suite passes (ruff clean). A concurrency probe (20 rounds; each round = 1 reset racing 4 exposure reads) returned **80/80 HTTP 200**. A wider probe (20 rounds; reset racing dashboard, exposure, readiness, SPOF, exposure/map and health) returned **140/140 HTTP 200** with zero failures. A browser rehearsal of all eight presenter steps completed with **zero console errors**.
+
 ## Prior M2 live accuracy check (Gemini, optional `live` marker)
 
 Run: 2026-11-14 13:41 UTC - model `gemini-3.5-flash-lite`, one call per sample PNG, JSON-output mode, temperature 0.

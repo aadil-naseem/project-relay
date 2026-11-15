@@ -23,6 +23,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.clock import now
+from app.core.locks import DEMO_WRITE_LOCK
 from app.db import Base, engine
 from app.enums import (
     BackupStatus,
@@ -344,30 +345,40 @@ def seed(session: Session) -> dict[str, int]:
 
 
 def reset_demo() -> dict[str, int]:
-    """Drop and recreate the schema, seed, write the initial readiness snapshot,
-    and load the committed prefetch cache (zones, terrain, routes).
+    """Rebuild the demo world atomically: wipe every row, reseed, reload cache.
 
-    Used by `scripts/reset_demo.py` and later by `POST /demo/reset` (Phase 13).
+    The rebuild deletes rows instead of dropping tables. Dropping and recreating
+    the schema is not atomic on pysqlite (the driver commits around DDL), which
+    left a window where a concurrent request saw "no such table" and returned a
+    500 without CORS headers. Row deletes and inserts run in one transaction, so
+    readers in WAL mode keep serving the previous committed world until this
+    commits. `DEMO_WRITE_LOCK` serializes the rebuild against other demo writes
+    and stops two resets overlapping.
+
+    Used by `scripts/reset_demo.py` and by `POST /demo/reset`.
     """
-    logger.info("resetting demo world (drop + create + seed + exposure cache)")
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-    with Session(engine) as session:
-        counts = _seed(session)
-        exposure = load_exposure_cache(session)
-        counts.update(exposure)
-        session.add(
-            ReadinessSnapshot(
-                id=INITIAL_SNAPSHOT_ID,
-                factory_id="fac_owner",
-                window_hours=48,
-                score=0.0,
-                weighted_score=0.0,
-                breakdown={},
-                reason="INITIAL (not yet computed)",
+    logger.info("resetting demo world (wipe rows + reseed + exposure cache)")
+    with DEMO_WRITE_LOCK:
+        Base.metadata.create_all(bind=engine)  # no-op when the schema exists
+        with Session(engine) as session:
+            connection = session.connection()
+            for table in reversed(Base.metadata.sorted_tables):
+                connection.execute(table.delete())
+            counts = _seed(session)
+            exposure = load_exposure_cache(session)
+            counts.update(exposure)
+            session.add(
+                ReadinessSnapshot(
+                    id=INITIAL_SNAPSHOT_ID,
+                    factory_id="fac_owner",
+                    window_hours=48,
+                    score=0.0,
+                    weighted_score=0.0,
+                    breakdown={},
+                    reason="INITIAL (not yet computed)",
+                )
             )
-        )
-        session.commit()
+            session.commit()
     return counts
 
 
