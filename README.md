@@ -19,22 +19,43 @@ docs/       frozen brief, technical blueprint, progress, verified facts
 ## Run (Windows, from the project root)
 
 ```powershell
-# backend
+# backend - seed the sample world first, then serve
 cd backend
-.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
 .\.venv\Scripts\python.exe scripts\reset_demo.py
-.\.venv\Scripts\python.exe -m pytest -q
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
 
-# frontend
+# frontend (second terminal)
 cd ..\frontend
 npm run dev
 ```
 
 API docs: `http://localhost:8000/docs`. UI: `http://localhost:5173`.
 
+```powershell
+# tests
+cd backend;  .\.venv\Scripts\python.exe -m pytest -q
+cd ..\frontend; npm test
+```
+
 ## Demo mode
 
 Default weather mode is `replay`: real Cyclone Michaung rainfall (Dec 2023) time-shifted to now, so the demo does not depend on live forecast availability. Switch with `POST /api/v1/demo/mode`.
+
+If the backend is unreachable, **Open saved snapshot** loads a committed
+read-only replay pack (`frontend/src/data/snapshot.json`), so the screens can
+still be shown with the server stopped. Regenerate the pack with
+`backend/scripts/capture_frontend_snapshot.py`.
+
+## Deploy
+
+Frontend on Vercel, backend on Render or Railway (FastAPI + SQLite needs a
+writable disk). Step-by-step: [`docs/DEPLOY.md`](docs/DEPLOY.md).
+
+## Release
+
+`v1.0` is the demo freeze (frontend + backend). `backend-v1` marks the backend
+test gate. See [`docs/PROGRESS.md`](docs/PROGRESS.md) for phase status and
+[`docs/TEST_REPORT.md`](docs/TEST_REPORT.md) for the test evidence.
 
 ## Limitations (stated honestly)
 
