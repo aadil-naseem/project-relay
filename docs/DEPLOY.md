@@ -58,9 +58,17 @@ Never commit `.env`; it is already git-ignored.
 
 ## 2. Frontend on Vercel
 
-1. Vercel → **Add New → Project** → import this repository.
-2. Set **Root Directory** to `frontend`. Vercel picks up `frontend/vercel.json`
-   (Vite build, SPA rewrites so `/app/...` deep links work).
+Import the repository at its **root** — do not change the Root Directory.
+Vercel reads the root `vercel.json`, which installs and builds `frontend/` and
+publishes `frontend/dist`, plus the SPA rewrites that keep `/app/...` deep links
+working.
+
+1. Vercel → **Add New → Project** → import this repository (root directory left
+   as the default `./`).
+2. If Vercel offers a framework preset, leave it as **Other**; the root
+   `vercel.json` already carries the install, build and output settings.
+   (`frontend/vercel.json` is kept for the alternative where you set Root
+   Directory to `frontend`; use one approach or the other, not both.)
 3. Add one environment variable, for the Production environment:
 
    | Key | Value |
