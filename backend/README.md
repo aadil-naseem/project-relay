@@ -2,6 +2,17 @@
 
 FastAPI service for the fictional Sample Precision Components demo. The application defaults to SQLite at `backend/data/fcd.sqlite`, uses the committed replay data, and can run without external API keys.
 
+## Install
+
+From the repository root, create the virtual environment and install the backend dependencies. The root
+[`requirements.txt`](../requirements.txt) lists every library (runtime, test and lint) with the versions this
+release was tested on; `backend/requirements.txt` is the runtime-only subset the hosted deploy installs.
+
+```powershell
+py -3.12 -m venv backend\.venv
+backend\.venv\Scripts\python.exe -m pip install -r requirements.txt
+```
+
 ## Run locally
 
 From the repository root:

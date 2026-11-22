@@ -1,0 +1,118 @@
+# =============================================================================
+# RELAY - Factory Continuity Desk
+# Complete dependency list for a fresh clone.
+# =============================================================================
+#
+# There are TWO toolchains in this repo:
+#
+#   1. Python  -> the FastAPI backend   (this file)
+#   2. Node.js -> the React + Vite SPA  (frontend/package.json)
+#
+# -----------------------------------------------------------------------------
+# 1. Backend setup (Python 3.12)
+# -----------------------------------------------------------------------------
+#
+# Windows PowerShell, from the repo root:
+#
+#   py -3.12 -m venv backend\.venv
+#   backend\.venv\Scripts\python.exe -m pip install --upgrade pip
+#   backend\.venv\Scripts\python.exe -m pip install -r requirements.txt
+#   backend\.venv\Scripts\python.exe backend\scripts\reset_demo.py
+#
+# macOS / Linux, from the repo root:
+#
+#   python3.12 -m venv backend/.venv
+#   backend/.venv/bin/python -m pip install --upgrade pip
+#   backend/.venv/bin/python -m pip install -r requirements.txt
+#   backend/.venv/bin/python backend/scripts/reset_demo.py
+#
+# Then run the API (from backend/):
+#
+#   .venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
+#
+# No API key is required. Weather runs on replay data and drawings are answered
+# from a committed golden cache, so the demo works fully offline.
+#
+# -----------------------------------------------------------------------------
+# 2. Frontend setup (Node.js 20+; tested on Node 24)
+# -----------------------------------------------------------------------------
+#
+#   cd frontend
+#   npm ci            # exact versions from package-lock.json (npm install also works)
+#   npm run dev
+#
+# Frontend runtime libraries (versions live in frontend/package.json):
+#   react, react-dom, react-router-dom, @tanstack/react-query, zustand,
+#   vite, @vitejs/plugin-react, three, @react-three/fiber, @react-three/drei,
+#   gsap, lenis, recharts, leaflet, react-leaflet,
+#   @fontsource/{ibm-plex-sans,ibm-plex-mono,big-shoulders-display,instrument-serif}
+# Frontend dev tools: oxlint, @types/react, @types/react-dom
+#
+# -----------------------------------------------------------------------------
+# Notes on scope
+# -----------------------------------------------------------------------------
+#
+# * Versions below are pinned to the ones this release (v1.0) was tested with,
+#   so a clone reproduces the same environment. They are also listed unpinned in
+#   backend/requirements*.txt, which is what the hosted deploy installs.
+# * The hosted backend build installs backend/requirements.txt (runtime only).
+#   This root file adds the test and lint tools on top.
+# * backend/requirements-data.txt and backend/requirements-optional.txt are
+#   NOT needed to run the app - see the optional section at the bottom.
+#
+# =============================================================================
+
+
+# --- Web framework and server ------------------------------------------------
+fastapi==0.162.7
+uvicorn[standard]==0.54.0
+python-multipart==0.0.33          # multipart drawing uploads
+
+
+# --- Data models, settings and persistence -----------------------------------
+pydantic==2.14.3
+pydantic-settings==2.16.3
+SQLAlchemy==2.1.8
+python-dotenv==1.2.4
+
+
+# --- HTTP client and retries (weather + vision adapters) ---------------------
+httpx==0.28.1
+tenacity==9.2.1
+
+
+# --- Deterministic core: exposure, SPOF graph, matching, readiness -----------
+networkx==3.7                      # dependency / SPOF graph traversal
+numpy==2.5.4
+shapely==2.2.0                     # site geometry and hazard-zone tests
+
+
+# --- Documents and drawings --------------------------------------------------
+pymupdf==2.1                       # read PDF engineering drawings
+pillow==13.0.0                     # image handling for drawing extraction
+Jinja2==3.1.6                      # handover-pack and report rendering
+PyYAML==6.0.3                      # config and sample-world fixtures
+
+
+# --- Test, coverage and lint tools -------------------------------------------
+pytest==9.2.0
+pytest-cov==7.1.0
+respx==0.23.1                      # mock httpx calls in adapter tests
+hypothesis==6.170.15               # property tests for the deterministic core
+ruff==0.17.5                       # lint + import order (config in backend/pyproject.toml)
+
+
+# --- Optional: data prefetch / sample-drawing generation ---------------------
+# Only for maintainers regenerating the committed sample world and drawings.
+# Not imported by the running app, so they are commented out by default.
+# Install with:  pip install -r requirements.txt osmnx==2.1.1 reportlab==5.1.0
+#
+# osmnx==2.1.1
+# reportlab==5.1.0
+
+
+# --- Optional: OCR fallback for image-only drawings --------------------------
+# backend/requirements-optional.txt. Leave this out unless a drawing has no text
+# layer and time allows; the manual passport entry path works without it.
+#
+# rapidocr-onnxruntime

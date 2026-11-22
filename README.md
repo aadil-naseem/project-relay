@@ -82,6 +82,10 @@ React + Vite SPA  ──HTTP/JSON──▶  FastAPI  ──▶  deterministic co
 ## Quickstart (Windows, from the repo root)
 
 ```powershell
+# 0. one-time: create the Python env and install every backend library
+py -3.12 -m venv backend\.venv
+backend\.venv\Scripts\python.exe -m pip install -r requirements.txt
+
 # 1. backend - seed the sample world, then serve
 cd backend
 .\.venv\Scripts\python.exe scripts\reset_demo.py
@@ -89,9 +93,13 @@ cd backend
 
 # 2. frontend (second terminal)
 cd ..\frontend
-npm install
+npm ci
 npm run dev
 ```
+
+Every Python dependency (runtime, test and lint, with the versions this release was tested
+on) is listed in [`requirements.txt`](requirements.txt) at the repo root, along with the
+`venv` steps for Windows, macOS and Linux and the frontend's Node toolchain.
 
 - UI: <http://localhost:5173> · API docs: <http://localhost:8000/docs>
 - Landing static fallback (no 3D): <http://localhost:5173/?tier=static>
@@ -126,11 +134,12 @@ Step-by-step, including the free-tier caveats: [`docs/DEPLOY.md`](docs/DEPLOY.md
 ## Repository layout
 
 ```
-backend/     FastAPI app, deterministic core, adapters, config, seeded sample world, tests
-frontend/    React + Vite SPA: landing story, 8 screens, component library, offline snapshot
-docs/        project brief, technical blueprint, frontend planner, progress, test report, deploy guide
-render.yaml  Render blueprint for the backend
-vercel.json  Vercel build config for the frontend
+backend/         FastAPI app, deterministic core, adapters, config, seeded sample world, tests
+frontend/        React + Vite SPA: landing story, 8 screens, component library, offline snapshot
+docs/            project brief, technical blueprint, frontend planner, progress, test report, deploy guide
+requirements.txt full Python dependency set for a fresh clone (runtime + tests) and setup steps
+render.yaml      Render blueprint for the backend
+vercel.json      Vercel build config for the frontend
 ```
 
 ## Documentation
